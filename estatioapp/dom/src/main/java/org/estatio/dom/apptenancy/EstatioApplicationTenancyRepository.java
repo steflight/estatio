@@ -1,5 +1,6 @@
 package org.estatio.dom.apptenancy;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -16,6 +17,8 @@ import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancyRepository;
 import org.isisaddons.module.security.dom.user.ApplicationUser;
 
+import org.incode.module.alias.dom.api.aliasable.Aliasable;
+
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.geography.Country;
 import org.estatio.dom.lease.Lease;
@@ -26,7 +29,7 @@ import org.estatio.dom.valuetypes.ApplicationTenancyLevel;
 @DomainService(
         nature = NatureOfService.DOMAIN
 )
-public class EstatioApplicationTenancyRepository {
+public class EstatioApplicationTenancyRepository implements org.incode.module.alias.dom.spi.aliastype.ApplicationTenancyRepository{
 
     public List<ApplicationTenancy> allTenancies() {
         return applicationTenancies.allTenancies();
@@ -157,6 +160,15 @@ public class EstatioApplicationTenancyRepository {
     public List<ApplicationTenancy> localTenanciesFor(final Property property) {
         return Lists.newArrayList(Iterables.filter(
                 allTenancies(), Predicates.isLocalOf(property)));
+    }
+
+    @Override
+    public List<String> atPathsFor(final Aliasable aliasable) {
+        List<String> result = new ArrayList<>();
+        for (ApplicationTenancy at : allTenancies()){
+            result.add(at.getPath());
+        }
+        return result;
     }
 
     // //////////////////////////////////////

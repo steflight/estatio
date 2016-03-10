@@ -33,6 +33,8 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.alias.dom.api.aliasable.Aliasable;
+
 import org.estatio.dom.EstatioDomainObject;
 import org.estatio.dom.IsisMultilineLines;
 import org.estatio.dom.JdoColumnLength;
@@ -69,7 +71,7 @@ import lombok.Setter;
 @DomainObject(bounded = true)
 public class Charge
         extends EstatioDomainObject<Charge>
-        implements WithReferenceUnique, WithNameUnique, WithApplicationTenancyProperty, WithApplicationTenancyPathPersisted {
+        implements WithReferenceUnique, WithNameUnique, WithApplicationTenancyProperty, WithApplicationTenancyPathPersisted, Aliasable {
 
     public Charge() {
         super("reference");

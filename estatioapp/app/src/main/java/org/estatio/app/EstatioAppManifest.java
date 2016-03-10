@@ -63,7 +63,8 @@ public class EstatioAppManifest implements AppManifest {
                         org.isisaddons.module.sessionlogger.SessionLoggerModule.class,
                         // don't include the settings module, instead we use EstatioDomainSettingsModule
                         // org.isisaddons.module.settings.SettingsModule.class,
-                        org.isisaddons.module.stringinterpolator.StringInterpolatorModule.class
+                        org.isisaddons.module.stringinterpolator.StringInterpolatorModule.class,
+                        org.incode.module.alias.dom.AliasModule.class
                 )
         );
         return modules;

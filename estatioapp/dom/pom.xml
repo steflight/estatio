@@ -110,6 +110,11 @@ language governing permissions and limitations under the License.
             <artifactId>isis-module-settings-dom</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.incode.module.alias</groupId>
+            <artifactId>incode-module-alias-dom</artifactId>
+        </dependency>
+
         <!-- testing -->
         <dependency>
             <groupId>org.apache.isis.core</groupId>

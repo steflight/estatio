@@ -41,6 +41,8 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.alias.dom.api.aliasable.Aliasable;
+
 import org.estatio.dom.EstatioDomainObject;
 import org.estatio.dom.JdoColumnLength;
 import org.estatio.dom.RegexValidation;
@@ -76,7 +78,7 @@ import lombok.Setter;
 public class Tax
         extends EstatioDomainObject<Tax>
         implements WithReferenceComparable<Tax>, WithNameGetter, WithReferenceUnique,
-                   WithApplicationTenancyCountry, WithApplicationTenancyPathPersisted {
+                   WithApplicationTenancyCountry, WithApplicationTenancyPathPersisted, Aliasable {
 
     public Tax() {
         super("reference");

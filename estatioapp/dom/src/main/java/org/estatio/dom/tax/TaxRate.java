@@ -40,6 +40,8 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.alias.dom.api.aliasable.Aliasable;
+
 import org.estatio.dom.Chained;
 import org.estatio.dom.EstatioDomainObject;
 import org.estatio.dom.JdoColumnLength;
@@ -70,7 +72,7 @@ import lombok.Setter;
 @DomainObject(editing = Editing.DISABLED)
 public class TaxRate
         extends EstatioDomainObject<TaxRate>
-        implements Chained<TaxRate>, WithIntervalMutable<TaxRate>, WithApplicationTenancyCountry {
+        implements Chained<TaxRate>, WithIntervalMutable<TaxRate>, WithApplicationTenancyCountry, Aliasable {
 
     public TaxRate() {
         super("tax, startDate desc nullsLast");
