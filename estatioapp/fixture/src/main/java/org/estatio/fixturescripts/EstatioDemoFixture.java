@@ -26,6 +26,7 @@ import org.estatio.fixture.asset.PropertyForCARTEST;
 import org.estatio.fixture.asset.PropertyForGraIt;
 import org.estatio.fixture.asset.PropertyForHanSe;
 import org.estatio.fixture.asset.PropertyForVivFr;
+import org.estatio.fixture.budget.BudgetItemAllocationsForBud;
 import org.estatio.fixture.budget.BudgetItemAllocationsForOxf;
 import org.estatio.fixture.budget.BudgetsForOxf;
 import org.estatio.fixture.budget.KeyTablesForOxf;
@@ -103,6 +104,8 @@ public class EstatioDemoFixture extends DiscoverableFixtureScript {
         executionContext.executeChild(this, new BudgetItemAllocationsForOxf());
         executionContext.executeChild(this, new PropertyForCARTEST());
         executionContext.executeChild(this, new NumeratorForOrganisationFra());
+
+        executionContext.executeChild(this, new BudgetItemAllocationsForBud());
 
         final FixtureClock fixtureClock = (FixtureClock) FixtureClock.getInstance();
         fixtureClock.reset();
