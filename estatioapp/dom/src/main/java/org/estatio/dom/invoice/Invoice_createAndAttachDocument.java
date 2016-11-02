@@ -17,18 +17,16 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.estatio.dom.asset.paperclips;
+package org.estatio.dom.invoice;
 
 import org.apache.isis.applib.annotation.Mixin;
 
 import org.incode.module.document.dom.mixins.T_createAndAttachDocumentAndRender;
 
-import org.estatio.dom.asset.Property;
-
 @Mixin
-public class Property_createDocument extends T_createAndAttachDocumentAndRender<Property> {
+public class Invoice_createAndAttachDocument extends T_createAndAttachDocumentAndRender<Invoice> {
 
-    public Property_createDocument(final Property domainObject) {
+    public Invoice_createAndAttachDocument(final Invoice domainObject) {
         super(domainObject);
     }
 }

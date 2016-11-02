@@ -31,8 +31,6 @@ import org.joda.time.LocalDate;
 import org.apache.isis.applib.services.clock.ClockService;
 import org.apache.isis.applib.value.Clob;
 
-import org.isisaddons.module.security.dom.tenancy.ApplicationTenancyRepository;
-
 import org.incode.module.document.dom.impl.applicability.Binder;
 import org.incode.module.document.dom.impl.docs.Document;
 import org.incode.module.document.dom.impl.docs.DocumentTemplate;
@@ -178,7 +176,8 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 ApplicationTenancyForIt.PATH, " (Italy)",
                 contentText, fmkRenderingStrategy,
                 NAME_TEXT_INVOICE_ITA, fmkRenderingStrategy,
-                Document.class, BinderForDocumentAttachedToPrelimLetterOrInvoice.class, executionContext
+                Document.class, BinderForDocumentAttachedToPrelimLetterOrInvoice.class, 
+				executionContext
         );
 
 
@@ -189,7 +188,7 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 docTypeForInvoice,
                 ApplicationTenancyForGlobal.PATH, null,
                 false,
-                url
+                "Invoice for ${this.number}", url
                 + "Invoice"
                 + "&id=${this.id}"
                 + "&rs:Command=Render&rs:Format=PDF", sipcRenderingStrategy,
@@ -203,7 +202,7 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 docTypeForInvoice,
                 ApplicationTenancyForIt.PATH, "( Italy)",
                 false,
-                url
+                "Invoice for ${this.number}", url
                 + "Invoice"
                 + "&id=${this.id}"
                 + "&rs:Command=Render&rs:Format=PDF",
@@ -225,7 +224,7 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 upsertType(DOC_TYPE_REF_INVOICES_OVERVIEW, "Invoices overview", executionContext),
                 ApplicationTenancyForGlobal.PATH, null,
                 true,
-                URL
+                "Invoices overview", URL
                 + "Invoices"
                 + "&dueDate=${this.dueDate}&${this.seller.id}&atPath=${this.atPath}"
                 + "&rs:Command=Render&rs:Format=PDF",
@@ -240,7 +239,7 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 upsertType(DOC_TYPE_REF_INVOICES_PRELIM, "Preliminary letter for Invoices", executionContext),
                 ApplicationTenancyForGlobal.PATH, null,
                 true,
-                URL
+                "Preliminary letter for Invoices", URL
                 + "Preliminary+Letter"
                 + "&dueDate=${this.dueDate}&sellerId=${this.seller.id}&atPath=${this.atPath}"
                 + "&rs:Command=Render&rs:Format=PDF",
@@ -256,7 +255,7 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 upsertType(DOC_TYPE_REF_INVOICES_PRELIM_FOR_SELLER, "Preliminary Invoice for Seller", executionContext),
                 ApplicationTenancyForGlobal.PATH, null,
                 true,
-                URL
+                "Preliminary Invoice for Seller", URL
                 + "Preliminary+Letter"
                 + "&dueDate=${this.dueDate}&sellerId=${this.seller.id}&atPath=${this.atPath}"
                 + "&rs:Command=Render&rs:Format=PDF",
@@ -281,9 +280,10 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
             final ExecutionContext executionContext) {
 
         final DocumentTemplate template =
-                upsertTemplateForPdf(documentType, atPath, nameSuffixIfAny, previewOnly, contentText,
-                        contentRenderingStrategy, nameText,
-                        nameRenderingStrategy, executionContext);
+                upsertTemplateForPdf(documentType, atPath, nameSuffixIfAny, previewOnly, 
+				        contentText, contentRenderingStrategy, 
+						nameText, nameRenderingStrategy, 
+						executionContext);
         template.applicable(applicableToClass, binderClass);
 
         return template;
@@ -370,11 +370,9 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
 
 
     @Inject
-    private ApplicationTenancyRepository applicationTenancyRepository;
+    RenderingStrategyRepository renderingStrategyRepository;
     @Inject
-    private RenderingStrategyRepository renderingStrategyRepository;
-    @Inject
-    private ClockService clockService;
+    ClockService clockService;
 
 
 }

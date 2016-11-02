@@ -19,12 +19,8 @@
 package org.estatio.dom.invoice.viewmodel.dnc;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-
-import com.google.common.collect.Lists;
 
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
@@ -34,28 +30,19 @@ import org.incode.module.document.dom.impl.docs.Document;
 import org.incode.module.document.dom.impl.docs.DocumentTemplate;
 
 import org.estatio.dom.invoice.Invoice;
-import org.estatio.dom.invoice.Invoice_createDocumentAndScheduleRender;
+import org.estatio.dom.invoice.Invoice_createAndAttachDocumentAndScheduleRender;
 
 @DomainService(nature = NatureOfService.DOMAIN)
 public class InvoiceDocumentTemplateService {
 
-    List<DocumentTemplate> templatesFor(final Invoice invoice) {
-        return Lists.newArrayList(
-                createDocumentMixin(invoice)
-                        .choices0$$()
-                        .stream()
-                        .filter(x -> !x.isPreviewOnly())
-                        .collect(Collectors.toList()));
-    }
-
     Document createAttachAndScheduleRender(final Invoice invoice, final DocumentTemplate documentTemplate1) throws
             IOException {
-        final Invoice_createDocumentAndScheduleRender mixin = createDocumentMixin(invoice);
+        final Invoice_createAndAttachDocumentAndScheduleRender mixin = createMixin(invoice);
         return (Document) mixin.$$(documentTemplate1);
     }
 
-    private Invoice_createDocumentAndScheduleRender createDocumentMixin(final Invoice anyInvoice) {
-        return factoryService.mixin(Invoice_createDocumentAndScheduleRender.class, anyInvoice);
+    private Invoice_createAndAttachDocumentAndScheduleRender createMixin(final Invoice anyInvoice) {
+        return factoryService.mixin(Invoice_createAndAttachDocumentAndScheduleRender.class, anyInvoice);
     }
 
 

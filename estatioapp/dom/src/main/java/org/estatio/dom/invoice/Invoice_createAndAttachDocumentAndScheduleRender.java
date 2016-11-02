@@ -30,9 +30,10 @@ import org.incode.module.document.dom.impl.docs.DocumentTemplate;
 import org.incode.module.document.dom.mixins.T_createAndAttachDocumentAndScheduleRender;
 
 @Mixin
-public class Invoice_createDocumentAndScheduleRender extends T_createAndAttachDocumentAndScheduleRender<Invoice> {
+public class Invoice_createAndAttachDocumentAndScheduleRender
+        extends T_createAndAttachDocumentAndScheduleRender<Invoice> {
 
-    public Invoice_createDocumentAndScheduleRender(final Invoice domainObject) {
+    public Invoice_createAndAttachDocumentAndScheduleRender(final Invoice domainObject) {
         super(domainObject);
     }
 

@@ -98,7 +98,8 @@ public class Document_email  {
 
         // create and attach cover note
         final DocumentTemplate coverNoteTemplate = determineEmailCoverNoteTemplate();
-        final Document coverNoteDoc = coverNoteTemplate.createDocumentUsingBinding(this.document, message);
+        final Document coverNoteDoc = coverNoteTemplate.createDocumentUsingBinding(this.document, message
+        );
 
         coverNoteDoc.render(coverNoteTemplate, this.document, message);
 
