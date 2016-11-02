@@ -126,6 +126,8 @@ public class Document_email  {
         if (document.getState() != DocumentState.RENDERED) {
             return "Document not yet rendered";
         }
+
+
         if(determineEmailCoverNoteTemplate() == null) {
             return "Email cover note type/template not provided";
         }

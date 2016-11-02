@@ -24,6 +24,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.ActionLayout;
@@ -70,7 +71,17 @@ public abstract class InvoiceSummaryForPropertyDueDateStatus_sendByEmailAbstract
 
     @Override
     List<Document> documentsToSend() {
-        return documentsToSend(canBeSentByEmail());
+        return documentsToSend(Predicates.and(
+                        document -> !exclude(document),
+                        canBeSentByEmail()
+                ));
+    }
+
+    /**
+     * Optional hook to allow subclasses to further restrict the documents that can be sent.
+     */
+    protected boolean exclude(final Document document) {
+        return false;
     }
 
     private Predicate<Document> canBeSentByEmail() {

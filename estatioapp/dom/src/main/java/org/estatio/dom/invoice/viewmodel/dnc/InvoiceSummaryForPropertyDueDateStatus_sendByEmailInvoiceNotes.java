@@ -18,7 +18,11 @@
  */
 package org.estatio.dom.invoice.viewmodel.dnc;
 
+import javax.inject.Inject;
+
 import org.apache.isis.applib.annotation.Mixin;
+
+import org.incode.module.document.dom.impl.docs.Document;
 
 import org.estatio.dom.invoice.Constants;
 import org.estatio.dom.invoice.viewmodel.InvoiceSummaryForPropertyDueDateStatus;
@@ -31,4 +35,11 @@ public class InvoiceSummaryForPropertyDueDateStatus_sendByEmailInvoiceNotes exte
         super(invoiceSummary, Constants.DOC_TYPE_REF_INVOICE);
     }
 
+    @Override
+    protected boolean exclude(final Document document) {
+        return invoiceEmailPolicyService.disableSendInvoiceNote(document) != null;
+    }
+
+    @Inject
+    InvoiceEmailPolicyService invoiceEmailPolicyService;
 }
