@@ -31,7 +31,6 @@ import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.services.email.EmailService;
 import org.apache.isis.core.commons.config.IsisConfiguration;
-import org.apache.isis.core.runtime.services.email.EmailServiceDefault;
 
 @DomainService(menuOrder = "99")
 public class EmailServiceForEstatio implements EmailService {
@@ -65,11 +64,11 @@ public class EmailServiceForEstatio implements EmailService {
 
     @Override
     public boolean isConfigured() {
-        return delegate.isConfigured();
+        return "proxy.ecp.loc".equals(configuration.getString("isis.service.email.sender.hostname")) || delegate.isConfigured();
     }
 
     @Inject
-    EmailServiceDefault delegate;
+    EmailServiceThrowingException delegate;
 
     @javax.inject.Inject
     IsisConfiguration configuration;
