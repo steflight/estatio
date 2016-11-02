@@ -154,8 +154,6 @@ public class EstatioAppManifest implements AppManifest {
         withFacetFactory(props, "org.isisaddons.module.security.facets.TenantedAuthorizationFacetFactory");
         withFacetFactory(props, "org.isisaddons.metamodel.paraname8.NamedFacetOnParameterParaname8Factory");
 
-        withDebugMailSmtpSettings(props);
-
         props.put("isis.persistor.datanucleus.impl.datanucleus.deletionPolicy", "DataNucleus");
 
         return props;
@@ -278,19 +276,6 @@ public class EstatioAppManifest implements AppManifest {
         return props;
     }
 
-    private static Map<String, String> withDebugMailSmtpSettings(final Map<String, String> props) {
-
-        // for testing email (using debugmail.io)
-        // TODO: run the app specifying the password provided by debugmail.io (a GUID):
-        // -Disis.service.email.sender.address=jeroen@stromboli.it -Disis.service.email.sender.password=99999999-9999-9999-9999-999999999999
-        // -Disis.service.email.sender.address=dan@haywood-associates.co.uk -Disis.service.email.sender.password=99999999-9999-9999-9999-999999999999
-
-        props.put("isis.service.email.sender.hostname", "debugmail.io");
-        props.put("isis.service.email.port", "25");
-        props.put("isis.service.email.tls.enabled", "false");
-
-        return props;
-    }
 
     protected static Map<String, String> withInstallFixtures(Map<String, String> props) {
         props.put("isis.persistor.datanucleus.install-fixtures", "true");
