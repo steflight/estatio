@@ -30,9 +30,9 @@ import org.apache.isis.applib.DomainObjectContainer;
 import org.apache.isis.applib.query.Query;
 import org.apache.isis.core.unittestsupport.jmocking.JUnitRuleMockery2;
 
-import org.incode.module.base.dom.testing.FinderInteraction;
 
 import org.estatio.dom.budgeting.partioning.PartitionItem;
+import org.incode.module.unittestsupport.dom.repo.FinderInteraction;
 import org.estatio.dom.budgeting.keyitem.KeyItem;
 import org.estatio.dom.budgeting.keyitem.KeyItemForTesting;
 

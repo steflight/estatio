@@ -70,11 +70,9 @@ language governing permissions and limitations under the License.
             <groupId>org.isisaddons.module.poly</groupId>
             <artifactId>isis-module-poly-dom</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>org.incode.module.base</groupId>
-            <artifactId>incode-module-base-dom</artifactId>
-            <type>test-jar</type>
+            <groupId>org.incode.module.unittestsupport</groupId>
+            <artifactId>incode-module-unittestsupport-dom</artifactId>
             <scope>test</scope>
         </dependency>
 
