@@ -41,7 +41,12 @@ import lombok.Setter;
                 name = "findByBudgetItemAndType", language = "JDOQL",
                 value = "SELECT " +
                         "FROM org.estatio.dom.budgeting.budgetitem.BudgetItemValue " +
-                        "WHERE budgetItem == :budgetItem && type == :type ")
+                        "WHERE budgetItem == :budgetItem && type == :type "),
+        @Query(
+                name = "findUnique", language = "JDOQL",
+                value = "SELECT " +
+                        "FROM org.estatio.dom.budgeting.budgetitem.BudgetItemValue " +
+                        "WHERE budgetItem == :budgetItem && date == :date && type == :type ")
 })
 @Unique(name = "BudgetItemValue_budgetItem_date_type", members = { "budgetItem", "date", "type" })
 @DomainObject(

@@ -360,8 +360,7 @@ public class Budget extends UdoDomainObject2<Budget>
     @Override
     @Programmatic
     public BudgetItem findOrCreateBudgetItem(
-            final Charge budgetItemCharge,
-            final BigDecimal budgetedValue) {
+            final Charge budgetItemCharge) {
         return budgetItemRepository.findOrCreateBudgetItem(this, budgetItemCharge);
     }
 

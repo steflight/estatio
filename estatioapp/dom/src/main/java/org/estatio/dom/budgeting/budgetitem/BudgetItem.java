@@ -245,6 +245,12 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
         return budgetItemAllocationRepository.updateOrCreateBudgetItemAllocation(this, allocationCharge, keyTable, percentage);
     }
 
+    @Programmatic
+    public BudgetItem updateOrCreateBudgetItemValue(final BigDecimal value, final LocalDate date, final BudgetCalculationType type){
+        budgetItemValueRepository.updateOrCreateBudgetItemValue(value ,this, date, type);
+        return this;
+    }
+
     @Inject
     private BudgetItemRepository budgetItemRepository;
 

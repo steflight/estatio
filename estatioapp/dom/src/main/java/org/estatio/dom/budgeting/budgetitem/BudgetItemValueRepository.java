@@ -79,16 +79,32 @@ public class BudgetItemValueRepository extends UdoDomainRepositoryAndFactory<Bud
         return allMatches("findByBudgetItemAndType", "budgetItem", budgetItem, "type", type);
     }
 
-    public BudgetItemValue findUnique(final BudgetItem budgetItem, final  LocalDate date, final BudgetCalculationType type) {
+    public BudgetItemValue findUnique(final BudgetItem budgetItem, final LocalDate date, final BudgetCalculationType type) {
         QBudgetItemValue cand = QBudgetItemValue.candidate();
-        return isisJdoSupport.executeQuery(BudgetItemValue.class, cand.budgetItem.eq(budgetItem).and(cand.date.eq(date)).and(cand.type.eq(type))).get(0);
+        List<BudgetItemValue> results = isisJdoSupport.executeQuery(BudgetItemValue.class, cand.budgetItem.eq(budgetItem).and(cand.date.eq(date)).and(cand.type.eq(type)));
+        return results.size() > 0 ? results.get(0) : null;
+    }
+
+    public BudgetItemValue fU(final BudgetItem budgetItem, final LocalDate date, final BudgetCalculationType type){
+        return uniqueMatch("findUnique", "budgetItem", budgetItem, "date", date, "type", type);
     }
 
     public List<BudgetItemValue> allBudgetItemValues() {
         return allInstances();
     }
 
+    public BudgetItemValue updateOrCreateBudgetItemValue(final BigDecimal value, final BudgetItem budgetItem, final LocalDate date, final BudgetCalculationType type) {
+        BudgetItemValue budgetItemValue = fU(budgetItem, date, type);
+        if (budgetItemValue != null) {
+            budgetItemValue.setValue(value);
+        } else {
+            budgetItemValue = newBudgetItemValue(budgetItem, value, date, type);
+        }
+        return budgetItemValue;
+    }
+
     @Inject
     private IsisJdoSupport isisJdoSupport;
+
 
 }

@@ -97,6 +97,12 @@ public class BudgetItemValueRepositoryTest extends EstatioIntegrationTest {
         // then
         assertThat(result.getDate()).isEqualTo(new LocalDate(2015, 01, 01));
 
+        // and when
+        result = budgetItemValueRepository.findUnique(budgetItem, new LocalDate(2015,01,02), BudgetCalculationType.BUDGETED);
+
+        // then
+        assertThat(result).isNull();
+
     }
 
 }
