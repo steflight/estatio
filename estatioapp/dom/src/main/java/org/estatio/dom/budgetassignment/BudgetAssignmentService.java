@@ -47,16 +47,18 @@ public class BudgetAssignmentService {
 
                 for (BudgetCalculationViewmodel calculationResult : calculationResults(budget, occupancy.getUnit())){
 
-                    results.add(
-                            new DetailedBudgetAssignmentResult(
-                                    occupancy.getUnit(),
-                                    calculationResult.getBudgetItemAllocation().getBudgetItem().getCharge(),
-                                    getRowLabelLastPart(calculationResult.getBudgetItemAllocation().getBudgetItem()),
-                                    calculationResult.getValue(),
-                                    calculationResult.getKeyItem().getKeyTable(),
-                                    calculationResult.getBudgetItemAllocation().getCharge()
-                            )
-                    );
+                    if (calculationResult.getCalculationType() == BudgetCalculationType.BUDGETED) {
+                        results.add(
+                                new DetailedBudgetAssignmentResult(
+                                        occupancy.getUnit(),
+                                        calculationResult.getBudgetItemAllocation().getBudgetItem().getCharge(),
+                                        getRowLabelLastPart(calculationResult.getBudgetItemAllocation().getBudgetItem()),
+                                        calculationResult.getValue(),
+                                        calculationResult.getKeyItem().getKeyTable(),
+                                        calculationResult.getBudgetItemAllocation().getCharge()
+                                )
+                        );
+                    }
 
                 }
 

@@ -1,5 +1,6 @@
 package org.estatio.integtests.budget;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -12,6 +13,7 @@ import org.junit.rules.ExpectedException;
 
 import org.apache.isis.applib.fixturescripts.FixtureScript;
 import org.apache.isis.applib.services.wrapper.HiddenException;
+import org.apache.isis.applib.services.wrapper.InvalidException;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
@@ -21,6 +23,9 @@ import org.estatio.dom.budgetassignment.ServiceChargeItemRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
+import org.estatio.dom.budgeting.budgetitem.BudgetItem;
+import org.estatio.dom.budgeting.keytable.FoundationValueType;
+import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.budgeting.keytable.KeyTableRepository;
 import org.estatio.dom.lease.LeaseItem;
 import org.estatio.dom.lease.LeaseItemType;
@@ -158,95 +163,95 @@ public class BudgetIntegrationTest extends EstatioIntegrationTest {
             budget2016 = budgetRepository.findByPropertyAndStartDate(propertyOxf, BudgetsForOxf.BUDGET_2016_START_DATE);
         }
 
-//        @Test
-//        public void nextBudgetTest() throws Exception {
-//
-//            // given
-//            assertThat(budgetsForOxf.size()).isEqualTo(2);
-//
-//            // when
-//            newStartDate = new LocalDate(2015, 07, 01);
-//            budget2015New = budget2015.createNextBudget(newStartDate);
-//
-//            // then
-//            assertThat(budgetRepository.findByProperty(propertyOxf).size()).isEqualTo(3);
-//            assertThat(budget2015.getEndDate()).isEqualTo(new LocalDate(2015, 06, 30));
-//            assertThat(budget2015New.getStartDate()).isEqualTo(newStartDate);
-//            assertThat(budget2015New.getEndDate()).isEqualTo(new LocalDate(2015,12,31));
-//
-//            assertThat(budget2015New.getItems().size()).isEqualTo(budget2015.getItems().size());
-//            BudgetItem firstNewItem = budget2015New.getItems().first();
-//            BudgetItem lastNewItem = budget2015New.getItems().last();
-//            assertThat(firstNewItem.getBudgetItemAllocations().size()).isEqualTo(1);
-//            assertThat(lastNewItem.getBudgetItemAllocations().size()).isEqualTo(2);
-//            assertThat(lastNewItem.getBudgetItemAllocations().last().getPercentage()).isEqualTo(new BigDecimal("20.000000"));
-//
-//            assertThat(budget2015New.getKeyTables().size()).isEqualTo(budget2015.getKeyTables().size());
-//            KeyTable firstNewKeyTable = budget2015New.getKeyTables().first();
-//            KeyTable lastNewKeyTable = budget2015New.getKeyTables().last();
-//            assertThat(firstNewKeyTable.getName()).isEqualTo(budget2015.getKeyTables().first().getName());
-//            assertThat(lastNewKeyTable.getName()).isEqualTo(budget2015.getKeyTables().last().getName());
-//            assertThat(firstNewKeyTable.getFoundationValueType()).isEqualTo(FoundationValueType.AREA);
-//            assertThat(lastNewKeyTable.getFoundationValueType()).isEqualTo(FoundationValueType.COUNT);
-//            assertThat(firstNewKeyTable.getItems().size()).isEqualTo(budget2015.getKeyTables().first().getItems().size());
-//            assertThat(firstNewKeyTable.getItems().first().getValue()).isEqualTo(new BigDecimal("3.077000"));
-//
-//            // and when
-//            newInBetweenStartDate = new LocalDate(2015, 04, 14);
-//            budget2015NewInBetween = budget2015.createNextBudget(newInBetweenStartDate);
-//
-//            // then
-//            assertThat(budget2015.getEndDate()).isEqualTo(new LocalDate(2015, 04, 13));
-//            assertThat(budget2015NewInBetween.getStartDate()).isEqualTo(newInBetweenStartDate);
-//            assertThat(budget2015NewInBetween.getEndDate()).isEqualTo(new LocalDate(2015, 06, 30));
-//            assertThat(budgetRepository.findByProperty(propertyOxf).size()).isEqualTo(4);
-//
-//            // and when
-//            budget2017 = budget2016.createNextBudget(new LocalDate(2017, 01 ,01));
-//
-//            // then
-//            assertThat(budget2017.getStartDate()).isEqualTo(new LocalDate(2017, 01, 01));
-//            assertThat(budget2017.getEndDate()).isEqualTo(new LocalDate(2017, 12, 31));
-//            assertThat(budgetRepository.findByProperty(propertyOxf).size()).isEqualTo(5);
-//            assertThat(budget2017.getItems().size()).isEqualTo(budget2016.getItems().size());
-//
-//
-//        }
-//
-//        @Rule
-//        public ExpectedException expectedException = ExpectedException.none();
-//
-//        @Test
-//        public void nextBudgetEndDateBeforeStartDateTest() {
-//
-//            //then
-//            expectedException.expect(InvalidException.class);
-//            expectedException.expectMessage("Reason: New start date should be after current start date");
-//            // when
-//            wrap(budget2015).createNextBudget(new LocalDate(2014,12,31));
-//
-//        }
-//
-//        @Test
-//        public void nextBudgetEndDateAfterEndDateTest() {
-//
-//            //then
-//            expectedException.expect(InvalidException.class);
-//            expectedException.expectMessage("Reason: New start date cannot be after current end date or first day of next year");
-//            // when
-//            wrap(budget2015).createNextBudget(new LocalDate(2016,01,02));
-//
-//        }
-//
-//        @Test
-//        public void nextBudgetAlreadyExistsTest(){
-//
-//            //then
-//            expectedException.expect(InvalidException.class);
-//            expectedException.expectMessage("Reason: This budget already exists");
-//            // when
-//            wrap(budget2015).createNextBudget(new LocalDate(2016,01,01));
-//        }
+        @Test
+        public void nextBudgetTest() throws Exception {
+
+            // given
+            assertThat(budgetsForOxf.size()).isEqualTo(2);
+
+            // when
+            newStartDate = new LocalDate(2015, 07, 01);
+            budget2015New = budget2015.createNextBudget(newStartDate);
+
+            // then
+            assertThat(budgetRepository.findByProperty(propertyOxf).size()).isEqualTo(3);
+            assertThat(budget2015.getEndDate()).isEqualTo(new LocalDate(2015, 06, 30));
+            assertThat(budget2015New.getStartDate()).isEqualTo(newStartDate);
+            assertThat(budget2015New.getEndDate()).isEqualTo(new LocalDate(2015,12,31));
+
+            assertThat(budget2015New.getItems().size()).isEqualTo(budget2015.getItems().size());
+            BudgetItem firstNewItem = budget2015New.getItems().first();
+            BudgetItem lastNewItem = budget2015New.getItems().last();
+            assertThat(firstNewItem.getBudgetItemAllocations().size()).isEqualTo(1);
+            assertThat(lastNewItem.getBudgetItemAllocations().size()).isEqualTo(2);
+            assertThat(lastNewItem.getBudgetItemAllocations().last().getPercentage()).isEqualTo(new BigDecimal("20.000000"));
+
+            assertThat(budget2015New.getKeyTables().size()).isEqualTo(budget2015.getKeyTables().size());
+            KeyTable firstNewKeyTable = budget2015New.getKeyTables().first();
+            KeyTable lastNewKeyTable = budget2015New.getKeyTables().last();
+            assertThat(firstNewKeyTable.getName()).isEqualTo(budget2015.getKeyTables().first().getName());
+            assertThat(lastNewKeyTable.getName()).isEqualTo(budget2015.getKeyTables().last().getName());
+            assertThat(firstNewKeyTable.getFoundationValueType()).isEqualTo(FoundationValueType.AREA);
+            assertThat(lastNewKeyTable.getFoundationValueType()).isEqualTo(FoundationValueType.COUNT);
+            assertThat(firstNewKeyTable.getItems().size()).isEqualTo(budget2015.getKeyTables().first().getItems().size());
+            assertThat(firstNewKeyTable.getItems().first().getValue()).isEqualTo(new BigDecimal("3.077000"));
+
+            // and when
+            newInBetweenStartDate = new LocalDate(2015, 04, 14);
+            budget2015NewInBetween = budget2015.createNextBudget(newInBetweenStartDate);
+
+            // then
+            assertThat(budget2015.getEndDate()).isEqualTo(new LocalDate(2015, 04, 13));
+            assertThat(budget2015NewInBetween.getStartDate()).isEqualTo(newInBetweenStartDate);
+            assertThat(budget2015NewInBetween.getEndDate()).isEqualTo(new LocalDate(2015, 06, 30));
+            assertThat(budgetRepository.findByProperty(propertyOxf).size()).isEqualTo(4);
+
+            // and when
+            budget2017 = budget2016.createNextBudget(new LocalDate(2017, 01 ,01));
+
+            // then
+            assertThat(budget2017.getStartDate()).isEqualTo(new LocalDate(2017, 01, 01));
+            assertThat(budget2017.getEndDate()).isEqualTo(new LocalDate(2017, 12, 31));
+            assertThat(budgetRepository.findByProperty(propertyOxf).size()).isEqualTo(5);
+            assertThat(budget2017.getItems().size()).isEqualTo(budget2016.getItems().size());
+
+
+        }
+
+        @Rule
+        public ExpectedException expectedException = ExpectedException.none();
+
+        @Test
+        public void nextBudgetEndDateBeforeStartDateTest() {
+
+            //then
+            expectedException.expect(InvalidException.class);
+            expectedException.expectMessage("Reason: New start date should be after current start date");
+            // when
+            wrap(budget2015).createNextBudget(new LocalDate(2014,12,31));
+
+        }
+
+        @Test
+        public void nextBudgetEndDateAfterEndDateTest() {
+
+            //then
+            expectedException.expect(InvalidException.class);
+            expectedException.expectMessage("Reason: New start date cannot be after current end date or first day of next year");
+            // when
+            wrap(budget2015).createNextBudget(new LocalDate(2016,01,02));
+
+        }
+
+        @Test
+        public void nextBudgetAlreadyExistsTest(){
+
+            //then
+            expectedException.expect(InvalidException.class);
+            expectedException.expectMessage("Reason: This budget already exists");
+            // when
+            wrap(budget2015).createNextBudget(new LocalDate(2016,01,01));
+        }
 
 
     }

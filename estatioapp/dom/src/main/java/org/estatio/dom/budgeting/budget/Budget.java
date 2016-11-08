@@ -226,50 +226,50 @@ public class Budget extends UdoDomainObject2<Budget>
         return budgetItemRepository.validateNewBudgetItem(this, charge);
     }
 
-//    public Budget createNextBudget(final LocalDate newStartDate) {
-//        if (newStartDate.getYear() > getBudgetYear()) {
-//            return createBudgetForNextYear();
-//        } else {
-//            return createBudgetInSameYear(newStartDate);
-//        }
-//    }
+    public Budget createNextBudget(final LocalDate newStartDate) {
+        if (newStartDate.getYear() > getBudgetYear()) {
+            return createBudgetForNextYear();
+        } else {
+            return createBudgetInSameYear(newStartDate);
+        }
+    }
 
-//    private Budget createBudgetForNextYear(){
-//        LocalDate start = new LocalDate(getBudgetYear()+1, 01, 01);
-//        LocalDate end = new LocalDate(getBudgetYear()+1, 12, 31);
-//        Budget newBudget = budgetRepository.newBudget(getProperty(),start, end);
-//        return copyCurrentTo(newBudget);
-//    }
-//
-//    private Budget createBudgetInSameYear(final LocalDate newStartDate){
-//        LocalDate endDateOfCurrent = getEndDate();
-//        setEndDate(newStartDate.minusDays(1));
-//        Budget newBudget = budgetRepository.newBudget(getProperty(), newStartDate, endDateOfCurrent);
-//        return copyCurrentTo(newBudget);
-//    }
+    private Budget createBudgetForNextYear(){
+        LocalDate start = new LocalDate(getBudgetYear()+1, 01, 01);
+        LocalDate end = new LocalDate(getBudgetYear()+1, 12, 31);
+        Budget newBudget = budgetRepository.newBudget(getProperty(),start, end);
+        return copyCurrentTo(newBudget);
+    }
 
-//    private Budget copyCurrentTo(final Budget newBudget) {
-//        for (KeyTable keyTable : getKeyTables()){
-//            keyTable.createCopyOn(newBudget);
-//        }
-//        for (BudgetItem item : getItems()){
-//            item.createCopyOn(newBudget);
-//        }
-//        return newBudget;
-//    }
-//
-//    public String validateCreateNextBudget(final LocalDate newStartDate){
-//        if (newStartDate.isBefore(getStartDate().plusDays(1))){
-//            return "New start date should be after current start date";
-//        }
-//        if (newStartDate.isAfter(getEndDate()) && !(newStartDate.equals(new LocalDate(getBudgetYear()+1, 01, 01)))){
-//            return "New start date cannot be after current end date or first day of next year";
-//        }
-//        if (budgetRepository.findByPropertyAndStartDate(getProperty(),newStartDate) != null){
-//            return "This budget already exists";
-//        }
-//        return null;
-//    }
+    private Budget createBudgetInSameYear(final LocalDate newStartDate){
+        LocalDate endDateOfCurrent = getEndDate();
+        setEndDate(newStartDate.minusDays(1));
+        Budget newBudget = budgetRepository.newBudget(getProperty(), newStartDate, endDateOfCurrent);
+        return copyCurrentTo(newBudget);
+    }
+
+    private Budget copyCurrentTo(final Budget newBudget) {
+        for (KeyTable keyTable : getKeyTables()){
+            keyTable.createCopyOn(newBudget);
+        }
+        for (BudgetItem item : getItems()){
+            item.createCopyOn(newBudget);
+        }
+        return newBudget;
+    }
+
+    public String validateCreateNextBudget(final LocalDate newStartDate){
+        if (newStartDate.isBefore(getStartDate().plusDays(1))){
+            return "New start date should be after current start date";
+        }
+        if (newStartDate.isAfter(getEndDate()) && !(newStartDate.equals(new LocalDate(getBudgetYear()+1, 01, 01)))){
+            return "New start date cannot be after current end date or first day of next year";
+        }
+        if (budgetRepository.findByPropertyAndStartDate(getProperty(),newStartDate) != null){
+            return "This budget already exists";
+        }
+        return null;
+    }
 
     /*
     * TODO: revisit after refactoring
