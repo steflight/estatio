@@ -12,10 +12,4 @@ public interface BudgetItemCreator {
             final BigDecimal budgetedValue
     );
 
-    BudgetItem updateOrCreateBudgetItem(
-            final Charge budgetItemCharge,
-            final BigDecimal budgetedValue,
-            final BigDecimal auditedValue
-    );
-
 }

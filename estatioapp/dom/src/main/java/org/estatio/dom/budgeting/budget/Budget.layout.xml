@@ -37,14 +37,13 @@
             </ns2:fieldSet>
         </col>
         <col span="8" unreferencedCollections="true">
-            <ns2:collection id="items">
+            <ns2:collection id="items" defaultView="table">
                 <ns2:action id="newBudgetItem"/>
                 <ns2:action id="removeAllBudgetItems"/>
             </ns2:collection>
-            <ns2:collection id="keyTables">
+            <ns2:collection id="keyTables" defaultView="table">
                 <ns2:action id="createKeyTable"/>
             </ns2:collection>
-            <ns2:collection id="serviceChargeTerms"/>
         </col>
     </row>
 </grid>

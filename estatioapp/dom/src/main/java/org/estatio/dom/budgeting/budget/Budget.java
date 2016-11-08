@@ -39,7 +39,6 @@ import org.joda.time.LocalDate;
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.ActionLayout;
 import org.apache.isis.applib.annotation.BookmarkPolicy;
-import org.apache.isis.applib.annotation.CollectionLayout;
 import org.apache.isis.applib.annotation.Contributed;
 import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.DomainObjectLayout;
@@ -49,21 +48,19 @@ import org.apache.isis.applib.annotation.Parameter;
 import org.apache.isis.applib.annotation.ParameterLayout;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.annotation.PropertyLayout;
-import org.apache.isis.applib.annotation.RenderType;
 import org.apache.isis.applib.annotation.RestrictTo;
 import org.apache.isis.applib.annotation.SemanticsOf;
 import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.incode.module.base.dom.with.WithIntervalMutable;
 import org.incode.module.base.dom.utils.TitleBuilder;
 import org.incode.module.base.dom.valuetypes.LocalDateInterval;
+import org.incode.module.base.dom.with.WithIntervalMutable;
 
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 import org.estatio.dom.asset.Property;
-import org.estatio.dom.asset.UnitRepository;
 import org.estatio.dom.budgetassignment.ServiceChargeItem;
 import org.estatio.dom.budgetassignment.ServiceChargeItemRepository;
 import org.estatio.dom.budgeting.allocation.BudgetItemAllocation;
@@ -123,7 +120,7 @@ public class Budget extends UdoDomainObject2<Budget>
     public String title() {
         return TitleBuilder.start()
                 .withParent(getProperty())
-                .withName(getInterval())
+                .withName(getBudgetYear())
                 .toString();
     }
 
@@ -201,12 +198,10 @@ public class Budget extends UdoDomainObject2<Budget>
         return "Dates should not be changed.";
     }
 
-    @CollectionLayout(render = RenderType.EAGERLY)
     @Persistent(mappedBy = "budget", dependentElement = "true")
     @Getter @Setter
     private SortedSet<BudgetItem> items = new TreeSet<>();
 
-    @CollectionLayout(render = RenderType.EAGERLY)
     @Persistent(mappedBy = "budget", dependentElement = "true")
     @Getter @Setter
     private SortedSet<KeyTable> keyTables = new TreeSet<>();
@@ -222,59 +217,59 @@ public class Budget extends UdoDomainObject2<Budget>
     public BudgetItem newBudgetItem(
             final BigDecimal budgetedValue,
             final Charge charge) {
-        return budgetItemRepository.newBudgetItem(this, budgetedValue, charge);
+        return budgetItemRepository.newBudgetItem(this, charge);
     }
 
     public String validateNewBudgetItem(
             final BigDecimal budgetedValue,
             final Charge charge) {
-        return budgetItemRepository.validateNewBudgetItem(this,budgetedValue,charge);
+        return budgetItemRepository.validateNewBudgetItem(this, charge);
     }
 
-    public Budget createNextBudget(final LocalDate newStartDate) {
-        if (newStartDate.getYear() > getBudgetYear()) {
-            return createBudgetForNextYear();
-        } else {
-            return createBudgetInSameYear(newStartDate);
-        }
-    }
+//    public Budget createNextBudget(final LocalDate newStartDate) {
+//        if (newStartDate.getYear() > getBudgetYear()) {
+//            return createBudgetForNextYear();
+//        } else {
+//            return createBudgetInSameYear(newStartDate);
+//        }
+//    }
 
-    private Budget createBudgetForNextYear(){
-        LocalDate start = new LocalDate(getBudgetYear()+1, 01, 01);
-        LocalDate end = new LocalDate(getBudgetYear()+1, 12, 31);
-        Budget newBudget = budgetRepository.newBudget(getProperty(),start, end);
-        return copyCurrentTo(newBudget);
-    }
+//    private Budget createBudgetForNextYear(){
+//        LocalDate start = new LocalDate(getBudgetYear()+1, 01, 01);
+//        LocalDate end = new LocalDate(getBudgetYear()+1, 12, 31);
+//        Budget newBudget = budgetRepository.newBudget(getProperty(),start, end);
+//        return copyCurrentTo(newBudget);
+//    }
+//
+//    private Budget createBudgetInSameYear(final LocalDate newStartDate){
+//        LocalDate endDateOfCurrent = getEndDate();
+//        setEndDate(newStartDate.minusDays(1));
+//        Budget newBudget = budgetRepository.newBudget(getProperty(), newStartDate, endDateOfCurrent);
+//        return copyCurrentTo(newBudget);
+//    }
 
-    private Budget createBudgetInSameYear(final LocalDate newStartDate){
-        LocalDate endDateOfCurrent = getEndDate();
-        setEndDate(newStartDate.minusDays(1));
-        Budget newBudget = budgetRepository.newBudget(getProperty(), newStartDate, endDateOfCurrent);
-        return copyCurrentTo(newBudget);
-    }
-
-    private Budget copyCurrentTo(final Budget newBudget) {
-        for (KeyTable keyTable : getKeyTables()){
-            keyTable.createCopyOn(newBudget);
-        }
-        for (BudgetItem item : getItems()){
-            item.createCopyOn(newBudget);
-        }
-        return newBudget;
-    }
-
-    public String validateCreateNextBudget(final LocalDate newStartDate){
-        if (newStartDate.isBefore(getStartDate().plusDays(1))){
-            return "New start date should be after current start date";
-        }
-        if (newStartDate.isAfter(getEndDate()) && !(newStartDate.equals(new LocalDate(getBudgetYear()+1, 01, 01)))){
-            return "New start date cannot be after current end date or first day of next year";
-        }
-        if (budgetRepository.findByPropertyAndStartDate(getProperty(),newStartDate) != null){
-            return "This budget already exists";
-        }
-        return null;
-    }
+//    private Budget copyCurrentTo(final Budget newBudget) {
+//        for (KeyTable keyTable : getKeyTables()){
+//            keyTable.createCopyOn(newBudget);
+//        }
+//        for (BudgetItem item : getItems()){
+//            item.createCopyOn(newBudget);
+//        }
+//        return newBudget;
+//    }
+//
+//    public String validateCreateNextBudget(final LocalDate newStartDate){
+//        if (newStartDate.isBefore(getStartDate().plusDays(1))){
+//            return "New start date should be after current start date";
+//        }
+//        if (newStartDate.isAfter(getEndDate()) && !(newStartDate.equals(new LocalDate(getBudgetYear()+1, 01, 01)))){
+//            return "New start date cannot be after current end date or first day of next year";
+//        }
+//        if (budgetRepository.findByPropertyAndStartDate(getProperty(),newStartDate) != null){
+//            return "This budget already exists";
+//        }
+//        return null;
+//    }
 
     /*
     * TODO: revisit after refactoring
@@ -331,36 +326,6 @@ public class Budget extends UdoDomainObject2<Budget>
         return keyTableRepository.validateNewKeyTable(this, name, foundationValueType, keyValueMethod, 6);
     }
 
-    @Programmatic
-    public BigDecimal getBudgetedValueForBudgetInterval() {
-        return getBudgetedValue().multiply(getAnnualFactor()).setScale(2, BigDecimal.ROUND_HALF_UP);
-    }
-
-    @Programmatic
-    public BigDecimal getAuditedValueForBudgetInterval() {
-        return getAuditedValue().multiply(getAnnualFactor()).setScale(2, BigDecimal.ROUND_HALF_UP);
-    }
-
-    @Programmatic
-    public BigDecimal getBudgetedValue() {
-        BigDecimal total = BigDecimal.ZERO;
-        for (BudgetItem item : getItems()) {
-            total = total.add(item.getBudgetedValue());
-        }
-        return total;
-    }
-
-    @Programmatic
-    public BigDecimal getAuditedValue() {
-        BigDecimal total = BigDecimal.ZERO;
-        for (BudgetItem item : getItems()) {
-            if (item.getAuditedValue() != null) {
-                total = total.add(item.getAuditedValue());
-            }
-        }
-        return total;
-    }
-
     public BigDecimal getAnnualFactor(){
         BigDecimal numberOfDaysInYear = BigDecimal.valueOf(getBudgetYearInterval().days());
         BigDecimal numberOfDaysInBudgetInterval = BigDecimal.valueOf(getInterval().days());
@@ -397,26 +362,15 @@ public class Budget extends UdoDomainObject2<Budget>
     public BudgetItem findOrCreateBudgetItem(
             final Charge budgetItemCharge,
             final BigDecimal budgetedValue) {
-        return budgetItemRepository.findOrCreateBudgetItem(this, budgetItemCharge, budgetedValue);
+        return budgetItemRepository.findOrCreateBudgetItem(this, budgetItemCharge);
     }
 
-    @Override
-    @Programmatic
-    public BudgetItem updateOrCreateBudgetItem(
-            final Charge budgetItemCharge,
-            final BigDecimal budgetedValue,
-            final BigDecimal auditedValue) {
-        return budgetItemRepository.updateOrCreateBudgetItem(this, budgetItemCharge, budgetedValue, auditedValue);
-    }
 
     @Inject
     private BudgetItemRepository budgetItemRepository;
 
     @Inject
     private BudgetRepository budgetRepository;
-
-    @Inject
-    private UnitRepository unitRepository;
 
     @Inject
     private OccupancyRepository occupancyRepository;

@@ -24,12 +24,12 @@ import org.joda.time.LocalDate;
 import org.junit.Test;
 
 import org.incode.module.base.dom.testing.AbstractBeanPropertiesTest;
+
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgeting.PropertyForTesting;
 import org.estatio.dom.budgeting.allocation.BudgetItemAllocation;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.charge.Charge;
-import org.incode.module.base.dom.valuetypes.LocalDateInterval;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -70,7 +70,7 @@ public class BudgetTest {
             assertThat(budgetTitle).isEqualTo(
                     property.getClass().getSimpleName()
                             + " [" + property.getReference() + "]"
-                            + " > " + new LocalDateInterval(startDate, endDate).toString());
+                            + " > " + budget.getBudgetYear());
         }
     }
 

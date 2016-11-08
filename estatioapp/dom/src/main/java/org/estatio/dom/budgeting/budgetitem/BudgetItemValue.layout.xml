@@ -9,11 +9,11 @@
     </row>
     <row>
         <col span="4">
-            <ns2:fieldSet name="Item" id="item" unreferencedProperties="true">
-                <ns2:property id="budget"/>
-                <ns2:property id="charge">
-                    <ns2:action id="changeCharge" position="BELOW"/>
-                </ns2:property>
+            <ns2:fieldSet name="Value" id="value" unreferencedProperties="true">
+                <ns2:property id="value"/>
+                <ns2:property id="type"/>
+                <ns2:property id="date"/>
+                <ns2:property id="budgetItem"/>
                 <ns2:property id="applicationTenancy"/>
             </ns2:fieldSet>
             <ns2:fieldSet name="Metadata" id="metadata">
@@ -27,12 +27,6 @@
             </ns2:fieldSet>
         </col>
         <col span="8" unreferencedCollections="true">
-            <ns2:collection id="values" defaultView="table">
-                <ns2:action id="newValue"/>
-            </ns2:collection>
-            <ns2:collection id="budgetItemAllocations" defaultView="table">
-                <ns2:action id="createBudgetItemAllocation"/>
-            </ns2:collection>
         </col>
     </row>
 </grid>

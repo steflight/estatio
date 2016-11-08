@@ -17,7 +17,6 @@ import org.apache.isis.applib.annotation.Programmatic;
 import org.estatio.dom.Importable;
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
-import org.estatio.dom.budgeting.allocation.BudgetItemAllocation;
 import org.estatio.dom.budgeting.allocation.BudgetItemAllocationRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
@@ -107,10 +106,10 @@ public class BudgetImportExport implements Importable {
         Charge targetCharge = fetchCharge(getInvoiceChargeReference());
         Budget budget = budgetRepository.findOrCreateBudget(property, getBudgetStartDate(), getBudgetEndDate());
         KeyTable keyTable = findOrCreateKeyTable(budget, getKeyTableName(), getFoundationValueType(), getKeyValueMethod());
-        BudgetItemAllocation budgetItemAllocation =
-                budget
-                        .updateOrCreateBudgetItem(sourceCharge, getBudgetedValue(), getAuditedValue())
-                        .updateOrCreateBudgetItemAllocation(targetCharge, keyTable, getPercentage());
+//        BudgetItemAllocation budgetItemAllocation =
+//                budget
+//                        .updateOrCreateBudgetItem(sourceCharge, getBudgetedValue(), getAuditedValue())
+//                        .updateOrCreateBudgetItemAllocation(targetCharge, keyTable, getPercentage());
 
         return Lists.newArrayList(budget);
     }
