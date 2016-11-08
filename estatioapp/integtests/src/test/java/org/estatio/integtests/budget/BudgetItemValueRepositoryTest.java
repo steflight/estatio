@@ -1,5 +1,6 @@
 package org.estatio.integtests.budget;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -58,7 +59,7 @@ public class BudgetItemValueRepositoryTest extends EstatioIntegrationTest {
         assertThat(budgetItem.getValues().first().getType()).isEqualTo(BudgetCalculationType.BUDGETED);
 
         // when
-        List<BudgetItemValue> results = budgetItemValueRepository.findByBudgetItemAndType(budgetItem, BudgetCalculationType.BUDGETED);
+        List<BudgetItemValue> results = wrap(budgetItemValueRepository).findByBudgetItemAndType(budgetItem, BudgetCalculationType.BUDGETED);
 
         // then
         assertThat(results.size()).isEqualTo(1);
@@ -102,6 +103,51 @@ public class BudgetItemValueRepositoryTest extends EstatioIntegrationTest {
 
         // then
         assertThat(result).isNull();
+
+    }
+
+    @Test
+    public void updateOrCreateTest_Update(){
+
+        // given
+        LocalDate budgetStart = new LocalDate(2015, 01, 01);
+        Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
+        Budget budget = budgetRepository.findByPropertyAndStartDate(property, budgetStart);
+        BudgetItem budgetItem = budget.getItems().first();
+
+        assertThat(budgetItem.getValues().size()).isEqualTo(1);
+        assertThat(budgetItem.getValues().first().getType()).isEqualTo(BudgetCalculationType.BUDGETED);
+        assertThat(budgetItem.getValues().first().getValue()).isEqualTo(new BigDecimal("30000.55"));
+
+        // when
+        BudgetItemValue result = wrap(budgetItemValueRepository).updateOrCreateBudgetItemValue(new BigDecimal("33333.00"), budgetItem, budgetStart, BudgetCalculationType.BUDGETED);
+
+        // then
+        assertThat(budgetItem.getValues().size()).isEqualTo(1);
+        assertThat(result.getValue()).isEqualTo(new BigDecimal("33333.00"));
+
+    }
+
+    @Test
+    public void updateOrCreateTest_Create(){
+
+        // given
+        LocalDate budgetStart = new LocalDate(2015, 01, 01);
+        Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
+        Budget budget = budgetRepository.findByPropertyAndStartDate(property, budgetStart);
+        BudgetItem budgetItem = budget.getItems().first();
+
+        assertThat(budgetItem.getValues().size()).isEqualTo(1);
+        assertThat(budgetItem.getValues().first().getType()).isEqualTo(BudgetCalculationType.BUDGETED);
+        assertThat(budgetItem.getValues().first().getValue()).isEqualTo(new BigDecimal("30000.55"));
+
+        // when
+        BudgetItemValue result = wrap(budgetItemValueRepository).updateOrCreateBudgetItemValue(new BigDecimal("33333.00"), budgetItem, budgetStart, BudgetCalculationType.AUDITED);
+
+        // then
+        assertThat(budgetItem.getValues().size()).isEqualTo(2);
+        assertThat(result.getValue()).isEqualTo(new BigDecimal("33333.00"));
+        assertThat(result.getType()).isEqualTo(BudgetCalculationType.AUDITED);
 
     }
 
