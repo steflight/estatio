@@ -66,6 +66,9 @@ public class BudgetItemValueRepository extends UdoDomainRepositoryAndFactory<Bud
         if (type == BudgetCalculationType.BUDGETED && findByBudgetItemAndType(budgetItem, type).size()>0){
             return "Only one value of type BUDGETED is allowed";
         }
+        if (value == null){
+            return "Value cannot be empty";
+        }
         return null;
     }
 
@@ -94,13 +97,17 @@ public class BudgetItemValueRepository extends UdoDomainRepositoryAndFactory<Bud
     }
 
     public BudgetItemValue updateOrCreateBudgetItemValue(final BigDecimal value, final BudgetItem budgetItem, final LocalDate date, final BudgetCalculationType type) {
-        BudgetItemValue budgetItemValue = fU(budgetItem, date, type);
-        if (budgetItemValue != null) {
-            budgetItemValue.setValue(value);
+        BudgetItemValue itemValue = fU(budgetItem, date, type);
+        if (itemValue != null) {
+            itemValue.setValue(value);
         } else {
-            budgetItemValue = newBudgetItemValue(budgetItem, value, date, type);
+            itemValue = newBudgetItemValue(budgetItem, value, date, type);
         }
-        return budgetItemValue;
+        return itemValue;
+    }
+
+    public String validateUpdateOrCreateBudgetItemValue(final BigDecimal value, final BudgetItem budgetItem, final LocalDate date, final BudgetCalculationType type) {
+        return validateNewBudgetItemValue(budgetItem, value, date, type);
     }
 
     @Inject

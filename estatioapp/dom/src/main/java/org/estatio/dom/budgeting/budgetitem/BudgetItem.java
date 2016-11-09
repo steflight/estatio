@@ -247,7 +247,9 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
 
     @Programmatic
     public BudgetItem updateOrCreateBudgetItemValue(final BigDecimal value, final LocalDate date, final BudgetCalculationType type){
-        budgetItemValueRepository.updateOrCreateBudgetItemValue(value ,this, date, type);
+        if (value!=null) {
+            budgetItemValueRepository.updateOrCreateBudgetItemValue(value, this, date, type);
+        }
         return this;
     }
 

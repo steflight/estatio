@@ -18,6 +18,8 @@
 package org.estatio.dom.budgeting.budgetitem;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
@@ -87,6 +89,39 @@ public class BudgetItemValueRepositoryTest {
 
         }
 
+        @Test
+        public void validateNewBudgetItemValue() throws Exception {
+
+            // given
+            final BudgetItemValue budgetItemValue = new BudgetItemValue();
+            final BudgetItem budgetItem = new BudgetItem();
+            final BigDecimal value = null;
+            final LocalDate date = new LocalDate(2016,01,01);
+            final BudgetCalculationType type = BudgetCalculationType.BUDGETED;
+
+            // when
+
+            budgetItemValueRepository = new BudgetItemValueRepository() {
+                @Override
+                public List<BudgetItemValue> findByBudgetItemAndType(final BudgetItem budgetItem, final BudgetCalculationType type) {
+                    return Arrays.asList();
+                }
+            };
+
+            // then
+            assertThat(budgetItemValueRepository.validateNewBudgetItemValue(budgetItem, null, date, type)).isEqualTo("Value cannot be empty");
+
+            // and when
+            budgetItemValueRepository = new BudgetItemValueRepository() {
+                @Override
+                public List<BudgetItemValue> findByBudgetItemAndType(final BudgetItem budgetItem, final BudgetCalculationType type) {
+                    return Arrays.asList(budgetItemValue);
+                }
+            };
+
+            // then
+            assertThat(budgetItemValueRepository.validateNewBudgetItemValue(budgetItem, null, date, type)).isEqualTo("Only one value of type BUDGETED is allowed");
+        }
     }
 
 }
