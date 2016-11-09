@@ -182,14 +182,14 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
     private SortedSet<PartitionItem> partitionItems = new TreeSet<>();
 
     @Action(semantics = SemanticsOf.NON_IDEMPOTENT)
-    public PartitionItem createBudgetItemAllocation(
+    public PartitionItem createPartitionItem(
             final Charge charge,
             final KeyTable keyTable,
             final BigDecimal percentage) {
         return partitionItemRepository.newPartitionItem(charge, keyTable, this, percentage);
     }
 
-    public List<Charge> choices0CreateBudgetItemAllocation(
+    public List<Charge> choices0CreatePartitionItem(
             final Charge charge,
             final KeyTable keyTable,
             final BigDecimal percentage
@@ -197,21 +197,21 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
         return chargeRepository.allCharges();
     }
 
-    public List<KeyTable> choices1CreateBudgetItemAllocation(
+    public List<KeyTable> choices1CreatePartitionItem(
             final Charge charge,
             final KeyTable keyTable,
             final BigDecimal percentage) {
         return keyTableRepository.findByBudget(getBudget());
     }
 
-    public BigDecimal default2CreateBudgetItemAllocation(
+    public BigDecimal default2CreatePartitionItem(
             final Charge charge,
             final KeyTable keyTable,
             final BigDecimal percentage) {
         return new BigDecimal(100);
     }
 
-    public String validateCreateBudgetItemAllocation(
+    public String validateCreatePartitionItem(
             final Charge charge,
             final KeyTable keyTable,
             final BigDecimal percentage){
@@ -224,7 +224,7 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
         for (PartitionItem allocation : getPartitionItems()){
             String keyTableName = allocation.getKeyTable().getName();
             KeyTable correspondingTableOnbudget = keyTableRepository.findByBudgetAndName(budget, keyTableName);
-            itemCopy.createBudgetItemAllocation(allocation.getCharge(), correspondingTableOnbudget, allocation.getPercentage());
+            itemCopy.createPartitionItem(allocation.getCharge(), correspondingTableOnbudget, allocation.getPercentage());
         }
     }
 
@@ -241,7 +241,7 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
     }
 
     @Programmatic
-    public PartitionItem updateOrCreateBudgetItemAllocation(final Charge charge, final KeyTable keyTable, final BigDecimal percentage) {
+    public PartitionItem updateOrCreatePartitionItem(final Charge charge, final KeyTable keyTable, final BigDecimal percentage) {
         return partitionItemRepository.updateOrCreatePartitionItem(this, charge, keyTable, percentage);
     }
 

@@ -74,7 +74,7 @@ public class BudgetCalculationRepositoryTest {
         };
     }
 
-    public static class FindByBudgetItemAllocationAndKeyItemAndCalculationType extends BudgetCalculationRepositoryTest {
+    public static class FindByPartitionItemAndKeyItemAndCalculationType extends BudgetCalculationRepositoryTest {
 
         @Test
         public void happyCase() {
@@ -97,7 +97,7 @@ public class BudgetCalculationRepositoryTest {
 
     }
 
-    public static class FindByBudgetItemAllocationAndCalculationType extends BudgetCalculationRepositoryTest {
+    public static class FindByPartitionItemAndCalculationType extends BudgetCalculationRepositoryTest {
 
         @Test
         public void happyCase() {
@@ -116,7 +116,7 @@ public class BudgetCalculationRepositoryTest {
 
     }
 
-    public static class FindByBudgetItemAllocationAndStatus extends BudgetCalculationRepositoryTest {
+    public static class FindByPartitionItemAndStatus extends BudgetCalculationRepositoryTest {
 
         @Test
         public void happyCase() {
@@ -135,7 +135,7 @@ public class BudgetCalculationRepositoryTest {
 
     }
 
-    public static class FindByBudgetItemAllocationAndStatusAndCalculationType extends BudgetCalculationRepositoryTest {
+    public static class FindByPartitionItemAndStatusAndCalculationType extends BudgetCalculationRepositoryTest {
 
         @Test
         public void happyCase() {
@@ -156,14 +156,14 @@ public class BudgetCalculationRepositoryTest {
 
     }
 
-    public static class FindByBudgetItemAllocation extends BudgetCalculationRepositoryTest {
+    public static class FindByPartitionItem extends BudgetCalculationRepositoryTest {
 
         @Test
         public void happyCase() {
 
             PartitionItem partitionItem = new PartitionItem();
             KeyItem keyItem = new KeyItemForTesting();
-            budgetCalculationRepository.findByBudgetItemAllocation(partitionItem);
+            budgetCalculationRepository.findByPartitionItem(partitionItem);
 
             assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.ALL_MATCHES);
             assertThat(finderInteraction.getResultType()).isEqualTo(BudgetCalculation.class);

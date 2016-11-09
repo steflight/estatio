@@ -66,7 +66,7 @@ public class PartitionItemRepository extends UdoDomainRepositoryAndFactory<Parti
             final BigDecimal percentage
     ){
         if(findByChargeAndBudgetItemAndKeyTable(charge, budgetItem, keyTable) != null) {
-            return "This schedule item already exists";
+            return "This partition item already exists";
         }
         return null;
     }

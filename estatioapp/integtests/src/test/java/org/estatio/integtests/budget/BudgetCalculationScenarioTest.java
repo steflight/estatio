@@ -27,7 +27,7 @@ import org.estatio.dom.lease.LeaseRepository;
 import org.estatio.fixture.EstatioBaseLineFixture;
 import org.estatio.fixture.asset.PropertyForBudNl;
 import org.estatio.fixture.budget.BudgetForBud;
-import org.estatio.fixture.budget.BudgetItemAllocationsForBud;
+import org.estatio.fixture.budget.PartitionItemsForBud;
 import org.estatio.fixture.charge.ChargeRefData;
 import org.estatio.fixture.lease.LeasesForBudNl;
 import org.estatio.integtests.EstatioIntegrationTest;
@@ -63,7 +63,7 @@ BudgetCalculationScenarioTest extends EstatioIntegrationTest {
             @Override
             protected void execute(final ExecutionContext executionContext) {
                 executionContext.executeChild(this, new EstatioBaseLineFixture());
-                executionContext.executeChild(this, new BudgetItemAllocationsForBud());
+                executionContext.executeChild(this, new PartitionItemsForBud());
             }
         });
     }

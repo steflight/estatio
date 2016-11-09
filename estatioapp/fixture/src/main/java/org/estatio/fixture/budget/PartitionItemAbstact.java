@@ -34,9 +34,9 @@ import org.estatio.dom.budgeting.keytable.KeyTableRepository;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.charge.ChargeRepository;
 
-public abstract class BudgetItemAllocationAbstact extends FixtureScript {
+public abstract class PartitionItemAbstact extends FixtureScript {
 
-    protected PartitionItem createBudgetItemAllocation(
+    protected PartitionItem createPartitionItem(
             final Charge charge,
             final KeyTable keyTable,
             final BudgetItem budgetItem,

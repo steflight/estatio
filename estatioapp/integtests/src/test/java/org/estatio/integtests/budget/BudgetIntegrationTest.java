@@ -34,7 +34,7 @@ import org.estatio.dom.lease.Occupancy;
 import org.estatio.dom.lease.OccupancyRepository;
 import org.estatio.fixture.EstatioBaseLineFixture;
 import org.estatio.fixture.asset.PropertyForOxfGb;
-import org.estatio.fixture.budget.BudgetItemAllocationsForOxf;
+import org.estatio.fixture.budget.PartitionItemsForOxf;
 import org.estatio.fixture.budget.BudgetsForOxf;
 import org.estatio.fixture.lease.LeaseForOxfTopModel001Gb;
 import org.estatio.fixture.lease.LeaseItemForServiceChargeBudgetedForOxfTopModel001Gb;
@@ -77,7 +77,7 @@ public class BudgetIntegrationTest extends EstatioIntegrationTest {
             @Override
             protected void execute(final ExecutionContext executionContext) {
                 executionContext.executeChild(this, new EstatioBaseLineFixture());
-                executionContext.executeChild(this, new BudgetItemAllocationsForOxf());
+                executionContext.executeChild(this, new PartitionItemsForOxf());
                 executionContext.executeChild(this, new LeaseItemForServiceChargeBudgetedForOxfTopModel001Gb());
             }
         });

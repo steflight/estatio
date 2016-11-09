@@ -40,7 +40,7 @@ public class BudgetCalculationServiceTest {
         Budget budget;
         BudgetItem budgetItem;
         BudgetItemValue budgetItemValue;
-        PartitionItem allocation;
+        PartitionItem partitionItem;
         KeyTable keyTable;
         KeyItem keyItem1;
         KeyItem keyItem2;
@@ -77,11 +77,11 @@ public class BudgetCalculationServiceTest {
             keyItem2.setKeyTable(keyTable);
             keyTable.getItems().add(keyItem2);
 
-            allocation = new PartitionItem();
-            allocation.setBudgetItem(budgetItem);
-            allocation.setKeyTable(keyTable);
+            partitionItem = new PartitionItem();
+            partitionItem.setBudgetItem(budgetItem);
+            partitionItem.setKeyTable(keyTable);
 
-            budgetItem.getPartitionItems().add(allocation);
+            budgetItem.getPartitionItems().add(partitionItem);
             budget.getItems().add(budgetItem);
 
         }
@@ -92,7 +92,7 @@ public class BudgetCalculationServiceTest {
             // given
             budgetItemValue.setValue(new BigDecimal("1000.00"));
             budgetItemValue.setType(BudgetCalculationType.BUDGETED);
-            allocation.setPercentage(new BigDecimal("100.00"));
+            partitionItem.setPercentage(new BigDecimal("100.00"));
 
             // when
             List<BudgetCalculationViewmodel> results = service.getCalculations(budget);
@@ -126,7 +126,7 @@ public class BudgetCalculationServiceTest {
             // given
             budgetItemValue.setValue(new BigDecimal("1000.00"));
             budgetItemValue.setType(BudgetCalculationType.BUDGETED);
-            allocation.setPercentage(new BigDecimal("99.00"));
+            partitionItem.setPercentage(new BigDecimal("99.00"));
 
             // when
             List<BudgetCalculationViewmodel> results = service.getCalculations(budget);
@@ -144,7 +144,7 @@ public class BudgetCalculationServiceTest {
             // given
             budgetItemValue.setValue(BigDecimal.ZERO);
             budgetItemValue.setType(BudgetCalculationType.BUDGETED);
-            allocation.setPercentage(new BigDecimal("99.00"));
+            partitionItem.setPercentage(new BigDecimal("99.00"));
 
             // when
             List<BudgetCalculationViewmodel> results = service.getCalculations(budget);
@@ -162,7 +162,7 @@ public class BudgetCalculationServiceTest {
             // given
             budgetItemValue.setValue(BigDecimal.ZERO);
             budgetItemValue.setType(BudgetCalculationType.BUDGETED);
-            allocation.setPercentage(BigDecimal.ZERO);
+            partitionItem.setPercentage(BigDecimal.ZERO);
 
             // when
             List<BudgetCalculationViewmodel> results = service.getCalculations(budget);
@@ -180,7 +180,7 @@ public class BudgetCalculationServiceTest {
             // given
             budgetItemValue.setValue(new BigDecimal("1000.00"));
             budgetItemValue.setType(BudgetCalculationType.BUDGETED);
-            allocation.setPercentage(new BigDecimal("99.00"));
+            partitionItem.setPercentage(new BigDecimal("99.00"));
             keyItem1.setValue(BigDecimal.ZERO);
             keyItem2.setValue(BigDecimal.ZERO);
 

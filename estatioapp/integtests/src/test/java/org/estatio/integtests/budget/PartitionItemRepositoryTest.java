@@ -23,7 +23,7 @@ import org.estatio.dom.charge.Charge;
 import org.estatio.dom.charge.ChargeRepository;
 import org.estatio.fixture.EstatioBaseLineFixture;
 import org.estatio.fixture.asset.PropertyForOxfGb;
-import org.estatio.fixture.budget.BudgetItemAllocationsForOxf;
+import org.estatio.fixture.budget.PartitionItemsForOxf;
 import org.estatio.fixture.budget.BudgetsForOxf;
 import org.estatio.fixture.charge.ChargeRefData;
 import org.estatio.integtests.EstatioIntegrationTest;
@@ -53,7 +53,7 @@ public class PartitionItemRepositoryTest extends EstatioIntegrationTest {
             @Override
             protected void execute(final ExecutionContext executionContext) {
                 executionContext.executeChild(this, new EstatioBaseLineFixture());
-                executionContext.executeChild(this, new BudgetItemAllocationsForOxf());
+                executionContext.executeChild(this, new PartitionItemsForOxf());
             }
         });
     }
@@ -61,7 +61,7 @@ public class PartitionItemRepositoryTest extends EstatioIntegrationTest {
     public static class validateNewPartitionItem extends PartitionItemRepositoryTest {
 
         @Test
-        public void doubleBudgetItemAllocation() throws Exception {
+        public void doublePartitionItem() throws Exception {
 
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
@@ -75,7 +75,7 @@ public class PartitionItemRepositoryTest extends EstatioIntegrationTest {
                             partitionItem.getKeyTable(),
                             partitionItem.getBudgetItem(),
                             null)
-            ).isEqualTo("This schedule item already exists");
+            ).isEqualTo("This partition item already exists");
 
         }
 

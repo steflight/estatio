@@ -84,7 +84,7 @@ public class BudgetCalculationRepository extends UdoDomainRepositoryAndFactory<B
         return allMatches("findByPartitionItemAndCalculationType", "partitionItem", partitionItem, "calculationType", calculationType);
     }
 
-    public List<BudgetCalculation> findByBudgetItemAllocation(
+    public List<BudgetCalculation> findByPartitionItem(
             final PartitionItem partitionItem
     ){
         return allMatches("findByPartitionItem", "partitionItem", partitionItem);
@@ -107,7 +107,7 @@ public class BudgetCalculationRepository extends UdoDomainRepositoryAndFactory<B
         for (BudgetItem budgetItem : budget.getItems()){
             for (PartitionItem allocation : budgetItem.getPartitionItems()){
                 if (allocation.getCharge().equals(charge)) {
-                    result.addAll(findByBudgetItemAllocation(allocation));
+                    result.addAll(findByPartitionItem(allocation));
                 }
             }
         }

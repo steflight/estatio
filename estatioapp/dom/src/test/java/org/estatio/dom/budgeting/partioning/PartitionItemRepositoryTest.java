@@ -128,7 +128,7 @@ public class PartitionItemRepositoryTest {
 
     }
 
-    public static class FindOrCreatePartitionItemAllocationNew extends PartitionItemRepositoryTest {
+    public static class FindOrCreatePartitionItemNew extends PartitionItemRepositoryTest {
 
         @Rule
         public JUnitRuleMockery2 context = JUnitRuleMockery2.createFor(JUnitRuleMockery2.Mode.INTERFACES_AND_CLASSES);

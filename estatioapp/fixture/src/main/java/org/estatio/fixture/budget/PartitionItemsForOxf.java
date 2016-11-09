@@ -31,7 +31,7 @@ import org.estatio.fixture.EstatioBaseLineFixture;
 import org.estatio.fixture.asset.PropertyForOxfGb;
 import org.estatio.fixture.charge.ChargeRefData;
 
-public class BudgetItemAllocationsForOxf extends BudgetItemAllocationAbstact {
+public class PartitionItemsForOxf extends PartitionItemAbstact {
 
     @Override
     protected void execute(ExecutionContext executionContext) {
@@ -55,9 +55,9 @@ public class BudgetItemAllocationsForOxf extends BudgetItemAllocationAbstact {
         KeyTable keyTable1 = keyTables.get(0);
         KeyTable keyTable2 = keyTables.get(1);
 
-        createBudgetItemAllocation(charge, keyTable1, budgetItem1, new BigDecimal(100), executionContext);
-        createBudgetItemAllocation(charge, keyTable1, budgetItem2, new BigDecimal(80), executionContext);
-        createBudgetItemAllocation(charge, keyTable2, budgetItem2, new BigDecimal(20), executionContext);
+        createPartitionItem(charge, keyTable1, budgetItem1, new BigDecimal(100), executionContext);
+        createPartitionItem(charge, keyTable1, budgetItem2, new BigDecimal(80), executionContext);
+        createPartitionItem(charge, keyTable2, budgetItem2, new BigDecimal(20), executionContext);
     }
 
 }

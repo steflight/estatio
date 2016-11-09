@@ -30,7 +30,7 @@ import org.estatio.fixture.EstatioBaseLineFixture;
 import org.estatio.fixture.asset.PropertyForBudNl;
 import org.estatio.fixture.charge.ChargeRefData;
 
-public class BudgetItemAllocationsForBud extends BudgetItemAllocationAbstact {
+public class PartitionItemsForBud extends PartitionItemAbstact {
 
     @Override
     protected void execute(ExecutionContext executionContext) {
@@ -54,11 +54,11 @@ public class BudgetItemAllocationsForBud extends BudgetItemAllocationAbstact {
         KeyTable keyTable1 = keyTableRepository.findByBudgetAndName(budget, KeyTablesForBud.NAME_BY_AREA);
         KeyTable keyTable2 = keyTableRepository.findByBudgetAndName(budget, KeyTablesForBud.NAME_BY_COUNT);
 
-        createBudgetItemAllocation(invoiceCharge1, keyTable1, budgetItem1, new BigDecimal(100), executionContext);
-        createBudgetItemAllocation(invoiceCharge1, keyTable1, budgetItem2, new BigDecimal(80), executionContext);
-        createBudgetItemAllocation(invoiceCharge1, keyTable2, budgetItem2, new BigDecimal(20), executionContext);
-        createBudgetItemAllocation(invoiceCharge2, keyTable1, budgetItem3, new BigDecimal(90), executionContext);
-        createBudgetItemAllocation(invoiceCharge1, keyTable2, budgetItem3, new BigDecimal(10), executionContext);
+        createPartitionItem(invoiceCharge1, keyTable1, budgetItem1, new BigDecimal(100), executionContext);
+        createPartitionItem(invoiceCharge1, keyTable1, budgetItem2, new BigDecimal(80), executionContext);
+        createPartitionItem(invoiceCharge1, keyTable2, budgetItem2, new BigDecimal(20), executionContext);
+        createPartitionItem(invoiceCharge2, keyTable1, budgetItem3, new BigDecimal(90), executionContext);
+        createPartitionItem(invoiceCharge1, keyTable2, budgetItem3, new BigDecimal(10), executionContext);
     }
 
 }

@@ -163,13 +163,13 @@ public class PartitionItem extends UdoDomainObject2<PartitionItem> implements Wi
 
     @Action(semantics = SemanticsOf.SAFE)
     public List<BudgetCalculation> getCalculations(){
-        return budgetCalculationRepository.findByBudgetItemAllocation(this);
+        return budgetCalculationRepository.findByPartitionItem(this);
     }
 
     // ////////////////////////////////////////
 
     @Action(restrictTo = RestrictTo.PROTOTYPING, semantics = SemanticsOf.NON_IDEMPOTENT_ARE_YOU_SURE)
-    public Budget deleteBudgetItemAllocation() {
+    public Budget deletePartitionItem() {
         removeIfNotAlready(this);
         return this.getBudgetItem().getBudget();
     }

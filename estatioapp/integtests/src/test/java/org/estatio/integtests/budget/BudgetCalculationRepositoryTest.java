@@ -12,21 +12,20 @@ import org.apache.isis.applib.fixturescripts.FixtureScript;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
-import org.estatio.dom.budgeting.partioning.PartitionItem;
-import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
-import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationService;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationStatus;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.keyitem.KeyItem;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
+import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.charge.ChargeRepository;
 import org.estatio.fixture.EstatioBaseLineFixture;
 import org.estatio.fixture.asset.PropertyForOxfGb;
-import org.estatio.fixture.budget.BudgetItemAllocationsForOxf;
+import org.estatio.fixture.budget.PartitionItemsForOxf;
 import org.estatio.fixture.budget.BudgetsForOxf;
 import org.estatio.fixture.charge.ChargeRefData;
 import org.estatio.integtests.EstatioIntegrationTest;
@@ -48,9 +47,6 @@ public class BudgetCalculationRepositoryTest extends EstatioIntegrationTest {
     PartitionItemRepository partitionItemRepository;
 
     @Inject
-    BudgetCalculationService budgetCalculationService;
-
-    @Inject
     ChargeRepository chargeRepository;
 
     @Before
@@ -59,12 +55,12 @@ public class BudgetCalculationRepositoryTest extends EstatioIntegrationTest {
             @Override
             protected void execute(final ExecutionContext executionContext) {
                 executionContext.executeChild(this, new EstatioBaseLineFixture());
-                executionContext.executeChild(this, new BudgetItemAllocationsForOxf());
+                executionContext.executeChild(this, new PartitionItemsForOxf());
             }
         });
     }
 
-    public static class FindByBudgetItemAllocationAndKeyItem extends BudgetCalculationRepositoryTest {
+    public static class FindByPartitionItemAndKeyItem extends BudgetCalculationRepositoryTest {
 
         @Test
         public void happyCase() throws Exception {
@@ -83,7 +79,7 @@ public class BudgetCalculationRepositoryTest extends EstatioIntegrationTest {
 
     }
 
-    public static class FindByBudgetItemAllocation extends BudgetCalculationRepositoryTest {
+    public static class FindByPartitionItem extends BudgetCalculationRepositoryTest {
 
         @Test
         public void happyCase() throws Exception {
@@ -93,7 +89,7 @@ public class BudgetCalculationRepositoryTest extends EstatioIntegrationTest {
             BudgetCalculation newBudgetCalculation = budgetCalculationRepository.updateOrCreateTemporaryBudgetCalculation(partitionItem, keyItem, BigDecimal.ZERO, BudgetCalculationType.BUDGETED);
 
             // when
-            List<BudgetCalculation> budgetCalculations = budgetCalculationRepository.findByBudgetItemAllocation(partitionItem);
+            List<BudgetCalculation> budgetCalculations = budgetCalculationRepository.findByPartitionItem(partitionItem);
 
             // then
             assertThat(budgetCalculations.size()).isEqualTo(1);
@@ -130,7 +126,7 @@ public class BudgetCalculationRepositoryTest extends EstatioIntegrationTest {
         }
     }
 
-    public static class FindByBudgetItemAllocationAndStatus extends BudgetCalculationRepositoryTest {
+    public static class FindByPartitionItemAndStatus extends BudgetCalculationRepositoryTest {
 
         @Test
         public void happyCase() throws Exception {

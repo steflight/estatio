@@ -113,7 +113,7 @@ public class BudgetTest {
             // given
             Budget budget = new Budget();
             budget.getItems().add(createItemFor(budget, "0"));
-            budget.getItems().addAll(createTwoItemsWithSameAllocationFor(budget, "1", "2"));
+            budget.getItems().addAll(createTwoItemsWithSamePartitionItemFor(budget, "1", "2"));
 
             // when
             charges = budget.getInvoiceCharges();
@@ -133,18 +133,18 @@ public class BudgetTest {
             charge.setReference(uniqueString);
             newItem.setCharge(charge);
 
-            PartitionItem allocation = new PartitionItem();
+            PartitionItem partitionItem = new PartitionItem();
             Charge targetCharge = new Charge();
             targetCharge.setReference("target".concat(uniqueString));
-            allocation.setCharge(targetCharge);
-            allocation.setBudgetItem(newItem);
+            partitionItem.setCharge(targetCharge);
+            partitionItem.setBudgetItem(newItem);
 
-            newItem.getPartitionItems().add(allocation);
+            newItem.getPartitionItems().add(partitionItem);
 
             return newItem;
         }
 
-        private List<BudgetItem> createTwoItemsWithSameAllocationFor(final Budget budget, final String str1, final String str2) {
+        private List<BudgetItem> createTwoItemsWithSamePartitionItemFor(final Budget budget, final String str1, final String str2) {
 
             BudgetItem newItem1 = new BudgetItem();
             Charge charge1 = new Charge();
@@ -156,14 +156,14 @@ public class BudgetTest {
             charge2.setReference(str2);
             newItem2.setCharge(charge2);
 
-            PartitionItem allocation = new PartitionItem();
+            PartitionItem partitionItem = new PartitionItem();
             Charge targetCharge = new Charge();
             targetCharge.setReference("target".concat(str1));
-            allocation.setCharge(targetCharge);
-            allocation.setBudgetItem(newItem1);
+            partitionItem.setCharge(targetCharge);
+            partitionItem.setBudgetItem(newItem1);
 
-            newItem1.getPartitionItems().add(allocation);
-            newItem2.getPartitionItems().add(allocation);
+            newItem1.getPartitionItems().add(partitionItem);
+            newItem2.getPartitionItems().add(partitionItem);
 
             return Arrays.asList(newItem1, newItem2);
         }
