@@ -182,9 +182,9 @@ public class BudgetIntegrationTest extends EstatioIntegrationTest {
             assertThat(budget2015New.getItems().size()).isEqualTo(budget2015.getItems().size());
             BudgetItem firstNewItem = budget2015New.getItems().first();
             BudgetItem lastNewItem = budget2015New.getItems().last();
-            assertThat(firstNewItem.getBudgetItemAllocations().size()).isEqualTo(1);
-            assertThat(lastNewItem.getBudgetItemAllocations().size()).isEqualTo(2);
-            assertThat(lastNewItem.getBudgetItemAllocations().last().getPercentage()).isEqualTo(new BigDecimal("20.000000"));
+            assertThat(firstNewItem.getPartitionItems().size()).isEqualTo(1);
+            assertThat(lastNewItem.getPartitionItems().size()).isEqualTo(2);
+            assertThat(lastNewItem.getPartitionItems().last().getPercentage()).isEqualTo(new BigDecimal("20.000000"));
 
             assertThat(budget2015New.getKeyTables().size()).isEqualTo(budget2015.getKeyTables().size());
             KeyTable firstNewKeyTable = budget2015New.getKeyTables().first();

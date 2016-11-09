@@ -27,7 +27,7 @@ import org.incode.module.base.dom.testing.AbstractBeanPropertiesTest;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgeting.PropertyForTesting;
-import org.estatio.dom.budgeting.allocation.BudgetItemAllocation;
+import org.estatio.dom.budgeting.allocation.PartitionItem;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.charge.Charge;
 
@@ -133,13 +133,13 @@ public class BudgetTest {
             charge.setReference(uniqueString);
             newItem.setCharge(charge);
 
-            BudgetItemAllocation allocation = new BudgetItemAllocation();
+            PartitionItem allocation = new PartitionItem();
             Charge targetCharge = new Charge();
             targetCharge.setReference("target".concat(uniqueString));
             allocation.setCharge(targetCharge);
             allocation.setBudgetItem(newItem);
 
-            newItem.getBudgetItemAllocations().add(allocation);
+            newItem.getPartitionItems().add(allocation);
 
             return newItem;
         }
@@ -156,14 +156,14 @@ public class BudgetTest {
             charge2.setReference(str2);
             newItem2.setCharge(charge2);
 
-            BudgetItemAllocation allocation = new BudgetItemAllocation();
+            PartitionItem allocation = new PartitionItem();
             Charge targetCharge = new Charge();
             targetCharge.setReference("target".concat(str1));
             allocation.setCharge(targetCharge);
             allocation.setBudgetItem(newItem1);
 
-            newItem1.getBudgetItemAllocations().add(allocation);
-            newItem2.getBudgetItemAllocations().add(allocation);
+            newItem1.getPartitionItems().add(allocation);
+            newItem2.getPartitionItems().add(allocation);
 
             return Arrays.asList(newItem1, newItem2);
         }

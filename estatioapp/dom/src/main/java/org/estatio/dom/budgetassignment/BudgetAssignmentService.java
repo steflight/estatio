@@ -19,7 +19,7 @@ import org.incode.module.base.dom.valuetypes.LocalDateInterval;
 import org.estatio.dom.asset.Unit;
 import org.estatio.dom.budgetassignment.viewmodels.BudgetAssignmentResult;
 import org.estatio.dom.budgetassignment.viewmodels.DetailedBudgetAssignmentResult;
-import org.estatio.dom.budgeting.allocation.BudgetItemAllocation;
+import org.estatio.dom.budgeting.allocation.PartitionItem;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
@@ -51,11 +51,11 @@ public class BudgetAssignmentService {
                         results.add(
                                 new DetailedBudgetAssignmentResult(
                                         occupancy.getUnit(),
-                                        calculationResult.getBudgetItemAllocation().getBudgetItem().getCharge(),
-                                        getRowLabelLastPart(calculationResult.getBudgetItemAllocation().getBudgetItem()),
+                                        calculationResult.getPartitionItem().getBudgetItem().getCharge(),
+                                        getRowLabelLastPart(calculationResult.getPartitionItem().getBudgetItem()),
                                         calculationResult.getValue(),
                                         calculationResult.getKeyItem().getKeyTable(),
-                                        calculationResult.getBudgetItemAllocation().getCharge()
+                                        calculationResult.getPartitionItem().getCharge()
                                 )
                         );
                     }
@@ -71,7 +71,7 @@ public class BudgetAssignmentService {
     private BigDecimal getTotalBudgetedValue(final BudgetItem budgetItem){
         BigDecimal returnValue = BigDecimal.ZERO;
         List<BudgetCalculationViewmodel> resultsForItem =
-                budgetCalculationService.getCalculations(budgetItem.getBudget()).stream().filter(x -> x.getBudgetItemAllocation().getBudgetItem().equals(budgetItem)).collect(Collectors.toList()
+                budgetCalculationService.getCalculations(budgetItem.getBudget()).stream().filter(x -> x.getPartitionItem().getBudgetItem().equals(budgetItem)).collect(Collectors.toList()
         );
         for (BudgetCalculationViewmodel bcResult : resultsForItem){
             if (bcResult.getValue() != null && bcResult.getCalculationType() == BudgetCalculationType.BUDGETED) {
@@ -89,10 +89,10 @@ public class BudgetAssignmentService {
                 .concat(" | budgeted ")
                 .concat(budgetItem.getBudgetedValue().toString());
 
-        List<BudgetItemAllocation> sortedAllocations = new ArrayList<>(budgetItem.getBudgetItemAllocations());
+        List<PartitionItem> sortedAllocations = new ArrayList<>(budgetItem.getPartitionItems());
 
         List<RowLabelHelper> helpers = new ArrayList<>();
-        for (BudgetItemAllocation allocation : budgetItem.getBudgetItemAllocations()){
+        for (PartitionItem allocation : budgetItem.getPartitionItems()){
             helpers.add(new RowLabelHelper(allocation.getPercentage(), allocation.getKeyTable()));
         }
         Collections.sort(helpers);
@@ -140,8 +140,8 @@ public class BudgetAssignmentService {
         List<BudgetAssignmentResult> assignmentResults = new ArrayList<>();
         for (BudgetCalculationViewmodel calculationResult : calculationResultsForLease){
             List<BudgetAssignmentResult> filteredByChargeAndKeyTable = assignmentResults.stream()
-                    .filter(x -> x.getInvoiceCharge().equals(calculationResult.getBudgetItemAllocation().getCharge().getReference()))
-                    .filter(x -> x.getKeyTable().equals(calculationResult.getBudgetItemAllocation().getKeyTable().getName()))
+                    .filter(x -> x.getInvoiceCharge().equals(calculationResult.getPartitionItem().getCharge().getReference()))
+                    .filter(x -> x.getKeyTable().equals(calculationResult.getPartitionItem().getKeyTable().getName()))
                     .collect(Collectors.toList());
             if (filteredByChargeAndKeyTable.size()>0){
                 filteredByChargeAndKeyTable.get(0).add(calculationResult);
@@ -150,7 +150,7 @@ public class BudgetAssignmentService {
                     lease,
                     unit,
                     calculationResult.getKeyItem().getKeyTable(),
-                    calculationResult.getBudgetItemAllocation().getCharge(),
+                    calculationResult.getPartitionItem().getCharge(),
                     calculationResult.getValue()
                 ));
             }
@@ -233,15 +233,15 @@ public class BudgetAssignmentService {
 
     private ShortFall getShortFall(final BudgetItem budgetItem){
         ShortFall shortFall = new ShortFall();
-        for (BudgetItemAllocation allocation : budgetItem.getBudgetItemAllocations()){
+        for (PartitionItem allocation : budgetItem.getPartitionItems()){
             shortFall = shortFall.add(getShortFallForTemporaryCalculations(allocation));
         }
         return shortFall;
     }
 
-    private ShortFall getShortFallForTemporaryCalculations(final BudgetItemAllocation allocation){
+    private ShortFall getShortFallForTemporaryCalculations(final PartitionItem allocation){
         ShortFall shortFall = new ShortFall();
-        List<BudgetCalculation> calculationsForAllocation = budgetCalculationRepository.findByBudgetItemAllocationAndStatus(allocation, BudgetCalculationStatus.TEMPORARY);
+        List<BudgetCalculation> calculationsForAllocation = budgetCalculationRepository.findByPartitionItemAndStatus(allocation, BudgetCalculationStatus.TEMPORARY);
         for (BudgetCalculation calculation : calculationsForAllocation){
             shortFall = shortFall.add(getShortFall(calculation));
         }

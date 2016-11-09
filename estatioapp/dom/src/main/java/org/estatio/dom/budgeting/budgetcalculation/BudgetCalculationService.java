@@ -11,7 +11,7 @@ import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 
 import org.estatio.dom.budgetassignment.BudgetCalculationLinkRepository;
-import org.estatio.dom.budgeting.allocation.BudgetItemAllocation;
+import org.estatio.dom.budgeting.allocation.PartitionItem;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keyitem.KeyItem;
@@ -27,7 +27,7 @@ public class BudgetCalculationService {
         for (BudgetCalculationViewmodel result : getCalculations(budget)){
             budgetCalculations.add(
                     budgetCalculationRepository.updateOrCreateTemporaryBudgetCalculation(
-                    result.getBudgetItemAllocation(),
+                    result.getPartitionItem(),
                     result.getKeyItem(),
                     result.getValue(),
                     result.getCalculationType())
@@ -55,7 +55,7 @@ public class BudgetCalculationService {
     private List<BudgetCalculationViewmodel> calculate(final BudgetItem budgetItem) {
 
         List<BudgetCalculationViewmodel> result = new ArrayList<>();
-        for (BudgetItemAllocation itemAllocation : budgetItem.getBudgetItemAllocations()) {
+        for (PartitionItem itemAllocation : budgetItem.getPartitionItems()) {
 
             result.addAll(calculate(itemAllocation));
 
@@ -64,7 +64,7 @@ public class BudgetCalculationService {
         return result;
     }
 
-    private List<BudgetCalculationViewmodel> calculate(final BudgetItemAllocation itemAllocation) {
+    private List<BudgetCalculationViewmodel> calculate(final PartitionItem itemAllocation) {
 
         List<BudgetCalculationViewmodel> results = new ArrayList<>();
 
@@ -79,7 +79,7 @@ public class BudgetCalculationService {
         return results;
     }
 
-    private List<BudgetCalculationViewmodel> calculateForTotalAndType(final BudgetItemAllocation itemAllocation, final BigDecimal total, final BudgetCalculationType calculationType) {
+    private List<BudgetCalculationViewmodel> calculateForTotalAndType(final PartitionItem itemAllocation, final BigDecimal total, final BudgetCalculationType calculationType) {
 
         List<BudgetCalculationViewmodel> results = new ArrayList<>();
 

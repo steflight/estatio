@@ -35,31 +35,31 @@ import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.charge.Charge;
 
-@DomainService(repositoryFor = BudgetItemAllocation.class, nature = NatureOfService.DOMAIN)
+@DomainService(repositoryFor = PartitionItem.class, nature = NatureOfService.DOMAIN)
 @DomainServiceLayout()
-public class BudgetItemAllocationRepository extends UdoDomainRepositoryAndFactory<BudgetItemAllocation> {
+public class BudgetItemAllocationRepository extends UdoDomainRepositoryAndFactory<PartitionItem> {
 
     public BudgetItemAllocationRepository() {
-        super(BudgetItemAllocationRepository.class, BudgetItemAllocation.class);
+        super(BudgetItemAllocationRepository.class, PartitionItem.class);
     }
 
     // //////////////////////////////////////
 
-    public BudgetItemAllocation newBudgetItemAllocation(
+    public PartitionItem newPartitionItem(
             final Charge charge,
             final KeyTable keyTable,
             final BudgetItem budgetItem,
             final BigDecimal percentage) {
-        BudgetItemAllocation budgetItemAllocation = newTransientInstance(BudgetItemAllocation.class);
-        budgetItemAllocation.setCharge(charge);
-        budgetItemAllocation.setKeyTable(keyTable);
-        budgetItemAllocation.setBudgetItem(budgetItem);
-        budgetItemAllocation.setPercentage(percentage.setScale(6, BigDecimal.ROUND_HALF_UP));
-        persistIfNotAlready(budgetItemAllocation);
-        return budgetItemAllocation;
+        PartitionItem partitionItem = newTransientInstance(PartitionItem.class);
+        partitionItem.setCharge(charge);
+        partitionItem.setKeyTable(keyTable);
+        partitionItem.setBudgetItem(budgetItem);
+        partitionItem.setPercentage(percentage.setScale(6, BigDecimal.ROUND_HALF_UP));
+        persistIfNotAlready(partitionItem);
+        return partitionItem;
     }
 
-    public String validateNewBudgetItemAllocation(
+    public String validateNewPartitionItem(
             final Charge charge,
             final KeyTable keyTable,
             final BudgetItem budgetItem,
@@ -75,45 +75,45 @@ public class BudgetItemAllocationRepository extends UdoDomainRepositoryAndFactor
 
     @Action(semantics = SemanticsOf.SAFE, restrictTo = RestrictTo.PROTOTYPING)
     @ActionLayout()
-    public List<BudgetItemAllocation> allBudgetItemAllocations() {
+    public List<PartitionItem> allPartitionItems() {
         return allInstances();
     }
 
     // //////////////////////////////////////
 
     @Programmatic
-    public List<BudgetItemAllocation> findByBudgetItem(final BudgetItem budgetItem) {
+    public List<PartitionItem> findByBudgetItem(final BudgetItem budgetItem) {
         return allMatches("findByBudgetItem", "budgetItem", budgetItem);
     }
 
     @Programmatic
-    public List<BudgetItemAllocation> findByKeyTable(final KeyTable keyTable) {
+    public List<PartitionItem> findByKeyTable(final KeyTable keyTable) {
         return allMatches("findByKeyTable", "keyTable", keyTable);
     }
 
     @Programmatic
-    public BudgetItemAllocation findByChargeAndBudgetItemAndKeyTable(final Charge charge, final BudgetItem budgetItem, final KeyTable keyTable) {
+    public PartitionItem findByChargeAndBudgetItemAndKeyTable(final Charge charge, final BudgetItem budgetItem, final KeyTable keyTable) {
         return uniqueMatch("findByChargeAndBudgetItemAndKeyTable", "charge", charge, "budgetItem", budgetItem, "keyTable", keyTable);
     }
 
     @Programmatic
-    public BudgetItemAllocation findOrCreateBudgetItemAllocation(final BudgetItem budgetItem, final Charge invoiceCharge, final KeyTable keyTable, final BigDecimal percentage){
-        final BudgetItemAllocation budgetItemAllocation = findByChargeAndBudgetItemAndKeyTable(invoiceCharge, budgetItem, keyTable);
-        if (budgetItemAllocation == null) {
-            return newBudgetItemAllocation(invoiceCharge, keyTable, budgetItem, percentage);
+    public PartitionItem findOrCreatePartitionItem(final BudgetItem budgetItem, final Charge invoiceCharge, final KeyTable keyTable, final BigDecimal percentage){
+        final PartitionItem partitionItem = findByChargeAndBudgetItemAndKeyTable(invoiceCharge, budgetItem, keyTable);
+        if (partitionItem == null) {
+            return newPartitionItem(invoiceCharge, keyTable, budgetItem, percentage);
         }
-        return budgetItemAllocation;
+        return partitionItem;
     }
 
     @Programmatic
-    public BudgetItemAllocation updateOrCreateBudgetItemAllocation(final BudgetItem budgetItem, final Charge invoiceCharge, final KeyTable keyTable, final BigDecimal percentage){
-        final BudgetItemAllocation budgetItemAllocation = findByChargeAndBudgetItemAndKeyTable(invoiceCharge, budgetItem, keyTable);
-        if (budgetItemAllocation == null) {
-            return newBudgetItemAllocation(invoiceCharge, keyTable, budgetItem, percentage);
+    public PartitionItem updateOrCreatePartitionItem(final BudgetItem budgetItem, final Charge invoiceCharge, final KeyTable keyTable, final BigDecimal percentage){
+        final PartitionItem partitionItem = findByChargeAndBudgetItemAndKeyTable(invoiceCharge, budgetItem, keyTable);
+        if (partitionItem == null) {
+            return newPartitionItem(invoiceCharge, keyTable, budgetItem, percentage);
         } else {
-            budgetItemAllocation.setPercentage(percentage);
+            partitionItem.setPercentage(percentage);
         }
-        return budgetItemAllocation;
+        return partitionItem;
     }
 
 }

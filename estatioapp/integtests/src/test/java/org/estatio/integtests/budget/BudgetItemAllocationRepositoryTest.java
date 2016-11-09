@@ -12,8 +12,8 @@ import org.apache.isis.applib.fixturescripts.FixtureScript;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
-import org.estatio.dom.budgeting.allocation.BudgetItemAllocation;
 import org.estatio.dom.budgeting.allocation.BudgetItemAllocationRepository;
+import org.estatio.dom.budgeting.allocation.PartitionItem;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
@@ -66,14 +66,14 @@ public class BudgetItemAllocationRepositoryTest extends EstatioIntegrationTest {
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
             Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
-            BudgetItemAllocation budgetItemAllocation = budget.getItems().first().getBudgetItemAllocations().first();
+            PartitionItem partitionItem = budget.getItems().first().getPartitionItems().first();
 
             //when, then
             assertThat(budgetItemAllocationRepository
-                    .validateNewBudgetItemAllocation(
-                            budgetItemAllocation.getCharge(),
-                            budgetItemAllocation.getKeyTable(),
-                            budgetItemAllocation.getBudgetItem(),
+                    .validateNewPartitionItem(
+                            partitionItem.getCharge(),
+                            partitionItem.getKeyTable(),
+                            partitionItem.getBudgetItem(),
                             null)
             ).isEqualTo("This schedule item already exists");
 
@@ -90,9 +90,9 @@ public class BudgetItemAllocationRepositoryTest extends EstatioIntegrationTest {
             Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
             BudgetItem budgetItem = budget.getItems().last();
             // when
-            final List<BudgetItemAllocation> budgetItemAllocationList = budgetItemAllocationRepository.findByBudgetItem(budgetItem);
+            final List<PartitionItem> partitionItemList = budgetItemAllocationRepository.findByBudgetItem(budgetItem);
             // then
-            assertThat(budgetItemAllocationList.size()).isEqualTo(2);
+            assertThat(partitionItemList.size()).isEqualTo(2);
 
         }
 
@@ -107,9 +107,9 @@ public class BudgetItemAllocationRepositoryTest extends EstatioIntegrationTest {
             Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
             KeyTable keyTable = keytablesRepository.findByBudget(budget).get(0);
             // when
-            final List<BudgetItemAllocation> budgetItemAllocationList = budgetItemAllocationRepository.findByKeyTable(keyTable);
+            final List<PartitionItem> partitionItemList = budgetItemAllocationRepository.findByKeyTable(keyTable);
             // then
-            assertThat(budgetItemAllocationList.size()).isEqualTo(2);
+            assertThat(partitionItemList.size()).isEqualTo(2);
 
         }
 
@@ -127,17 +127,17 @@ public class BudgetItemAllocationRepositoryTest extends EstatioIntegrationTest {
             KeyTable keyTable = keytablesRepository.findByBudget(budget).get(0);
             Charge charge = chargeRepository.findByReference(ChargeRefData.GB_SERVICE_CHARGE);
             // when
-            final BudgetItemAllocation budgetItemAllocation = budgetItemAllocationRepository.findByChargeAndBudgetItemAndKeyTable(charge, budgetItem, keyTable);
+            final PartitionItem partitionItem = budgetItemAllocationRepository.findByChargeAndBudgetItemAndKeyTable(charge, budgetItem, keyTable);
             // then
-            assertThat(budgetItemAllocation.getBudgetItem()).isEqualTo(budgetItem);
-            assertThat(budgetItemAllocation.getKeyTable()).isEqualTo(keyTable);
+            assertThat(partitionItem.getBudgetItem()).isEqualTo(budgetItem);
+            assertThat(partitionItem.getKeyTable()).isEqualTo(keyTable);
         }
 
     }
 
     public static class UpdateOrCreateAllocation extends BudgetItemAllocationRepositoryTest {
 
-        BudgetItemAllocation budgetItemAllocation;
+        PartitionItem partitionItem;
         BigDecimal origPercentage;
         BigDecimal newPercentage;
 
@@ -155,16 +155,16 @@ public class BudgetItemAllocationRepositoryTest extends EstatioIntegrationTest {
             origPercentage = new BigDecimal("100").setScale(6, BigDecimal.ROUND_HALF_UP);
             newPercentage = new BigDecimal("90").setScale(6, BigDecimal.ROUND_HALF_UP);
 
-            budgetItemAllocation = budgetItemAllocationRepository.findByChargeAndBudgetItemAndKeyTable(charge, budgetItem, keyTable);
-            assertThat(budgetItemAllocation.getPercentage()).isEqualTo(origPercentage);
+            partitionItem = budgetItemAllocationRepository.findByChargeAndBudgetItemAndKeyTable(charge, budgetItem, keyTable);
+            assertThat(partitionItem.getPercentage()).isEqualTo(origPercentage);
 
             // when
-            budgetItemAllocation = budgetItemAllocationRepository.updateOrCreateBudgetItemAllocation(budgetItem, charge, keyTable, newPercentage);
+            partitionItem = budgetItemAllocationRepository.updateOrCreatePartitionItem(budgetItem, charge, keyTable, newPercentage);
 
             // then
-            assertThat(budgetItemAllocation.getBudgetItem()).isEqualTo(budgetItem);
-            assertThat(budgetItemAllocation.getKeyTable()).isEqualTo(keyTable);
-            assertThat(budgetItemAllocation.getPercentage()).isEqualTo(newPercentage);
+            assertThat(partitionItem.getBudgetItem()).isEqualTo(budgetItem);
+            assertThat(partitionItem.getKeyTable()).isEqualTo(keyTable);
+            assertThat(partitionItem.getPercentage()).isEqualTo(newPercentage);
         }
 
     }

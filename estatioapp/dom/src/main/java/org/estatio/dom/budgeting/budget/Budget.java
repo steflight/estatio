@@ -63,7 +63,7 @@ import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgetassignment.ServiceChargeItem;
 import org.estatio.dom.budgetassignment.ServiceChargeItemRepository;
-import org.estatio.dom.budgeting.allocation.BudgetItemAllocation;
+import org.estatio.dom.budgeting.allocation.PartitionItem;
 import org.estatio.dom.budgeting.api.BudgetItemCreator;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
@@ -348,7 +348,7 @@ public class Budget extends UdoDomainObject2<Budget>
     public List<Charge> getInvoiceCharges() {
         List<Charge> charges = new ArrayList<>();
         for (BudgetItem budgetItem : getItems()) {
-            for (BudgetItemAllocation allocation : budgetItem.getBudgetItemAllocations()) {
+            for (PartitionItem allocation : budgetItem.getPartitionItems()) {
                 if (!charges.contains(allocation.getCharge())) {
                     charges.add(allocation.getCharge());
                 }

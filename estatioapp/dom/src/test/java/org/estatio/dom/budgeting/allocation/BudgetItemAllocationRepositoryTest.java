@@ -60,7 +60,7 @@ public class BudgetItemAllocationRepositoryTest {
             }
 
             @Override
-            protected List<BudgetItemAllocation> allInstances() {
+            protected List<PartitionItem> allInstances() {
                 finderInteraction = new FinderInteraction(null, FinderInteraction.FinderMethod.ALL_INSTANCES);
                 return null;
             }
@@ -82,7 +82,7 @@ public class BudgetItemAllocationRepositoryTest {
             budgetItemAllocationRepository.findByBudgetItem(budgetItem);
 
             assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.ALL_MATCHES);
-            assertThat(finderInteraction.getResultType()).isEqualTo(BudgetItemAllocation.class);
+            assertThat(finderInteraction.getResultType()).isEqualTo(PartitionItem.class);
             assertThat(finderInteraction.getQueryName()).isEqualTo("findByBudgetItem");
             assertThat(finderInteraction.getArgumentsByParameterName().get("budgetItem")).isEqualTo((Object) budgetItem);
             assertThat(finderInteraction.getArgumentsByParameterName()).hasSize(1);
@@ -99,7 +99,7 @@ public class BudgetItemAllocationRepositoryTest {
             budgetItemAllocationRepository.findByKeyTable(keyTable);
 
             assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.ALL_MATCHES);
-            assertThat(finderInteraction.getResultType()).isEqualTo(BudgetItemAllocation.class);
+            assertThat(finderInteraction.getResultType()).isEqualTo(PartitionItem.class);
             assertThat(finderInteraction.getQueryName()).isEqualTo("findByKeyTable");
             assertThat(finderInteraction.getArgumentsByParameterName().get("keyTable")).isEqualTo((Object) keyTable);
             assertThat(finderInteraction.getArgumentsByParameterName()).hasSize(1);
@@ -118,7 +118,7 @@ public class BudgetItemAllocationRepositoryTest {
             budgetItemAllocationRepository.findByChargeAndBudgetItemAndKeyTable(charge, budgetItem, keyTable);
 
             assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.UNIQUE_MATCH);
-            assertThat(finderInteraction.getResultType()).isEqualTo(BudgetItemAllocation.class);
+            assertThat(finderInteraction.getResultType()).isEqualTo(PartitionItem.class);
             assertThat(finderInteraction.getQueryName()).isEqualTo("findByChargeAndBudgetItemAndKeyTable");
             assertThat(finderInteraction.getArgumentsByParameterName().get("charge")).isEqualTo((Object) charge);
             assertThat(finderInteraction.getArgumentsByParameterName().get("budgetItem")).isEqualTo((Object) budgetItem);
@@ -142,7 +142,7 @@ public class BudgetItemAllocationRepositoryTest {
         public void setup() {
             budgetItemAllocationRepository1 = new BudgetItemAllocationRepository() {
                 @Override
-                public BudgetItemAllocation findByChargeAndBudgetItemAndKeyTable(final Charge charge, final BudgetItem budgetItem, final KeyTable keyTable) {
+                public PartitionItem findByChargeAndBudgetItemAndKeyTable(final Charge charge, final BudgetItem budgetItem, final KeyTable keyTable) {
                     return null;
                 }
             };
@@ -156,26 +156,26 @@ public class BudgetItemAllocationRepositoryTest {
             final Charge charge = new Charge();
             final BudgetItem budgetItem = new BudgetItem();
             final BigDecimal percentage = new BigDecimal("100.000000");
-            final BudgetItemAllocation budgetItemAllocation = new BudgetItemAllocation();
+            final PartitionItem partitionItem = new PartitionItem();
 
             // expect
             context.checking(new Expectations() {
                 {
-                    oneOf(mockContainer).newTransientInstance(BudgetItemAllocation.class);
-                    will(returnValue(budgetItemAllocation));
-                    oneOf(mockContainer).persistIfNotAlready(budgetItemAllocation);
+                    oneOf(mockContainer).newTransientInstance(PartitionItem.class);
+                    will(returnValue(partitionItem));
+                    oneOf(mockContainer).persistIfNotAlready(partitionItem);
                 }
 
             });
 
             // when
-            BudgetItemAllocation newBudgetItemAllocation = budgetItemAllocationRepository1.findOrCreateBudgetItemAllocation(budgetItem, charge, keyTable, percentage);
+            PartitionItem newPartitionItem = budgetItemAllocationRepository1.findOrCreatePartitionItem(budgetItem, charge, keyTable, percentage);
 
             // then
-            assertThat(newBudgetItemAllocation.getCharge()).isEqualTo(charge);
-            assertThat(newBudgetItemAllocation.getBudgetItem()).isEqualTo(budgetItem);
-            assertThat(newBudgetItemAllocation.getKeyTable()).isEqualTo(keyTable);
-            assertThat(newBudgetItemAllocation.getPercentage()).isEqualTo(percentage);
+            assertThat(newPartitionItem.getCharge()).isEqualTo(charge);
+            assertThat(newPartitionItem.getBudgetItem()).isEqualTo(budgetItem);
+            assertThat(newPartitionItem.getKeyTable()).isEqualTo(keyTable);
+            assertThat(newPartitionItem.getPercentage()).isEqualTo(percentage);
 
         }
 

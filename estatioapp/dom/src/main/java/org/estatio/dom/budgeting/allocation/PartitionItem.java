@@ -81,14 +81,14 @@ import lombok.Setter;
                         "FROM org.estatio.dom.budgeting.allocation.BudgetItemAllocation " +
                         "WHERE charge == :charge && budgetItem == :budgetItem && keyTable == :keyTable ")
 })
-@Unique(name = "ScheduleItem_charge_budgetItem_keyTable_UNQ", members = {"charge", "budgetItem", "keyTable"})
+@Unique(name = "PartitionItem_charge_budgetItem_keyTable_UNQ", members = {"charge", "budgetItem", "keyTable"})
 @DomainObject(
         auditing = Auditing.DISABLED,
-        objectType = "org.estatio.dom.budgeting.allocation.BudgetItemAllocation"
+        objectType = "org.estatio.dom.budgeting.allocation.PartitionItem"
 )
-public class BudgetItemAllocation extends UdoDomainObject2<BudgetItemAllocation> implements WithApplicationTenancyProperty {
+public class PartitionItem extends UdoDomainObject2<PartitionItem> implements WithApplicationTenancyProperty {
 
-    public BudgetItemAllocation() {
+    public PartitionItem() {
         super("budgetItem, charge, keyTable");
     }
 
@@ -116,7 +116,7 @@ public class BudgetItemAllocation extends UdoDomainObject2<BudgetItemAllocation>
     private KeyTable keyTable;
 
     @ActionLayout(hidden = Where.EVERYWHERE)
-    public BudgetItemAllocation changeKeyTable(final KeyTable keyTable) {
+    public PartitionItem changeKeyTable(final KeyTable keyTable) {
         setKeyTable(keyTable);
         return this;
     }
@@ -145,7 +145,7 @@ public class BudgetItemAllocation extends UdoDomainObject2<BudgetItemAllocation>
     private BigDecimal percentage;
 
     @Action(restrictTo = RestrictTo.PROTOTYPING)
-    public BudgetItemAllocation updatePercentage(final BigDecimal percentage) {
+    public PartitionItem updatePercentage(final BigDecimal percentage) {
         setPercentage(percentage.setScale(6, BigDecimal.ROUND_HALF_UP));
         return this;
     }

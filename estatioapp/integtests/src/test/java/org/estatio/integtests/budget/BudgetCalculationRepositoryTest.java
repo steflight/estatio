@@ -12,7 +12,7 @@ import org.apache.isis.applib.fixturescripts.FixtureScript;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
-import org.estatio.dom.budgeting.allocation.BudgetItemAllocation;
+import org.estatio.dom.budgeting.allocation.PartitionItem;
 import org.estatio.dom.budgeting.allocation.BudgetItemAllocationRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
@@ -69,12 +69,12 @@ public class BudgetCalculationRepositoryTest extends EstatioIntegrationTest {
         @Test
         public void happyCase() throws Exception {
             // given
-            BudgetItemAllocation budgetItemAllocation = budgetItemAllocationRepository.allBudgetItemAllocations().get(0);
-            KeyItem keyItem = budgetItemAllocation.getKeyTable().getItems().first();
-            BudgetCalculation newBudgetCalculation = budgetCalculationRepository.updateOrCreateTemporaryBudgetCalculation(budgetItemAllocation, keyItem, BigDecimal.ZERO, BudgetCalculationType.BUDGETED);
+            PartitionItem partitionItem = budgetItemAllocationRepository.allPartitionItems().get(0);
+            KeyItem keyItem = partitionItem.getKeyTable().getItems().first();
+            BudgetCalculation newBudgetCalculation = budgetCalculationRepository.updateOrCreateTemporaryBudgetCalculation(partitionItem, keyItem, BigDecimal.ZERO, BudgetCalculationType.BUDGETED);
 
             // when
-            BudgetCalculation budgetCalculation = budgetCalculationRepository.findUnique(budgetItemAllocation, keyItem, BudgetCalculationStatus.TEMPORARY, BudgetCalculationType.BUDGETED);
+            BudgetCalculation budgetCalculation = budgetCalculationRepository.findUnique(partitionItem, keyItem, BudgetCalculationStatus.TEMPORARY, BudgetCalculationType.BUDGETED);
 
             // then
             assertThat(budgetCalculation).isEqualTo(newBudgetCalculation);
@@ -88,12 +88,12 @@ public class BudgetCalculationRepositoryTest extends EstatioIntegrationTest {
         @Test
         public void happyCase() throws Exception {
             // given
-            BudgetItemAllocation budgetItemAllocation = budgetItemAllocationRepository.allBudgetItemAllocations().get(0);
-            KeyItem keyItem = budgetItemAllocation.getKeyTable().getItems().first();
-            BudgetCalculation newBudgetCalculation = budgetCalculationRepository.updateOrCreateTemporaryBudgetCalculation(budgetItemAllocation, keyItem, BigDecimal.ZERO, BudgetCalculationType.BUDGETED);
+            PartitionItem partitionItem = budgetItemAllocationRepository.allPartitionItems().get(0);
+            KeyItem keyItem = partitionItem.getKeyTable().getItems().first();
+            BudgetCalculation newBudgetCalculation = budgetCalculationRepository.updateOrCreateTemporaryBudgetCalculation(partitionItem, keyItem, BigDecimal.ZERO, BudgetCalculationType.BUDGETED);
 
             // when
-            List<BudgetCalculation> budgetCalculations = budgetCalculationRepository.findByBudgetItemAllocation(budgetItemAllocation);
+            List<BudgetCalculation> budgetCalculations = budgetCalculationRepository.findByBudgetItemAllocation(partitionItem);
 
             // then
             assertThat(budgetCalculations.size()).isEqualTo(1);
@@ -138,17 +138,17 @@ public class BudgetCalculationRepositoryTest extends EstatioIntegrationTest {
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
             Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
-            BudgetItemAllocation allocation = budget.getItems().first().getBudgetItemAllocations().first();
+            PartitionItem allocation = budget.getItems().first().getPartitionItems().first();
             budget.calculate();
 
             // when
-            List<BudgetCalculation> budgetCalculationsForAllocationOfType = budgetCalculationRepository.findByBudgetItemAllocationAndStatus(allocation, BudgetCalculationStatus.TEMPORARY);
+            List<BudgetCalculation> budgetCalculationsForAllocationOfType = budgetCalculationRepository.findByPartitionItemAndStatus(allocation, BudgetCalculationStatus.TEMPORARY);
 
             // then
             assertThat(budgetCalculationsForAllocationOfType.size()).isEqualTo(25);
 
             // and when
-            budgetCalculationsForAllocationOfType = budgetCalculationRepository.findByBudgetItemAllocationAndStatus(allocation, BudgetCalculationStatus.ASSIGNED);
+            budgetCalculationsForAllocationOfType = budgetCalculationRepository.findByPartitionItemAndStatus(allocation, BudgetCalculationStatus.ASSIGNED);
 
             // then
             assertThat(budgetCalculationsForAllocationOfType.size()).isEqualTo(0);

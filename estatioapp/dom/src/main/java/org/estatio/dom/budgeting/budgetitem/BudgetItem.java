@@ -48,9 +48,9 @@ import org.incode.module.base.dom.utils.TitleBuilder;
 
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
-import org.estatio.dom.budgeting.allocation.BudgetItemAllocation;
 import org.estatio.dom.budgeting.allocation.BudgetItemAllocationRepository;
-import org.estatio.dom.budgeting.api.BudgetItemAllocationCreator;
+import org.estatio.dom.budgeting.allocation.PartitionItem;
+import org.estatio.dom.budgeting.api.PartitionItemCreator;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.keytable.KeyTable;
@@ -94,7 +94,7 @@ import lombok.Setter;
         objectType = "org.estatio.dom.budgeting.budgetitem.BudgetItem"
 )
 public class BudgetItem extends UdoDomainObject2<BudgetItem>
-        implements WithApplicationTenancyProperty, BudgetItemAllocationCreator {
+        implements WithApplicationTenancyProperty, PartitionItemCreator {
 
     public BudgetItem() {
         super("budget, charge");
@@ -179,14 +179,14 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
     @CollectionLayout(render= RenderType.EAGERLY)
     @Persistent(mappedBy = "budgetItem", dependentElement = "true")
     @Getter @Setter
-    private SortedSet<BudgetItemAllocation> budgetItemAllocations = new TreeSet<>();
+    private SortedSet<PartitionItem> partitionItems = new TreeSet<>();
 
     @Action(semantics = SemanticsOf.NON_IDEMPOTENT)
-    public BudgetItemAllocation createBudgetItemAllocation(
+    public PartitionItem createBudgetItemAllocation(
             final Charge charge,
             final KeyTable keyTable,
             final BigDecimal percentage) {
-        return budgetItemAllocationRepository.newBudgetItemAllocation(charge, keyTable, this, percentage);
+        return budgetItemAllocationRepository.newPartitionItem(charge, keyTable, this, percentage);
     }
 
     public List<Charge> choices0CreateBudgetItemAllocation(
@@ -215,13 +215,13 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
             final Charge charge,
             final KeyTable keyTable,
             final BigDecimal percentage){
-        return budgetItemAllocationRepository.validateNewBudgetItemAllocation(charge,keyTable, this, percentage);
+        return budgetItemAllocationRepository.validateNewPartitionItem(charge, keyTable, this, percentage);
     }
 
     @Programmatic
     public void createCopyOn(final Budget budget) {
         BudgetItem itemCopy = budget.newBudgetItem(getBudgetedValue(), getCharge());
-        for (BudgetItemAllocation allocation : getBudgetItemAllocations()){
+        for (PartitionItem allocation : getPartitionItems()){
             String keyTableName = allocation.getKeyTable().getName();
             KeyTable correspondingTableOnbudget = keyTableRepository.findByBudgetAndName(budget, keyTableName);
             itemCopy.createBudgetItemAllocation(allocation.getCharge(), correspondingTableOnbudget, allocation.getPercentage());
@@ -236,13 +236,13 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
 
     @Override
     @Programmatic
-    public BudgetItemAllocation findOrCreateBudgetItemAllocation(final Charge allocationCharge, final KeyTable keyTable, final BigDecimal percentage) {
-        return budgetItemAllocationRepository.findOrCreateBudgetItemAllocation(this, allocationCharge, keyTable, percentage);
+    public PartitionItem findOrCreatePartitionItem(final Charge charge, final KeyTable keyTable, final BigDecimal percentage) {
+        return budgetItemAllocationRepository.findOrCreatePartitionItem(this, charge, keyTable, percentage);
     }
 
     @Programmatic
-    public BudgetItemAllocation updateOrCreateBudgetItemAllocation(final Charge allocationCharge, final KeyTable keyTable, final BigDecimal percentage) {
-        return budgetItemAllocationRepository.updateOrCreateBudgetItemAllocation(this, allocationCharge, keyTable, percentage);
+    public PartitionItem updateOrCreateBudgetItemAllocation(final Charge charge, final KeyTable keyTable, final BigDecimal percentage) {
+        return budgetItemAllocationRepository.updateOrCreatePartitionItem(this, charge, keyTable, percentage);
     }
 
     @Programmatic

@@ -23,7 +23,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.estatio.dom.budgeting.allocation.BudgetItemAllocation;
+import org.estatio.dom.budgeting.allocation.PartitionItem;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.budgetitem.BudgetItemValue;
@@ -40,7 +40,7 @@ public class BudgetCalculationServiceTest {
         Budget budget;
         BudgetItem budgetItem;
         BudgetItemValue budgetItemValue;
-        BudgetItemAllocation allocation;
+        PartitionItem allocation;
         KeyTable keyTable;
         KeyItem keyItem1;
         KeyItem keyItem2;
@@ -77,11 +77,11 @@ public class BudgetCalculationServiceTest {
             keyItem2.setKeyTable(keyTable);
             keyTable.getItems().add(keyItem2);
 
-            allocation = new BudgetItemAllocation();
+            allocation = new PartitionItem();
             allocation.setBudgetItem(budgetItem);
             allocation.setKeyTable(keyTable);
 
-            budgetItem.getBudgetItemAllocations().add(allocation);
+            budgetItem.getPartitionItems().add(allocation);
             budget.getItems().add(budgetItem);
 
         }

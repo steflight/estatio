@@ -48,7 +48,7 @@ import org.estatio.dom.asset.registration.FixedAssetRegistration;
 import org.estatio.dom.bankmandate.BankMandate;
 import org.estatio.dom.budgetassignment.BudgetCalculationLink;
 import org.estatio.dom.budgetassignment.ServiceChargeItem;
-import org.estatio.dom.budgeting.allocation.BudgetItemAllocation;
+import org.estatio.dom.budgeting.allocation.PartitionItem;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
@@ -107,7 +107,7 @@ public class EstatioOperationalTeardownFixture extends FixtureScript {
         deleteFrom(BudgetCalculationLink.class);
         deleteFrom(BudgetCalculation.class);
         deleteFrom(ServiceChargeItem.class);
-        deleteFrom(BudgetItemAllocation.class);
+        deleteFrom(PartitionItem.class);
         deleteFrom(BudgetItemValue.class);
         deleteFrom(BudgetItem.class);
         deleteFrom(KeyItem.class);

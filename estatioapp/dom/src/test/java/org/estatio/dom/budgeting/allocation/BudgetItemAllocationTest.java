@@ -39,7 +39,7 @@ public class BudgetItemAllocationTest {
 
         @Test
         public void test() {
-            final BudgetItemAllocation pojo = new BudgetItemAllocation();
+            final PartitionItem pojo = new PartitionItem();
             newPojoTester()
                     .withFixture(pojos(Property.class, PropertyForTesting.class))
                     .withFixture(pojos(Charge.class, ChargeForTesting.class))
@@ -52,19 +52,19 @@ public class BudgetItemAllocationTest {
 
     public static class UpdatePercentage extends BudgetItemAllocationTest {
 
-        BudgetItemAllocation budgetItemAllocation = new BudgetItemAllocation();
+        PartitionItem partitionItem = new PartitionItem();
 
         @Test
         public void validate() {
 
             //given
-            budgetItemAllocation.setPercentage(new BigDecimal(100));
+            partitionItem.setPercentage(new BigDecimal(100));
 
             //when then
-            assertThat(budgetItemAllocation.validateUpdatePercentage(BigDecimal.valueOf(100.01))).isEqualTo("percentage should be in range 0 - 100");
-            assertThat(budgetItemAllocation.validateUpdatePercentage(BigDecimal.valueOf(-0.01))).isEqualTo("percentage should be in range 0 - 100");
-            assertThat(budgetItemAllocation.validateUpdatePercentage(new BigDecimal(100))).isNull();
-            assertThat(budgetItemAllocation.validateUpdatePercentage(new BigDecimal(0))).isNull();
+            assertThat(partitionItem.validateUpdatePercentage(BigDecimal.valueOf(100.01))).isEqualTo("percentage should be in range 0 - 100");
+            assertThat(partitionItem.validateUpdatePercentage(BigDecimal.valueOf(-0.01))).isEqualTo("percentage should be in range 0 - 100");
+            assertThat(partitionItem.validateUpdatePercentage(new BigDecimal(100))).isNull();
+            assertThat(partitionItem.validateUpdatePercentage(new BigDecimal(0))).isNull();
         }
 
         @Test
@@ -73,10 +73,10 @@ public class BudgetItemAllocationTest {
             //given
             final BigDecimal percentage = new BigDecimal("100");
             //when
-            budgetItemAllocation.updatePercentage(percentage);
+            partitionItem.updatePercentage(percentage);
             //then
-            assertThat(budgetItemAllocation.getPercentage()).isEqualTo(percentage.setScale(6));
-            assertThat(budgetItemAllocation.getPercentage()).isEqualTo(new BigDecimal("100.000000"));
+            assertThat(partitionItem.getPercentage()).isEqualTo(percentage.setScale(6));
+            assertThat(partitionItem.getPercentage()).isEqualTo(new BigDecimal("100.000000"));
 
         }
 
