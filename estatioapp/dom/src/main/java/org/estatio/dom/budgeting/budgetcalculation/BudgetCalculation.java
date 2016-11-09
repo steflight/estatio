@@ -49,7 +49,7 @@ import org.incode.module.base.dom.utils.TitleBuilder;
 
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
-import org.estatio.dom.budgeting.allocation.PartitionItem;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keyitem.KeyItem;
@@ -110,7 +110,7 @@ public class BudgetCalculation extends UdoDomainObject2<BudgetCalculation>
         implements WithApplicationTenancyProperty, Timestampable {
 
     public BudgetCalculation() {
-        super("budgetItemAllocation, keyItem");
+        super("partitionItem, keyItem");
     }
 
     public String title(){
@@ -126,7 +126,7 @@ public class BudgetCalculation extends UdoDomainObject2<BudgetCalculation>
     private BigDecimal value;
 
     @Getter @Setter
-    @Column(allowsNull = "false", name="budgetItemAllocationId")
+    @Column(allowsNull = "false", name="partitionItemId")
     @PropertyLayout(hidden = Where.REFERENCES_PARENT)
     private PartitionItem partitionItem;
 

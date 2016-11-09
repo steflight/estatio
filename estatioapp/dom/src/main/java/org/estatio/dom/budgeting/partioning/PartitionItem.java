@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.estatio.dom.budgeting.allocation;
+package org.estatio.dom.budgeting.partioning;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -68,23 +68,23 @@ import lombok.Setter;
         @Query(
                 name = "findByBudgetItem", language = "JDOQL",
                 value = "SELECT " +
-                        "FROM org.estatio.dom.budgeting.allocation.BudgetItemAllocation " +
+                        "FROM org.estatio.dom.budgeting.partioning.BudgetItemAllocation " +
                         "WHERE budgetItem == :budgetItem "),
         @Query(
                 name = "findByKeyTable", language = "JDOQL",
                 value = "SELECT " +
-                        "FROM org.estatio.dom.budgeting.allocation.BudgetItemAllocation " +
+                        "FROM org.estatio.dom.budgeting.partioning.BudgetItemAllocation " +
                         "WHERE keyTable == :keyTable "),
         @Query(
                 name = "findByChargeAndBudgetItemAndKeyTable", language = "JDOQL",
                 value = "SELECT " +
-                        "FROM org.estatio.dom.budgeting.allocation.BudgetItemAllocation " +
+                        "FROM org.estatio.dom.budgeting.partioning.BudgetItemAllocation " +
                         "WHERE charge == :charge && budgetItem == :budgetItem && keyTable == :keyTable ")
 })
 @Unique(name = "PartitionItem_charge_budgetItem_keyTable_UNQ", members = {"charge", "budgetItem", "keyTable"})
 @DomainObject(
         auditing = Auditing.DISABLED,
-        objectType = "org.estatio.dom.budgeting.allocation.PartitionItem"
+        objectType = "org.estatio.dom.budgeting.partioning.PartitionItem"
 )
 public class PartitionItem extends UdoDomainObject2<PartitionItem> implements WithApplicationTenancyProperty {
 

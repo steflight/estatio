@@ -12,8 +12,8 @@ import org.apache.isis.applib.fixturescripts.FixtureScript;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
-import org.estatio.dom.budgeting.allocation.PartitionItem;
-import org.estatio.dom.budgeting.allocation.BudgetItemAllocationRepository;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
+import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
@@ -45,7 +45,7 @@ public class BudgetCalculationRepositoryTest extends EstatioIntegrationTest {
     BudgetRepository budgetRepository;
 
     @Inject
-    BudgetItemAllocationRepository budgetItemAllocationRepository;
+    PartitionItemRepository partitionItemRepository;
 
     @Inject
     BudgetCalculationService budgetCalculationService;
@@ -69,7 +69,7 @@ public class BudgetCalculationRepositoryTest extends EstatioIntegrationTest {
         @Test
         public void happyCase() throws Exception {
             // given
-            PartitionItem partitionItem = budgetItemAllocationRepository.allPartitionItems().get(0);
+            PartitionItem partitionItem = partitionItemRepository.allPartitionItems().get(0);
             KeyItem keyItem = partitionItem.getKeyTable().getItems().first();
             BudgetCalculation newBudgetCalculation = budgetCalculationRepository.updateOrCreateTemporaryBudgetCalculation(partitionItem, keyItem, BigDecimal.ZERO, BudgetCalculationType.BUDGETED);
 
@@ -88,7 +88,7 @@ public class BudgetCalculationRepositoryTest extends EstatioIntegrationTest {
         @Test
         public void happyCase() throws Exception {
             // given
-            PartitionItem partitionItem = budgetItemAllocationRepository.allPartitionItems().get(0);
+            PartitionItem partitionItem = partitionItemRepository.allPartitionItems().get(0);
             KeyItem keyItem = partitionItem.getKeyTable().getItems().first();
             BudgetCalculation newBudgetCalculation = budgetCalculationRepository.updateOrCreateTemporaryBudgetCalculation(partitionItem, keyItem, BigDecimal.ZERO, BudgetCalculationType.BUDGETED);
 

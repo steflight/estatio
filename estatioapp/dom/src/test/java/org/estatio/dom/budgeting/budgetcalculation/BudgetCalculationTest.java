@@ -20,8 +20,7 @@ package org.estatio.dom.budgeting.budgetcalculation;
 import org.junit.Test;
 
 import org.incode.module.base.dom.testing.AbstractBeanPropertiesTest;
-import org.estatio.dom.budgeting.allocation.PartitionItem;
-import org.estatio.dom.budgeting.allocation.PartitionItem;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.budgeting.keyitem.KeyItem;
 
 public class BudgetCalculationTest {

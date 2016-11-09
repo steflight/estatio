@@ -19,7 +19,7 @@ import org.incode.module.base.dom.valuetypes.LocalDateInterval;
 import org.estatio.dom.asset.Unit;
 import org.estatio.dom.budgetassignment.viewmodels.BudgetAssignmentResult;
 import org.estatio.dom.budgetassignment.viewmodels.DetailedBudgetAssignmentResult;
-import org.estatio.dom.budgeting.allocation.PartitionItem;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;

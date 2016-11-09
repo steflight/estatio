@@ -27,7 +27,7 @@ import org.incode.module.base.dom.testing.AbstractBeanPropertiesTest;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgeting.PropertyForTesting;
-import org.estatio.dom.budgeting.allocation.PartitionItem;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.charge.Charge;
 

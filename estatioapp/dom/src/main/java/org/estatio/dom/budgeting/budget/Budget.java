@@ -63,7 +63,7 @@ import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgetassignment.ServiceChargeItem;
 import org.estatio.dom.budgetassignment.ServiceChargeItemRepository;
-import org.estatio.dom.budgeting.allocation.PartitionItem;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.budgeting.api.BudgetItemCreator;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;

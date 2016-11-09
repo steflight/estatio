@@ -15,7 +15,7 @@
  * under the License.
  */
 
-package org.estatio.dom.budgeting.allocation;
+package org.estatio.dom.budgeting.partioning;
 
 import java.math.BigDecimal;
 
@@ -33,7 +33,7 @@ import org.estatio.dom.charge.Charge;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class BudgetItemAllocationTest {
+public class PartitionItemTest {
 
     public static class BeanProperties extends AbstractBeanPropertiesTest {
 
@@ -50,7 +50,7 @@ public class BudgetItemAllocationTest {
 
     }
 
-    public static class UpdatePercentage extends BudgetItemAllocationTest {
+    public static class UpdatePercentage extends PartitionItemTest {
 
         PartitionItem partitionItem = new PartitionItem();
 

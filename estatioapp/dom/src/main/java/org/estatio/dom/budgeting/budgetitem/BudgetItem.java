@@ -48,8 +48,8 @@ import org.incode.module.base.dom.utils.TitleBuilder;
 
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
-import org.estatio.dom.budgeting.allocation.BudgetItemAllocationRepository;
-import org.estatio.dom.budgeting.allocation.PartitionItem;
+import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.budgeting.api.PartitionItemCreator;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
@@ -186,7 +186,7 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
             final Charge charge,
             final KeyTable keyTable,
             final BigDecimal percentage) {
-        return budgetItemAllocationRepository.newPartitionItem(charge, keyTable, this, percentage);
+        return partitionItemRepository.newPartitionItem(charge, keyTable, this, percentage);
     }
 
     public List<Charge> choices0CreateBudgetItemAllocation(
@@ -215,7 +215,7 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
             final Charge charge,
             final KeyTable keyTable,
             final BigDecimal percentage){
-        return budgetItemAllocationRepository.validateNewPartitionItem(charge, keyTable, this, percentage);
+        return partitionItemRepository.validateNewPartitionItem(charge, keyTable, this, percentage);
     }
 
     @Programmatic
@@ -237,12 +237,12 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
     @Override
     @Programmatic
     public PartitionItem findOrCreatePartitionItem(final Charge charge, final KeyTable keyTable, final BigDecimal percentage) {
-        return budgetItemAllocationRepository.findOrCreatePartitionItem(this, charge, keyTable, percentage);
+        return partitionItemRepository.findOrCreatePartitionItem(this, charge, keyTable, percentage);
     }
 
     @Programmatic
     public PartitionItem updateOrCreateBudgetItemAllocation(final Charge charge, final KeyTable keyTable, final BigDecimal percentage) {
-        return budgetItemAllocationRepository.updateOrCreatePartitionItem(this, charge, keyTable, percentage);
+        return partitionItemRepository.updateOrCreatePartitionItem(this, charge, keyTable, percentage);
     }
 
     @Programmatic
@@ -255,7 +255,7 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
     private BudgetItemRepository budgetItemRepository;
 
     @Inject
-    private BudgetItemAllocationRepository budgetItemAllocationRepository;
+    private PartitionItemRepository partitionItemRepository;
 
     @Inject
     private KeyTableRepository keyTableRepository;

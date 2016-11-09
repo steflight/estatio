@@ -23,7 +23,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.estatio.dom.budgeting.allocation.PartitionItem;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.budgetitem.BudgetItemValue;

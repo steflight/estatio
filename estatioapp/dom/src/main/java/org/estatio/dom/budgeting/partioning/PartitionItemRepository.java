@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.estatio.dom.budgeting.allocation;
+package org.estatio.dom.budgeting.partioning;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -37,10 +37,10 @@ import org.estatio.dom.charge.Charge;
 
 @DomainService(repositoryFor = PartitionItem.class, nature = NatureOfService.DOMAIN)
 @DomainServiceLayout()
-public class BudgetItemAllocationRepository extends UdoDomainRepositoryAndFactory<PartitionItem> {
+public class PartitionItemRepository extends UdoDomainRepositoryAndFactory<PartitionItem> {
 
-    public BudgetItemAllocationRepository() {
-        super(BudgetItemAllocationRepository.class, PartitionItem.class);
+    public PartitionItemRepository() {
+        super(PartitionItemRepository.class, PartitionItem.class);
     }
 
     // //////////////////////////////////////

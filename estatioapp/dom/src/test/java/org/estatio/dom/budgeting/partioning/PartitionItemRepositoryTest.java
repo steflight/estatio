@@ -15,7 +15,7 @@
  * under the License.
  */
 
-package org.estatio.dom.budgeting.allocation;
+package org.estatio.dom.budgeting.partioning;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -37,15 +37,15 @@ import org.estatio.dom.charge.Charge;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class BudgetItemAllocationRepositoryTest {
+public class PartitionItemRepositoryTest {
 
     FinderInteraction finderInteraction;
 
-    BudgetItemAllocationRepository budgetItemAllocationRepository;
+    PartitionItemRepository partitionItemRepository;
 
     @Before
     public void setup() {
-        budgetItemAllocationRepository = new BudgetItemAllocationRepository() {
+        partitionItemRepository = new PartitionItemRepository() {
 
             @Override
             protected <T> T firstMatch(Query<T> query) {
@@ -73,13 +73,13 @@ public class BudgetItemAllocationRepositoryTest {
         };
     }
 
-    public static class FindByBudgetItem extends BudgetItemAllocationRepositoryTest {
+    public static class FindByPartitionItem extends PartitionItemRepositoryTest {
 
         @Test
         public void happyCase() {
 
             BudgetItem budgetItem = new BudgetItem();
-            budgetItemAllocationRepository.findByBudgetItem(budgetItem);
+            partitionItemRepository.findByBudgetItem(budgetItem);
 
             assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.ALL_MATCHES);
             assertThat(finderInteraction.getResultType()).isEqualTo(PartitionItem.class);
@@ -90,13 +90,13 @@ public class BudgetItemAllocationRepositoryTest {
 
     }
 
-    public static class FindByKeyTable extends BudgetItemAllocationRepositoryTest {
+    public static class FindByKeyTable extends PartitionItemRepositoryTest {
 
         @Test
         public void happyCase() {
 
             KeyTable keyTable = new KeyTable();
-            budgetItemAllocationRepository.findByKeyTable(keyTable);
+            partitionItemRepository.findByKeyTable(keyTable);
 
             assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.ALL_MATCHES);
             assertThat(finderInteraction.getResultType()).isEqualTo(PartitionItem.class);
@@ -107,7 +107,7 @@ public class BudgetItemAllocationRepositoryTest {
 
     }
 
-    public static class FindByBudgetItemAndKeyTable extends BudgetItemAllocationRepositoryTest {
+    public static class FindByPartitionItemAndKeyTable extends PartitionItemRepositoryTest {
 
         @Test
         public void happyCase() {
@@ -115,7 +115,7 @@ public class BudgetItemAllocationRepositoryTest {
             Charge charge = new Charge();
             BudgetItem budgetItem = new BudgetItem();
             KeyTable keyTable = new KeyTable();
-            budgetItemAllocationRepository.findByChargeAndBudgetItemAndKeyTable(charge, budgetItem, keyTable);
+            partitionItemRepository.findByChargeAndBudgetItemAndKeyTable(charge, budgetItem, keyTable);
 
             assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.UNIQUE_MATCH);
             assertThat(finderInteraction.getResultType()).isEqualTo(PartitionItem.class);
@@ -128,7 +128,7 @@ public class BudgetItemAllocationRepositoryTest {
 
     }
 
-    public static class FindOrCreateBudgetItemAllocationNewAllocation extends BudgetItemAllocationRepositoryTest {
+    public static class FindOrCreatePartitionItemAllocationNew extends PartitionItemRepositoryTest {
 
         @Rule
         public JUnitRuleMockery2 context = JUnitRuleMockery2.createFor(JUnitRuleMockery2.Mode.INTERFACES_AND_CLASSES);
@@ -136,17 +136,17 @@ public class BudgetItemAllocationRepositoryTest {
         @Mock
         private DomainObjectContainer mockContainer;
 
-        BudgetItemAllocationRepository budgetItemAllocationRepository1;
+        PartitionItemRepository partitionItemRepository1;
 
         @Before
         public void setup() {
-            budgetItemAllocationRepository1 = new BudgetItemAllocationRepository() {
+            partitionItemRepository1 = new PartitionItemRepository() {
                 @Override
                 public PartitionItem findByChargeAndBudgetItemAndKeyTable(final Charge charge, final BudgetItem budgetItem, final KeyTable keyTable) {
                     return null;
                 }
             };
-            budgetItemAllocationRepository1.setContainer(mockContainer);
+            partitionItemRepository1.setContainer(mockContainer);
         }
 
         @Test
@@ -169,7 +169,7 @@ public class BudgetItemAllocationRepositoryTest {
             });
 
             // when
-            PartitionItem newPartitionItem = budgetItemAllocationRepository1.findOrCreatePartitionItem(budgetItem, charge, keyTable, percentage);
+            PartitionItem newPartitionItem = partitionItemRepository1.findOrCreatePartitionItem(budgetItem, charge, keyTable, percentage);
 
             // then
             assertThat(newPartitionItem.getCharge()).isEqualTo(charge);

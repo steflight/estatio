@@ -2,7 +2,7 @@ package org.estatio.dom.budgeting.api;
 
 import java.math.BigDecimal;
 
-import org.estatio.dom.budgeting.allocation.PartitionItem;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.charge.Charge;
 

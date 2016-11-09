@@ -17,9 +17,8 @@ import org.apache.isis.applib.annotation.Programmatic;
 import org.estatio.dom.Importable;
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
-import org.estatio.dom.budgeting.allocation.PartitionItem;
-import org.estatio.dom.budgeting.allocation.BudgetItemAllocationRepository;
-import org.estatio.dom.budgeting.allocation.PartitionItem;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
+import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
@@ -142,7 +141,7 @@ public class BudgetImportExport implements Importable {
     private BudgetItemRepository budgetItemRepository;
 
     @Inject
-    private BudgetItemAllocationRepository budgetItemAllocationRepository;
+    private PartitionItemRepository partitionItemRepository;
 
     @Inject
     private PropertyRepository propertyRepository;

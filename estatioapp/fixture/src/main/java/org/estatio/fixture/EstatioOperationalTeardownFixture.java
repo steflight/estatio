@@ -48,7 +48,7 @@ import org.estatio.dom.asset.registration.FixedAssetRegistration;
 import org.estatio.dom.bankmandate.BankMandate;
 import org.estatio.dom.budgetassignment.BudgetCalculationLink;
 import org.estatio.dom.budgetassignment.ServiceChargeItem;
-import org.estatio.dom.budgeting.allocation.PartitionItem;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;

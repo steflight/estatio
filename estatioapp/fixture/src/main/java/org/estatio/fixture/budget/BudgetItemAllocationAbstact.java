@@ -24,8 +24,8 @@ import javax.inject.Inject;
 import org.apache.isis.applib.fixturescripts.FixtureScript;
 
 import org.estatio.dom.asset.PropertyRepository;
-import org.estatio.dom.budgeting.allocation.PartitionItem;
-import org.estatio.dom.budgeting.allocation.BudgetItemAllocationRepository;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
+import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.budgetitem.BudgetItemRepository;
@@ -43,13 +43,13 @@ public abstract class BudgetItemAllocationAbstact extends FixtureScript {
             final BigDecimal percentage,
             final ExecutionContext fixtureResults
     ){
-        PartitionItem partitionItem = budgetItemAllocationRepository.newPartitionItem(charge,keyTable,budgetItem, percentage);
+        PartitionItem partitionItem = partitionItemRepository.newPartitionItem(charge,keyTable,budgetItem, percentage);
 
         return fixtureResults.addResult(this, partitionItem);
     }
 
     @Inject
-    protected BudgetItemAllocationRepository budgetItemAllocationRepository;
+    protected PartitionItemRepository partitionItemRepository;
 
     @Inject
     protected PropertyRepository propertyRepository;
