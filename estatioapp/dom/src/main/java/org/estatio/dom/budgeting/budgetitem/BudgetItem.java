@@ -233,6 +233,11 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
         return this;
     }
 
+    @Programmatic
+    public PartitionItem updateOrCreatePartitionItem(final Charge charge, final KeyTable keyTable, final BigDecimal percentage){
+        return partitionItemRepository.updateOrCreatePartitionItem(getBudget().getPartitioningForBudgeting(), this, charge, keyTable, percentage);
+    }
+
     @Inject
     private BudgetItemRepository budgetItemRepository;
 

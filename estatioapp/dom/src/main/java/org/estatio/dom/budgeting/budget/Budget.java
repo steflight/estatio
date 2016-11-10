@@ -367,6 +367,15 @@ public class Budget extends UdoDomainObject2<Budget>
         return charges;
     }
 
+    @Programmatic
+    public Budget findOrCreatePartitioningForBudgeting(){
+        Partitioning partitioningForBudgeting = getPartitioningForBudgeting();
+        if (partitioningForBudgeting==null){
+            newPartitioning(BudgetCalculationType.BUDGETED);
+        }
+        return this;
+    }
+
     @Override
     @Programmatic
     public BudgetItem findOrCreateBudgetItem(
