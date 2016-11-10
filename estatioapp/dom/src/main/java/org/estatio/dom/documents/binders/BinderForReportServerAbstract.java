@@ -23,7 +23,6 @@ import java.util.List;
 import org.isisaddons.module.security.dom.tenancy.WithApplicationTenancy;
 import org.isisaddons.module.stringinterpolator.dom.StringInterpolatorService;
 
-import org.incode.module.document.dom.impl.applicability.Binder;
 import org.incode.module.document.dom.impl.docs.DocumentTemplate;
 
 import org.estatio.dom.appsettings.EstatioSettingsService;
@@ -32,11 +31,16 @@ import org.estatio.dom.appsettings.EstatioSettingsService;
  * Creates a dataModel to be used with {@link StringInterpolatorService} for both content and subject;
  * requires domain object to implement {@link WithApplicationTenancy}.
  */
-public abstract class BinderForReportServerAbstract implements Binder {
+public abstract class BinderForReportServerAbstract<T> extends BinderAbstract<T> {
 
-    public Binding newBinding(
+    public BinderForReportServerAbstract(Class<T> expectedInputType) {
+        super(expectedInputType);
+    }
+
+    public Binding doNewBinding(
             final DocumentTemplate documentTemplate,
-            final Object domainObject, final String additionalTextIfAny) {
+            final T domainObject,
+            final String additionalTextIfAny) {
 
         final String baseUrl = estatioSettingsService.fetchReportServerBaseUrl();
 
@@ -44,13 +48,19 @@ public abstract class BinderForReportServerAbstract implements Binder {
         final DataModel dataModel = new DataModel(domainObject, baseUrl);
 
         // binding
-        return new Binding(dataModel, determineAttachTo(domainObject));
+        return new Binding(dataModel, determineAttachTo((T)domainObject));
     }
 
-    protected abstract List<Object> determineAttachTo(final Object domainObject);
+    /**
+     * Mandatory hook.
+     * @param domainObject
+     * @return
+     */
+    protected abstract List<Object> determineAttachTo(final T domainObject);
 
     @javax.inject.Inject
     EstatioSettingsService estatioSettingsService;
+
 
     /**
      * Intended to be used as a dataModel to pass into render strategies that use the

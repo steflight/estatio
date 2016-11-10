@@ -22,7 +22,11 @@ package org.estatio.dom.documents.binders;
 import java.util.Collections;
 import java.util.List;
 
-public class BinderForReportServerAttachNone extends BinderForReportServerAbstract {
+public class BinderForReportServerAttachNone extends BinderForReportServerAbstract<Object> {
+
+    public BinderForReportServerAttachNone() {
+        super(Object.class);
+    }
 
     /**
      * Never bound to the input object at all.

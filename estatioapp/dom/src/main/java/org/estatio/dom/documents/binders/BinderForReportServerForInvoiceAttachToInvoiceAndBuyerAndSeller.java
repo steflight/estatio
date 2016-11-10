@@ -18,11 +18,14 @@
  */
 package org.estatio.dom.documents.binders;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import org.isisaddons.module.security.dom.tenancy.WithApplicationTenancy;
 import org.isisaddons.module.stringinterpolator.dom.StringInterpolatorService;
+
+import org.estatio.dom.invoice.Invoice;
+import org.estatio.dom.party.Party;
 
 /**
  * Creates a dataModel to be used with {@link StringInterpolatorService} for both content and subject;
@@ -30,13 +33,15 @@ import org.isisaddons.module.stringinterpolator.dom.StringInterpolatorService;
  *
  * The input object is used for 'attachTo'.
  */
-public class BinderForReportServerAttachToInput extends BinderForReportServerAbstract<Object> {
+public class BinderForReportServerForInvoiceAttachToInvoiceAndBuyerAndSeller extends BinderForReportServerAbstract<Invoice> {
 
-    public BinderForReportServerAttachToInput() {
-        super(Object.class);
+    public BinderForReportServerForInvoiceAttachToInvoiceAndBuyerAndSeller() {
+        super(Invoice.class);
     }
 
-    protected List<Object> determineAttachTo(final Object domainObject) {
-        return Collections.singletonList(domainObject);
+    protected List<Object> determineAttachTo(final Invoice invoice) {
+        final Party buyer = invoice.getBuyer();
+        final Party seller = invoice.getSeller();
+        return Arrays.asList(buyer, seller, invoice);
     }
 }

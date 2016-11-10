@@ -24,7 +24,6 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
-import org.incode.module.document.dom.impl.applicability.Binder;
 import org.incode.module.document.dom.impl.docs.Document;
 import org.incode.module.document.dom.impl.docs.DocumentTemplate;
 import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
@@ -41,18 +40,17 @@ import lombok.Data;
 /**
  * For use with email covering notes for invoices.
  */
-public class BinderForDocumentAttachedToPrelimLetterOrInvoice implements Binder {
+public class BinderForDocumentAttachedToPrelimLetterOrInvoice extends BinderAbstract<Document> {
+
+    public BinderForDocumentAttachedToPrelimLetterOrInvoice() {
+        super(Document.class);
+    }
 
     @Override
-    public Binding newBinding(
+    public Binding doNewBinding(
             final DocumentTemplate documentTemplate,
-            final Object domainObject,
+            final Document document,
             final String additionalTextIfAny) {
-
-        if(!(domainObject instanceof Document)) {
-            throw new IllegalArgumentException("Domain object must be of type Document");
-        }
-        Document document = (Document) domainObject;
 
         final Invoice invoice = paperclipRepository.paperclipAttaches(document, Invoice.class);
 
