@@ -92,7 +92,7 @@ public class BudgetTest {
         }
 
         @Test
-        public void withNoCharges() {
+        public void withCharges() {
 
             // given
             Budget budget = new Budget();
@@ -128,18 +128,22 @@ public class BudgetTest {
 
         private BudgetItem createItemFor(final Budget budget, final String uniqueString) {
 
-            BudgetItem newItem = new BudgetItem();
-            Charge charge = new Charge();
-            charge.setReference(uniqueString);
-            newItem.setCharge(charge);
-
             PartitionItem partitionItem = new PartitionItem();
             Charge targetCharge = new Charge();
             targetCharge.setReference("target".concat(uniqueString));
             partitionItem.setCharge(targetCharge);
-            partitionItem.setBudgetItem(newItem);
 
-            newItem.getPartitionItems().add(partitionItem);
+            BudgetItem newItem = new BudgetItem(){
+                @Override
+                public List<PartitionItem> getPartitionItems(){
+                    return Arrays.asList(partitionItem);
+                }
+            };
+            Charge charge = new Charge();
+            charge.setReference(uniqueString);
+            newItem.setCharge(charge);
+
+            partitionItem.setBudgetItem(newItem);
 
             return newItem;
         }

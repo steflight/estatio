@@ -63,17 +63,21 @@ import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgetassignment.ServiceChargeItem;
 import org.estatio.dom.budgetassignment.ServiceChargeItemRepository;
-import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.budgeting.api.BudgetItemCreator;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationService;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.budgetitem.BudgetItemRepository;
 import org.estatio.dom.budgeting.keytable.FoundationValueType;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.budgeting.keytable.KeyTableRepository;
 import org.estatio.dom.budgeting.keytable.KeyValueMethod;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
+import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
+import org.estatio.dom.budgeting.partioning.Partitioning;
+import org.estatio.dom.budgeting.partioning.PartitioningRepository;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.lease.Occupancy;
 import org.estatio.dom.lease.OccupancyRepository;
@@ -146,7 +150,6 @@ public class Budget extends UdoDomainObject2<Budget>
     public LocalDateInterval getBudgetYearInterval() {
         return new LocalDateInterval(new LocalDate(getBudgetYear(),01,01), new LocalDate(new LocalDate(getBudgetYear(),12,31)));
     }
-    // ////////////////////////////////////////
 
     @Programmatic
     public LocalDateInterval getInterval() {
@@ -204,6 +207,10 @@ public class Budget extends UdoDomainObject2<Budget>
 
     @Persistent(mappedBy = "budget", dependentElement = "true")
     @Getter @Setter
+    private SortedSet<Partitioning> partitionings = new TreeSet<>();
+
+    @Persistent(mappedBy = "budget", dependentElement = "true")
+    @Getter @Setter
     private SortedSet<KeyTable> keyTables = new TreeSet<>();
 
     @PropertyLayout(hidden = Where.EVERYWHERE)
@@ -226,26 +233,35 @@ public class Budget extends UdoDomainObject2<Budget>
         return budgetItemRepository.validateNewBudgetItem(this, charge);
     }
 
-    public Budget createNextBudget(final LocalDate newStartDate) {
-        if (newStartDate.getYear() > getBudgetYear()) {
-            return createBudgetForNextYear();
-        } else {
-            return createBudgetInSameYear(newStartDate);
-        }
+    @Action(semantics = SemanticsOf.NON_IDEMPOTENT)
+    @ActionLayout(contributed = Contributed.AS_ACTION)
+    @MemberOrder(name = "partitionings", sequence = "1")
+    public Partitioning newPartitioning(final BudgetCalculationType type){
+        return partitioningRepository.newPartitioning(this, getStartDate(), getEndDate(), type);
     }
 
-    private Budget createBudgetForNextYear(){
+    public String validateNewPartitioning(final BudgetCalculationType type){
+        return partitioningRepository.validateNewPartitioning(this, getStartDate(), getEndDate(), type);
+    }
+
+    @Programmatic
+    public Partitioning getPartitioningForBudgeting(){
+        return partitioningRepository.findUnique(this, BudgetCalculationType.BUDGETED, getStartDate());
+    }
+
+    public Budget createNextBudget() {
         LocalDate start = new LocalDate(getBudgetYear()+1, 01, 01);
         LocalDate end = new LocalDate(getBudgetYear()+1, 12, 31);
         Budget newBudget = budgetRepository.newBudget(getProperty(),start, end);
+        newBudget.newPartitioning(BudgetCalculationType.BUDGETED);
         return copyCurrentTo(newBudget);
     }
 
-    private Budget createBudgetInSameYear(final LocalDate newStartDate){
-        LocalDate endDateOfCurrent = getEndDate();
-        setEndDate(newStartDate.minusDays(1));
-        Budget newBudget = budgetRepository.newBudget(getProperty(), newStartDate, endDateOfCurrent);
-        return copyCurrentTo(newBudget);
+    public String validateCreateNextBudget() {
+        if (budgetRepository.findByPropertyAndStartDate(getProperty(), new LocalDate(getBudgetYear()+1, 01, 01)) != null){
+            return "This budget already exists";
+        }
+        return null;
     }
 
     private Budget copyCurrentTo(final Budget newBudget) {
@@ -256,19 +272,6 @@ public class Budget extends UdoDomainObject2<Budget>
             item.createCopyOn(newBudget);
         }
         return newBudget;
-    }
-
-    public String validateCreateNextBudget(final LocalDate newStartDate){
-        if (newStartDate.isBefore(getStartDate().plusDays(1))){
-            return "New start date should be after current start date";
-        }
-        if (newStartDate.isAfter(getEndDate()) && !(newStartDate.equals(new LocalDate(getBudgetYear()+1, 01, 01)))){
-            return "New start date cannot be after current end date or first day of next year";
-        }
-        if (budgetRepository.findByPropertyAndStartDate(getProperty(),newStartDate) != null){
-            return "This budget already exists";
-        }
-        return null;
     }
 
     /*
@@ -291,6 +294,13 @@ public class Budget extends UdoDomainObject2<Budget>
         // delete calculations
         for (BudgetCalculation calculation : budgetCalculationRepository.findByBudget(this)) {
             calculation.remove();
+        }
+
+        // delete partition items
+        for (BudgetItem budgetItem : getItems()) {
+            for (PartitionItem item : partitionItemRepository.findByBudgetItem(budgetItem)) {
+                item.remove();
+            }
         }
 
         remove(this);
@@ -348,9 +358,9 @@ public class Budget extends UdoDomainObject2<Budget>
     public List<Charge> getInvoiceCharges() {
         List<Charge> charges = new ArrayList<>();
         for (BudgetItem budgetItem : getItems()) {
-            for (PartitionItem allocation : budgetItem.getPartitionItems()) {
-                if (!charges.contains(allocation.getCharge())) {
-                    charges.add(allocation.getCharge());
+            for (PartitionItem partitionItem : budgetItem.getPartitionItems()) {
+                if (!charges.contains(partitionItem.getCharge())) {
+                    charges.add(partitionItem.getCharge());
                 }
             }
         }
@@ -364,6 +374,12 @@ public class Budget extends UdoDomainObject2<Budget>
         return budgetItemRepository.findOrCreateBudgetItem(this, budgetItemCharge);
     }
 
+
+    @Inject
+    private PartitioningRepository partitioningRepository;
+
+    @Inject
+    private PartitionItemRepository partitionItemRepository;
 
     @Inject
     private BudgetItemRepository budgetItemRepository;

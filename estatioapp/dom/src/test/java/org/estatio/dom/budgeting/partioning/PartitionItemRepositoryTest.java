@@ -31,6 +31,7 @@ import org.apache.isis.applib.query.Query;
 import org.apache.isis.core.unittestsupport.jmocking.JUnitRuleMockery2;
 
 import org.incode.module.base.dom.testing.FinderInteraction;
+
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.charge.Charge;
@@ -107,23 +108,25 @@ public class PartitionItemRepositoryTest {
 
     }
 
-    public static class FindByPartitionItemAndKeyTable extends PartitionItemRepositoryTest {
+    public static class FindUnique extends PartitionItemRepositoryTest {
 
         @Test
         public void happyCase() {
 
+            Partitioning partitioning = new Partitioning();
             Charge charge = new Charge();
             BudgetItem budgetItem = new BudgetItem();
             KeyTable keyTable = new KeyTable();
-            partitionItemRepository.findByChargeAndBudgetItemAndKeyTable(charge, budgetItem, keyTable);
+            partitionItemRepository.findUnique(partitioning, charge, budgetItem, keyTable);
 
             assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.UNIQUE_MATCH);
             assertThat(finderInteraction.getResultType()).isEqualTo(PartitionItem.class);
-            assertThat(finderInteraction.getQueryName()).isEqualTo("findByChargeAndBudgetItemAndKeyTable");
+            assertThat(finderInteraction.getQueryName()).isEqualTo("findUnique");
+            assertThat(finderInteraction.getArgumentsByParameterName().get("partitioning")).isEqualTo((Object) partitioning);
             assertThat(finderInteraction.getArgumentsByParameterName().get("charge")).isEqualTo((Object) charge);
             assertThat(finderInteraction.getArgumentsByParameterName().get("budgetItem")).isEqualTo((Object) budgetItem);
             assertThat(finderInteraction.getArgumentsByParameterName().get("keyTable")).isEqualTo((Object) keyTable);
-            assertThat(finderInteraction.getArgumentsByParameterName()).hasSize(3);
+            assertThat(finderInteraction.getArgumentsByParameterName()).hasSize(4);
         }
 
     }
@@ -142,7 +145,7 @@ public class PartitionItemRepositoryTest {
         public void setup() {
             partitionItemRepository1 = new PartitionItemRepository() {
                 @Override
-                public PartitionItem findByChargeAndBudgetItemAndKeyTable(final Charge charge, final BudgetItem budgetItem, final KeyTable keyTable) {
+                public PartitionItem findUnique(final Partitioning partitioning, final Charge charge, final BudgetItem budgetItem, final KeyTable keyTable) {
                     return null;
                 }
             };
@@ -153,6 +156,7 @@ public class PartitionItemRepositoryTest {
         public void findOrCreateXxx() throws Exception {
 
             final KeyTable keyTable = new KeyTable();
+            final Partitioning partitioning = new Partitioning();
             final Charge charge = new Charge();
             final BudgetItem budgetItem = new BudgetItem();
             final BigDecimal percentage = new BigDecimal("100.000000");
@@ -169,9 +173,10 @@ public class PartitionItemRepositoryTest {
             });
 
             // when
-            PartitionItem newPartitionItem = partitionItemRepository1.findOrCreatePartitionItem(budgetItem, charge, keyTable, percentage);
+            PartitionItem newPartitionItem = partitionItemRepository1.findOrCreatePartitionItem(partitioning, budgetItem, charge, keyTable, percentage);
 
             // then
+            assertThat(newPartitionItem.getPartitioning()).isEqualTo(partitioning);
             assertThat(newPartitionItem.getCharge()).isEqualTo(charge);
             assertThat(newPartitionItem.getBudgetItem()).isEqualTo(budgetItem);
             assertThat(newPartitionItem.getKeyTable()).isEqualTo(keyTable);

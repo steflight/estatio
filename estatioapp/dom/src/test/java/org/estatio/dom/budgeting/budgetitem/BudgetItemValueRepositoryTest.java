@@ -31,17 +31,11 @@ import org.junit.Test;
 import org.apache.isis.applib.DomainObjectContainer;
 import org.apache.isis.core.unittestsupport.jmocking.JUnitRuleMockery2;
 
-import org.incode.module.base.dom.testing.FinderInteraction;
-
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class BudgetItemValueRepositoryTest {
-
-    FinderInteraction finderInteraction;
-
-    BudgetItemValueRepository budgetItemValueRepository;
 
     public static class NewBudgetItemValue extends BudgetItemValueRepositoryTest {
 

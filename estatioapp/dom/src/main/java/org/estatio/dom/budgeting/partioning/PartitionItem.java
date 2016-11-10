@@ -68,20 +68,20 @@ import lombok.Setter;
         @Query(
                 name = "findByBudgetItem", language = "JDOQL",
                 value = "SELECT " +
-                        "FROM org.estatio.dom.budgeting.partioning.BudgetItemAllocation " +
+                        "FROM org.estatio.dom.budgeting.partioning.PartitionItem " +
                         "WHERE budgetItem == :budgetItem "),
         @Query(
                 name = "findByKeyTable", language = "JDOQL",
                 value = "SELECT " +
-                        "FROM org.estatio.dom.budgeting.partioning.BudgetItemAllocation " +
+                        "FROM org.estatio.dom.budgeting.partioning.PartitionItem " +
                         "WHERE keyTable == :keyTable "),
         @Query(
-                name = "findByChargeAndBudgetItemAndKeyTable", language = "JDOQL",
+                name = "findUnique", language = "JDOQL",
                 value = "SELECT " +
-                        "FROM org.estatio.dom.budgeting.partioning.BudgetItemAllocation " +
-                        "WHERE charge == :charge && budgetItem == :budgetItem && keyTable == :keyTable ")
+                        "FROM org.estatio.dom.budgeting.partioning.PartitionItem " +
+                        "WHERE partitioning == :partitioning && charge == :charge && budgetItem == :budgetItem && keyTable == :keyTable ")
 })
-@Unique(name = "PartitionItem_charge_budgetItem_keyTable_UNQ", members = {"charge", "budgetItem", "keyTable"})
+@Unique(name = "PartitionItem_partitioning_charge_budgetItem_keyTable_UNQ", members = {"partitioning", "charge", "budgetItem", "keyTable"})
 @DomainObject(
         auditing = Auditing.DISABLED,
         objectType = "org.estatio.dom.budgeting.partioning.PartitionItem"
@@ -89,7 +89,7 @@ import lombok.Setter;
 public class PartitionItem extends UdoDomainObject2<PartitionItem> implements WithApplicationTenancyProperty {
 
     public PartitionItem() {
-        super("budgetItem, charge, keyTable");
+        super("partitioning, budgetItem, charge, keyTable");
     }
 
     //region > identificatiom
@@ -105,6 +105,10 @@ public class PartitionItem extends UdoDomainObject2<PartitionItem> implements Wi
     }
     //endregion
 
+    @Column(allowsNull = "false", name = "partitioningId")
+    @PropertyLayout(hidden = Where.REFERENCES_PARENT)
+    @Getter @Setter
+    private Partitioning partitioning;
 
     @Column(allowsNull = "false", name = "chargeId")
     @Getter @Setter
@@ -169,7 +173,7 @@ public class PartitionItem extends UdoDomainObject2<PartitionItem> implements Wi
     // ////////////////////////////////////////
 
     @Action(restrictTo = RestrictTo.PROTOTYPING, semantics = SemanticsOf.NON_IDEMPOTENT_ARE_YOU_SURE)
-    public Budget deletePartitionItem() {
+    public Budget remove() {
         removeIfNotAlready(this);
         return this.getBudgetItem().getBudget();
     }

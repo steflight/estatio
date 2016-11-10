@@ -31,7 +31,8 @@
                 <ns2:action id="newValue"/>
             </ns2:collection>
             <ns2:collection id="partitionItems" defaultView="table">
-                <ns2:action id="createPartitionItem"/>
+                <ns2:action id="createPartitionItemForBudgeting"/>
+                <ns2:action id="createPartitionItemForAudit"/>
             </ns2:collection>
         </col>
     </row>

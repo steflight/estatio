@@ -46,11 +46,13 @@ public class PartitionItemRepository extends UdoDomainRepositoryAndFactory<Parti
     // //////////////////////////////////////
 
     public PartitionItem newPartitionItem(
+            final Partitioning partitioning,
             final Charge charge,
             final KeyTable keyTable,
             final BudgetItem budgetItem,
             final BigDecimal percentage) {
         PartitionItem partitionItem = newTransientInstance(PartitionItem.class);
+        partitionItem.setPartitioning(partitioning);
         partitionItem.setCharge(charge);
         partitionItem.setKeyTable(keyTable);
         partitionItem.setBudgetItem(budgetItem);
@@ -60,12 +62,13 @@ public class PartitionItemRepository extends UdoDomainRepositoryAndFactory<Parti
     }
 
     public String validateNewPartitionItem(
+            final Partitioning partitioning,
             final Charge charge,
             final KeyTable keyTable,
             final BudgetItem budgetItem,
             final BigDecimal percentage
     ){
-        if(findByChargeAndBudgetItemAndKeyTable(charge, budgetItem, keyTable) != null) {
+        if(findUnique(partitioning, charge, budgetItem, keyTable) != null) {
             return "This partition item already exists";
         }
         return null;
@@ -91,25 +94,26 @@ public class PartitionItemRepository extends UdoDomainRepositoryAndFactory<Parti
         return allMatches("findByKeyTable", "keyTable", keyTable);
     }
 
+
     @Programmatic
-    public PartitionItem findByChargeAndBudgetItemAndKeyTable(final Charge charge, final BudgetItem budgetItem, final KeyTable keyTable) {
-        return uniqueMatch("findByChargeAndBudgetItemAndKeyTable", "charge", charge, "budgetItem", budgetItem, "keyTable", keyTable);
+    public PartitionItem findUnique(final Partitioning partitioning, final Charge charge, final BudgetItem budgetItem, final KeyTable keyTable) {
+        return uniqueMatch("findUnique", "partitioning", partitioning, "charge", charge, "budgetItem", budgetItem, "keyTable", keyTable);
     }
 
     @Programmatic
-    public PartitionItem findOrCreatePartitionItem(final BudgetItem budgetItem, final Charge invoiceCharge, final KeyTable keyTable, final BigDecimal percentage){
-        final PartitionItem partitionItem = findByChargeAndBudgetItemAndKeyTable(invoiceCharge, budgetItem, keyTable);
+    public PartitionItem findOrCreatePartitionItem(final Partitioning partitioning, final BudgetItem budgetItem, final Charge invoiceCharge, final KeyTable keyTable, final BigDecimal percentage){
+        final PartitionItem partitionItem = findUnique(partitioning, invoiceCharge, budgetItem, keyTable);
         if (partitionItem == null) {
-            return newPartitionItem(invoiceCharge, keyTable, budgetItem, percentage);
+            return newPartitionItem(partitioning, invoiceCharge, keyTable, budgetItem, percentage);
         }
         return partitionItem;
     }
 
     @Programmatic
-    public PartitionItem updateOrCreatePartitionItem(final BudgetItem budgetItem, final Charge invoiceCharge, final KeyTable keyTable, final BigDecimal percentage){
-        final PartitionItem partitionItem = findByChargeAndBudgetItemAndKeyTable(invoiceCharge, budgetItem, keyTable);
+    public PartitionItem updateOrCreatePartitionItem(final Partitioning partitioning, final BudgetItem budgetItem, final Charge invoiceCharge, final KeyTable keyTable, final BigDecimal percentage){
+        final PartitionItem partitionItem = findUnique(partitioning, invoiceCharge, budgetItem, keyTable);
         if (partitionItem == null) {
-            return newPartitionItem(invoiceCharge, keyTable, budgetItem, percentage);
+            return newPartitionItem(partitioning, invoiceCharge, keyTable, budgetItem, percentage);
         } else {
             partitionItem.setPercentage(percentage);
         }

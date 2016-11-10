@@ -26,6 +26,7 @@ import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keytable.KeyTable;
+import org.estatio.dom.budgeting.partioning.Partitioning;
 import org.estatio.dom.charge.Charge;
 import org.estatio.fixture.EstatioBaseLineFixture;
 import org.estatio.fixture.asset.PropertyForOxfGb;
@@ -41,12 +42,11 @@ public class PartitionItemsForOxf extends PartitionItemAbstact {
         executionContext.executeChild(this, new PropertyForOxfGb());
         executionContext.executeChild(this, new ChargeRefData());
         executionContext.executeChild(this, new KeyTablesForOxf());
-        executionContext.executeChild(this, new BudgetsForOxf());
+        executionContext.executeChild(this, new PartitioningForOxf());
 
         // exec
         Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
         LocalDate startDate = new LocalDate(2015, 01, 01);
-        LocalDate endDate = new LocalDate(2015, 12, 31);
         Budget budget = budgetRepository.findByPropertyAndStartDate(property, startDate);
         BudgetItem budgetItem1 = budget.getItems().first();
         BudgetItem budgetItem2 = budget.getItems().last();
@@ -54,10 +54,11 @@ public class PartitionItemsForOxf extends PartitionItemAbstact {
         final List<KeyTable> keyTables = keyTableRepository.findByBudget(budget);
         KeyTable keyTable1 = keyTables.get(0);
         KeyTable keyTable2 = keyTables.get(1);
+        Partitioning partitioning = budget.getPartitionings().first();
 
-        createPartitionItem(charge, keyTable1, budgetItem1, new BigDecimal(100), executionContext);
-        createPartitionItem(charge, keyTable1, budgetItem2, new BigDecimal(80), executionContext);
-        createPartitionItem(charge, keyTable2, budgetItem2, new BigDecimal(20), executionContext);
+        createPartitioningAndItem(partitioning, charge, keyTable1, budgetItem1, new BigDecimal(100), executionContext);
+        createPartitioningAndItem(partitioning, charge, keyTable1, budgetItem2, new BigDecimal(80), executionContext);
+        createPartitioningAndItem(partitioning, charge, keyTable2, budgetItem2, new BigDecimal(20), executionContext);
     }
 
 }

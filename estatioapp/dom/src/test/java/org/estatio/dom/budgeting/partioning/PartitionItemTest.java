@@ -22,9 +22,8 @@ import java.math.BigDecimal;
 import org.junit.Test;
 
 import org.incode.module.base.dom.testing.AbstractBeanPropertiesTest;
-import org.estatio.dom.asset.Property;
+
 import org.estatio.dom.budgeting.ChargeForTesting;
-import org.estatio.dom.budgeting.PropertyForTesting;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.budgetitem.BudgetItemForTesting;
 import org.estatio.dom.budgeting.keytable.KeyTable;
@@ -41,7 +40,7 @@ public class PartitionItemTest {
         public void test() {
             final PartitionItem pojo = new PartitionItem();
             newPojoTester()
-                    .withFixture(pojos(Property.class, PropertyForTesting.class))
+                    .withFixture(pojos(Partitioning.class, Partitioning.class))
                     .withFixture(pojos(Charge.class, ChargeForTesting.class))
                     .withFixture(pojos(KeyTable.class, KeyTableForTesting.class))
                     .withFixture(pojos(BudgetItem.class, BudgetItemForTesting.class))
@@ -49,6 +48,7 @@ public class PartitionItemTest {
         }
 
     }
+
 
     public static class UpdatePercentage extends PartitionItemTest {
 

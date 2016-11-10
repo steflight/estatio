@@ -18,6 +18,7 @@
 package org.estatio.dom.budgeting.budgetcalculation;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -61,6 +62,10 @@ public class BudgetCalculationServiceTest {
                 public BigDecimal getAuditedValue(){
                     return null;
                 }
+                @Override
+                public List<PartitionItem> getPartitionItems(){
+                    return Arrays.asList(partitionItem);
+                }
             };
 
             keyTable = new KeyTable();
@@ -81,7 +86,6 @@ public class BudgetCalculationServiceTest {
             partitionItem.setBudgetItem(budgetItem);
             partitionItem.setKeyTable(keyTable);
 
-            budgetItem.getPartitionItems().add(partitionItem);
             budget.getItems().add(budgetItem);
 
         }

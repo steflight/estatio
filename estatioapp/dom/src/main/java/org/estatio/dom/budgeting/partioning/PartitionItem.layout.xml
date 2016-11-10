@@ -3,6 +3,7 @@
     <row>
         <col span="12" unreferencedActions="true">
             <ns2:domainObject/>
+            <ns2:action id="remove"/>
             <ns2:action id="recentChanges"/>
             <ns2:action id="links"/>
         </col>
@@ -12,12 +13,12 @@
             <ns2:fieldSet name="General" id="general" unreferencedProperties="true">
                 <ns2:property id="applicationTenancy"/>
             </ns2:fieldSet>
-            <ns2:fieldSet name="Allocation" id="allocation">
+            <ns2:fieldSet name="Partition item" id="partitionItem">
+                <ns2:property id="partitioning"/>
                 <ns2:property id="budget" hidden="ALL_TABLES"/>
                 <ns2:property id="budgetItem" hidden="ALL_TABLES"/>
                 <ns2:property id="keyTable">
                     <ns2:action id="changeKeyTable" position="BELOW"/>
-                    <ns2:action id="deleteBudgetItemAllocation" position="BELOW"/>
                 </ns2:property>
             </ns2:fieldSet>
             <ns2:fieldSet name="Charge" id="charge">
@@ -39,7 +40,7 @@
             </ns2:fieldSet>
         </col>
         <col span="8" unreferencedCollections="true">
-            <ns2:collection id="calculations"/>
+            <ns2:collection id="calculations" />
         </col>
     </row>
 </grid>

@@ -29,16 +29,17 @@ import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.Query;
+import javax.jdo.annotations.Unique;
 import javax.jdo.annotations.VersionStrategy;
 
 import org.joda.time.LocalDate;
 
 import org.apache.isis.applib.annotation.Action;
-import org.apache.isis.applib.annotation.CollectionLayout;
+import org.apache.isis.applib.annotation.ActionLayout;
+import org.apache.isis.applib.annotation.Contributed;
 import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.annotation.PropertyLayout;
-import org.apache.isis.applib.annotation.RenderType;
 import org.apache.isis.applib.annotation.SemanticsOf;
 import org.apache.isis.applib.annotation.Where;
 
@@ -48,13 +49,14 @@ import org.incode.module.base.dom.utils.TitleBuilder;
 
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
-import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
-import org.estatio.dom.budgeting.partioning.PartitionItem;
-import org.estatio.dom.budgeting.api.PartitionItemCreator;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.budgeting.keytable.KeyTableRepository;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
+import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
+import org.estatio.dom.budgeting.partioning.Partitioning;
+import org.estatio.dom.budgeting.partioning.PartitioningRepository;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.charge.ChargeRepository;
 
@@ -90,11 +92,12 @@ import lombok.Setter;
                     + "&& charge == :charge "
                     + "&& budget.startDate == :startDate")
 })
+@Unique(name = "BudgetItem_budget_charge_UNQ", members = { "budget", "charge" })
 @DomainObject(
         objectType = "org.estatio.dom.budgeting.budgetitem.BudgetItem"
 )
 public class BudgetItem extends UdoDomainObject2<BudgetItem>
-        implements WithApplicationTenancyProperty, PartitionItemCreator {
+        implements WithApplicationTenancyProperty {
 
     public BudgetItem() {
         super("budget, charge");
@@ -176,55 +179,43 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
         return null;
     }
 
-    @CollectionLayout(render= RenderType.EAGERLY)
-    @Persistent(mappedBy = "budgetItem", dependentElement = "true")
-    @Getter @Setter
-    private SortedSet<PartitionItem> partitionItems = new TreeSet<>();
+
+    @Action(semantics = SemanticsOf.SAFE)
+    @ActionLayout(contributed = Contributed.AS_ASSOCIATION)
+    public List<PartitionItem> getPartitionItems(){
+        return partitionItemRepository.findByBudgetItem(this);
+    }
 
     @Action(semantics = SemanticsOf.NON_IDEMPOTENT)
-    public PartitionItem createPartitionItem(
-            final Charge charge,
-            final KeyTable keyTable,
-            final BigDecimal percentage) {
-        return partitionItemRepository.newPartitionItem(charge, keyTable, this, percentage);
+    public PartitionItem createPartitionItemForBudgeting(final Charge charge, final KeyTable keyTable, final BigDecimal percentage) {
+        return partitionItemRepository.newPartitionItem(getBudget().getPartitioningForBudgeting(), charge, keyTable, this, percentage);
     }
 
-    public List<Charge> choices0CreatePartitionItem(
-            final Charge charge,
-            final KeyTable keyTable,
-            final BigDecimal percentage
-    ){
-        return chargeRepository.allCharges();
+    @Action(semantics = SemanticsOf.NON_IDEMPOTENT)
+    public PartitionItem createPartitionItemForAudit(final Partitioning partitioning, final Charge charge, final KeyTable keyTable, final BigDecimal percentage) {
+        return partitionItemRepository.newPartitionItem(partitioning, charge, keyTable, this, percentage);
     }
 
-    public List<KeyTable> choices1CreatePartitionItem(
-            final Charge charge,
-            final KeyTable keyTable,
-            final BigDecimal percentage) {
-        return keyTableRepository.findByBudget(getBudget());
-    }
-
-    public BigDecimal default2CreatePartitionItem(
-            final Charge charge,
-            final KeyTable keyTable,
-            final BigDecimal percentage) {
-        return new BigDecimal(100);
-    }
-
-    public String validateCreatePartitionItem(
-            final Charge charge,
-            final KeyTable keyTable,
-            final BigDecimal percentage){
-        return partitionItemRepository.validateNewPartitionItem(charge, keyTable, this, percentage);
+    public List<Partitioning> choices0CreatePartitionItemForAudit(final Partitioning partitioning, final Charge charge, final KeyTable keyTable, final BigDecimal percentage) {
+        return partitioningRepository.findByBudgetAndType(getBudget(), BudgetCalculationType.AUDITED);
     }
 
     @Programmatic
     public void createCopyOn(final Budget budget) {
         BudgetItem itemCopy = budget.newBudgetItem(getBudgetedValue(), getCharge());
-        for (PartitionItem allocation : getPartitionItems()){
-            String keyTableName = allocation.getKeyTable().getName();
-            KeyTable correspondingTableOnbudget = keyTableRepository.findByBudgetAndName(budget, keyTableName);
-            itemCopy.createPartitionItem(allocation.getCharge(), correspondingTableOnbudget, allocation.getPercentage());
+        for (BudgetItemValue value : getValues()){
+            // only copies of budgeted values are made
+            if (value.getType() == BudgetCalculationType.BUDGETED) {
+                itemCopy.newValue(value.getValue(), budget.getStartDate(), value.getType());
+            }
+        }
+        for (PartitionItem partitionItem : partitionItemRepository.findByBudgetItem(this)){
+            // only copies of budgeted items are made
+            if (partitionItem.getPartitioning().getType()==BudgetCalculationType.BUDGETED) {
+                String keyTableName = partitionItem.getKeyTable().getName();
+                KeyTable correspondingTableOnbudget = keyTableRepository.findByBudgetAndName(budget, keyTableName);
+                itemCopy.createPartitionItemForBudgeting(partitionItem.getCharge(), correspondingTableOnbudget, partitionItem.getPercentage());
+            }
         }
     }
 
@@ -232,17 +223,6 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
     @PropertyLayout(hidden = Where.EVERYWHERE)
     public ApplicationTenancy getApplicationTenancy() {
         return getBudget().getApplicationTenancy();
-    }
-
-    @Override
-    @Programmatic
-    public PartitionItem findOrCreatePartitionItem(final Charge charge, final KeyTable keyTable, final BigDecimal percentage) {
-        return partitionItemRepository.findOrCreatePartitionItem(this, charge, keyTable, percentage);
-    }
-
-    @Programmatic
-    public PartitionItem updateOrCreatePartitionItem(final Charge charge, final KeyTable keyTable, final BigDecimal percentage) {
-        return partitionItemRepository.updateOrCreatePartitionItem(this, charge, keyTable, percentage);
     }
 
     @Programmatic
@@ -258,6 +238,9 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
 
     @Inject
     private PartitionItemRepository partitionItemRepository;
+
+    @Inject
+    private PartitioningRepository partitioningRepository;
 
     @Inject
     private KeyTableRepository keyTableRepository;

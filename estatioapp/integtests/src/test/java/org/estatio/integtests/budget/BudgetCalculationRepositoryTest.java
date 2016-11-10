@@ -134,7 +134,7 @@ public class BudgetCalculationRepositoryTest extends EstatioIntegrationTest {
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
             Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
-            PartitionItem allocation = budget.getItems().first().getPartitionItems().first();
+            PartitionItem allocation = budget.getItems().first().getPartitionItems().get(0);
             budget.calculate();
 
             // when
