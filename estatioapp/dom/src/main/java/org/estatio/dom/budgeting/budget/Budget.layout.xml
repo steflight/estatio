@@ -20,10 +20,7 @@
                 <ns2:property id="property"/>
                 <ns2:property id="budgetYear"/>
                 <ns2:property id="startDate"/>
-                <ns2:property id="endDate">
-                    <ns2:action id="changeDates" position="BELOW"/>
-                    <ns2:action id="changeEndDate" position="BELOW"/>
-                </ns2:property>
+                <ns2:property id="endDate" />
                 <ns2:property id="applicationTenancy"/>
             </ns2:fieldSet>
             <ns2:fieldSet name="Metadata" id="metadata">

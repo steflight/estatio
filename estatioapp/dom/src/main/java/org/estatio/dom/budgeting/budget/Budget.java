@@ -19,7 +19,6 @@
 package org.estatio.dom.budgeting.budget;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
@@ -236,8 +235,9 @@ public class Budget extends UdoDomainObject2<Budget>
     @Action(semantics = SemanticsOf.NON_IDEMPOTENT)
     @ActionLayout(contributed = Contributed.AS_ACTION)
     @MemberOrder(name = "partitionings", sequence = "1")
-    public Partitioning newPartitioning(final BudgetCalculationType type){
-        return partitioningRepository.newPartitioning(this, getStartDate(), getEndDate(), type);
+    public Budget newPartitioning(final BudgetCalculationType type){
+        partitioningRepository.newPartitioning(this, getStartDate(), getEndDate(), type);
+        return this;
     }
 
     public String validateNewPartitioning(final BudgetCalculationType type){
@@ -314,6 +314,9 @@ public class Budget extends UdoDomainObject2<Budget>
     @ActionLayout()
     public Budget removeAllBudgetItems() {
         for (BudgetItem budgetItem : this.getItems()) {
+            for (PartitionItem pItem : budgetItem.getPartitionItems()){
+                pItem.remove();
+            }
             getContainer().remove(budgetItem);
             getContainer().flush();
         }
@@ -334,13 +337,6 @@ public class Budget extends UdoDomainObject2<Budget>
             final FoundationValueType foundationValueType,
             final KeyValueMethod keyValueMethod) {
         return keyTableRepository.validateNewKeyTable(this, name, foundationValueType, keyValueMethod, 6);
-    }
-
-    public BigDecimal getAnnualFactor(){
-        BigDecimal numberOfDaysInYear = BigDecimal.valueOf(getBudgetYearInterval().days());
-        BigDecimal numberOfDaysInBudgetInterval = BigDecimal.valueOf(getInterval().days());
-
-        return numberOfDaysInBudgetInterval.divide(numberOfDaysInYear, MathContext.DECIMAL64);
     }
 
     @Action(semantics = SemanticsOf.IDEMPOTENT_ARE_YOU_SURE)

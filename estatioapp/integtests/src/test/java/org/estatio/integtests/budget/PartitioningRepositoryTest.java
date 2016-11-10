@@ -60,7 +60,8 @@ public class PartitioningRepositoryTest extends EstatioIntegrationTest {
             assertThat(budget.getPartitionings().size()).isEqualTo(0);
 
             // when
-            Partitioning partitioning = wrap(budget).newPartitioning(BudgetCalculationType.BUDGETED);
+            wrap(budget).newPartitioning(BudgetCalculationType.BUDGETED);
+            Partitioning partitioning = budget.getPartitioningForBudgeting();
 
             // then
             assertThat(budget.getPartitionings().size()).isEqualTo(1);

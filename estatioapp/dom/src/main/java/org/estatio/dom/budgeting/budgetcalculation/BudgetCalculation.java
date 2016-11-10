@@ -173,20 +173,14 @@ public class BudgetCalculation extends UdoDomainObject2<BudgetCalculation>
 
     @Action(semantics = SemanticsOf.SAFE)
     @ActionLayout(contributed = Contributed.AS_ASSOCIATION, hidden = Where.ALL_TABLES)
+    // TODO: revisit when working on shortfall and audited calculations
     public BigDecimal getValueForBudgetPeriod() {
-        return getValue().multiply(getAnnualFactor());
+        return getValue().multiply(BigDecimal.ONE);
     }
 
     @Programmatic
     public void remove(){
         getContainer().remove(this);
-    }
-
-    @Programmatic
-    public BigDecimal getAnnualFactor(){
-
-        return getBudget().getAnnualFactor();
-
     }
 
 }

@@ -58,7 +58,6 @@ import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
 import org.estatio.dom.budgeting.partioning.Partitioning;
 import org.estatio.dom.budgeting.partioning.PartitioningRepository;
 import org.estatio.dom.charge.Charge;
-import org.estatio.dom.charge.ChargeRepository;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -249,9 +248,6 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
 
     @Inject
     private KeyTableRepository keyTableRepository;
-
-    @Inject
-    private ChargeRepository chargeRepository;
 
     @Inject
     private BudgetItemValueRepository budgetItemValueRepository;
