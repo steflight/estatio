@@ -50,10 +50,12 @@ import org.apache.isis.applib.annotation.PropertyLayout;
 import org.apache.isis.applib.annotation.RenderType;
 import org.apache.isis.applib.annotation.SemanticsOf;
 import org.apache.isis.applib.annotation.Where;
+import org.apache.isis.applib.services.repository.RepositoryService;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
 import org.incode.module.communications.dom.impl.commchannel.CommunicationChannel;
+import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
 
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyAny;
@@ -704,12 +706,16 @@ public class Invoice
             for (InvoiceItem item : getItems()) {
                 item.remove();
             }
-            getContainer().remove(this);
+            paperclipRepository.deleteIfAttachedTo(this);
+            repositoryService.remove(this);
         }
     }
 
     public String disableRemove() {
-        return getStatus().invoiceIsChangable() ? null : "Only invoices with status New can be removed.";
+        if (!getStatus().invoiceIsChangable()) {
+            return "Only invoices with status New can be removed.";
+        }
+        return null;
     }
 
     @Action(semantics = SemanticsOf.NON_IDEMPOTENT_ARE_YOU_SURE)
@@ -733,6 +739,12 @@ public class Invoice
 
     @javax.inject.Inject
     InvoiceItemRepository invoiceItemRepository;
+
+    @javax.inject.Inject
+    PaperclipRepository paperclipRepository;
+
+    @javax.inject.Inject
+    RepositoryService repositoryService;
 
 
 
