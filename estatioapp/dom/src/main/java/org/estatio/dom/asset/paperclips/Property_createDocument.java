@@ -21,12 +21,12 @@ package org.estatio.dom.asset.paperclips;
 
 import org.apache.isis.applib.annotation.Mixin;
 
-import org.incode.module.document.dom.mixins.T_createDocumentAndRender;
+import org.incode.module.document.dom.mixins.T_createAndAttachDocumentAndRender;
 
 import org.estatio.dom.asset.Property;
 
 @Mixin
-public class Property_createDocument extends T_createDocumentAndRender<Property> {
+public class Property_createDocument extends T_createAndAttachDocumentAndRender<Property> {
 
     public Property_createDocument(final Property domainObject) {
         super(domainObject);

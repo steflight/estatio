@@ -102,7 +102,7 @@ mvn clean install -DskipTests -o
 
         <incode-module-base.version>1.13.2</incode-module-base.version>
         <incode-module-country.version>1.13.0</incode-module-country.version>
-        <incode-module-document.version>1.13.0</incode-module-document.version>
+        <incode-module-document.version>1.14.0-SNAPSHOT</incode-module-document.version>
 
 
         <incode-module-docrendering-freemarker.version>1.13.0</incode-module-docrendering-freemarker.version>

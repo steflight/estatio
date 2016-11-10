@@ -23,14 +23,14 @@ import java.io.IOException;
 
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.Mixin;
-import org.apache.isis.applib.annotation.ParameterLayout;
 import org.apache.isis.applib.annotation.Where;
 
+import org.incode.module.document.dom.impl.docs.Document;
 import org.incode.module.document.dom.impl.docs.DocumentTemplate;
-import org.incode.module.document.dom.mixins.T_createDocumentAndScheduleRender;
+import org.incode.module.document.dom.mixins.T_createAndAttachDocumentAndScheduleRender;
 
 @Mixin
-public class Invoice_createDocumentAndScheduleRender extends T_createDocumentAndScheduleRender<Invoice> {
+public class Invoice_createDocumentAndScheduleRender extends T_createAndAttachDocumentAndScheduleRender<Invoice> {
 
     public Invoice_createDocumentAndScheduleRender(final Invoice domainObject) {
         super(domainObject);
@@ -41,9 +41,8 @@ public class Invoice_createDocumentAndScheduleRender extends T_createDocumentAnd
      */
     @Action(hidden = Where.EVERYWHERE)
     @Override
-    public Object $$(
-            final DocumentTemplate template,
-            @ParameterLayout(named = "Action") final Intent intent) throws IOException {
-        return super.$$(template, intent);
+    public Document $$(
+            final DocumentTemplate template) throws IOException {
+        return super.$$(template);
     }
 }

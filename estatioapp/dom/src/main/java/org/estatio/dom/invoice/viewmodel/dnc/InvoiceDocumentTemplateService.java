@@ -32,7 +32,6 @@ import org.apache.isis.applib.services.factory.FactoryService;
 
 import org.incode.module.document.dom.impl.docs.Document;
 import org.incode.module.document.dom.impl.docs.DocumentTemplate;
-import org.incode.module.document.dom.mixins.T_createDocumentAndRender;
 
 import org.estatio.dom.invoice.Invoice;
 import org.estatio.dom.invoice.Invoice_createDocumentAndScheduleRender;
@@ -52,7 +51,7 @@ public class InvoiceDocumentTemplateService {
     Document createAttachAndScheduleRender(final Invoice invoice, final DocumentTemplate documentTemplate1) throws
             IOException {
         final Invoice_createDocumentAndScheduleRender mixin = createDocumentMixin(invoice);
-        return (Document) mixin.$$(documentTemplate1, T_createDocumentAndRender.Intent.CREATE_AND_ATTACH);
+        return (Document) mixin.$$(documentTemplate1);
     }
 
     private Invoice_createDocumentAndScheduleRender createDocumentMixin(final Invoice anyInvoice) {
