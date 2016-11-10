@@ -24,8 +24,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.joda.time.DateTime;
-
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.Mixin;
 import org.apache.isis.applib.annotation.Optionality;
@@ -33,18 +31,14 @@ import org.apache.isis.applib.annotation.Parameter;
 import org.apache.isis.applib.annotation.ParameterLayout;
 import org.apache.isis.applib.annotation.SemanticsOf;
 import org.apache.isis.applib.services.background.BackgroundService2;
-import org.apache.isis.applib.services.clock.ClockService;
 import org.apache.isis.applib.services.email.EmailService;
 import org.apache.isis.applib.services.queryresultscache.QueryResultsCache;
-import org.apache.isis.applib.services.registry.ServiceRegistry2;
-import org.apache.isis.applib.services.repository.RepositoryService;
-
-import org.isisaddons.module.security.app.user.MeService;
-import org.isisaddons.module.security.dom.user.ApplicationUser;
+import org.apache.isis.applib.services.xactn.TransactionService;
 
 import org.incode.module.communications.dom.impl.commchannel.CommunicationChannel;
-import org.incode.module.communications.dom.impl.comms.CommChannelRoleType;
+import org.incode.module.communications.dom.impl.commchannel.EmailAddress;
 import org.incode.module.communications.dom.impl.comms.Communication;
+import org.incode.module.communications.dom.impl.comms.CommunicationRepository;
 import org.incode.module.communications.dom.spi.CommHeaderForEmail;
 import org.incode.module.communications.dom.spi.DocumentCommunicationSupport;
 import org.incode.module.document.dom.DocumentModule;
@@ -54,8 +48,6 @@ import org.incode.module.document.dom.impl.docs.DocumentTemplate;
 import org.incode.module.document.dom.impl.docs.DocumentTemplateRepository;
 import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
 import org.incode.module.document.dom.impl.types.DocumentType;
-
-import org.incode.module.communications.dom.impl.commchannel.EmailAddress;
 
 /**
  * Provides the ability to send an email.
@@ -111,20 +103,11 @@ public class Document_email  {
         coverNoteDoc.render(coverNoteTemplate, this.document, message);
 
         // create comm and correspondents
-        final DateTime queuedAt = clockService.nowAsDateTime();
+        final String atPath = document.getAtPath();
+        final String subject = coverNoteDoc.getName();
+        final Communication communication =  communicationRepository.createEmail(subject, atPath, toChannel, cc, bcc);
 
-        final Communication communication = Communication.newEmail(document.getAtPath(), coverNoteDoc.getName(), queuedAt);
-        serviceRegistry2.injectServicesInto(communication);
-
-        communication.addCorrespondent(CommChannelRoleType.TO, toChannel);
-        communication.addCorrespondentIfAny(CommChannelRoleType.CC, cc);
-        communication.addCorrespondentIfAny(CommChannelRoleType.BCC, bcc);
-
-        final ApplicationUser currentUser = meService.me();
-        final String currentUserEmailAddress = currentUser.getEmailAddress();
-        communication.addCorrespondentIfAny(CommChannelRoleType.PREPARED_BY, currentUserEmailAddress);
-
-        repositoryService.persistAndFlush(communication);
+        transactionService.flushTransaction();
 
         // attach the doc and the cover note to communication
         paperclipRepository.attach(document, DocumentConstants.PAPERCLIP_ROLE_ATTACHMENT, communication);
@@ -214,7 +197,7 @@ public class Document_email  {
     QueryResultsCache queryResultsCache;
 
     @Inject
-    RepositoryService repositoryService;
+    TransactionService transactionService;
 
     @Inject
     List<DocumentCommunicationSupport> documentCommunicationSupports;
@@ -223,16 +206,10 @@ public class Document_email  {
     DocumentTemplateRepository documentTemplateRepository;
 
     @Inject
-    ClockService clockService;
+    CommunicationRepository communicationRepository;
 
     @Inject
     PaperclipRepository paperclipRepository;
-
-    @Inject
-    MeService meService;
-
-    @Inject
-    ServiceRegistry2 serviceRegistry2;
 
     @Inject
     EmailService emailService;

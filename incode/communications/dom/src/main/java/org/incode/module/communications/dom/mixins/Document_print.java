@@ -24,21 +24,17 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.joda.time.DateTime;
-
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.Mixin;
 import org.apache.isis.applib.annotation.ParameterLayout;
 import org.apache.isis.applib.annotation.SemanticsOf;
 import org.apache.isis.applib.services.background.BackgroundService2;
-import org.apache.isis.applib.services.clock.ClockService;
 import org.apache.isis.applib.services.queryresultscache.QueryResultsCache;
-import org.apache.isis.applib.services.registry.ServiceRegistry2;
-import org.apache.isis.applib.services.repository.RepositoryService;
+import org.apache.isis.applib.services.xactn.TransactionService;
 
 import org.incode.module.communications.dom.impl.commchannel.PostalAddress;
-import org.incode.module.communications.dom.impl.comms.CommChannelRoleType;
 import org.incode.module.communications.dom.impl.comms.Communication;
+import org.incode.module.communications.dom.impl.comms.CommunicationRepository;
 import org.incode.module.communications.dom.spi.CommHeaderForPrint;
 import org.incode.module.communications.dom.spi.DocumentCommunicationSupport;
 import org.incode.module.document.dom.DocumentModule;
@@ -75,14 +71,11 @@ public class Document_print {
         }
 
         // create comm and correspondents
-        final DateTime commSent = clockService.nowAsDateTime();
+        final String subject = document.getName();
+        final String atPath = document.getAtPath();
+        final Communication communication = communicationRepository.createPostal(subject, atPath, toChannel);
 
-        final Communication communication = Communication.newPostal(document.getAtPath(), document.getName());
-        serviceRegistry2.injectServicesInto(communication);
-
-        communication.addCorrespondent(CommChannelRoleType.TO, toChannel);
-
-        repositoryService.persistAndFlush(communication);
+        transactionService.flushTransaction();
 
         // attach this doc to communication
         paperclipRepository.attach(document, DocumentConstants.PAPERCLIP_ROLE_ENCLOSED, communication);
@@ -126,19 +119,16 @@ public class Document_print {
     QueryResultsCache queryResultsCache;
 
     @Inject
-    RepositoryService repositoryService;
-
-    @Inject
     List<DocumentCommunicationSupport> documentCommunicationSupports;
 
     @Inject
-    ClockService clockService;
+    TransactionService transactionService;
 
     @Inject
     PaperclipRepository paperclipRepository;
 
     @Inject
-    ServiceRegistry2 serviceRegistry2;
+    CommunicationRepository communicationRepository;
 
     @Inject
     BackgroundService2 backgroundService;
