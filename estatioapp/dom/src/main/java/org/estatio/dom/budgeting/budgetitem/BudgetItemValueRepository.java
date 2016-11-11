@@ -63,7 +63,7 @@ public class BudgetItemValueRepository extends UdoDomainRepositoryAndFactory<Bud
             final BigDecimal value,
             final LocalDate date,
             final BudgetCalculationType type) {
-        if (type == BudgetCalculationType.BUDGETED && findByBudgetItemAndType(budgetItem, type).size()>0){
+        if (type == BudgetCalculationType.BUDGETED && findByBudgetItemAndType(budgetItem, type).size() > 0){
             return "Only one value of type BUDGETED is allowed";
         }
         if (value == null){
@@ -73,22 +73,10 @@ public class BudgetItemValueRepository extends UdoDomainRepositoryAndFactory<Bud
     }
 
     public List<BudgetItemValue> findByBudgetItemAndType(final BudgetItem budgetItem, final BudgetCalculationType type) {
-        QBudgetItemValue cand = QBudgetItemValue.candidate();
-        return isisJdoSupport.executeQuery(BudgetItemValue.class, cand.budgetItem.eq(budgetItem).and(cand.type.eq(type)));
-    }
-
-    // TODO: this method is temporary; for comparison integration test only
-    public List<BudgetItemValue> fbBIandT(final BudgetItem budgetItem, final BudgetCalculationType type) {
         return allMatches("findByBudgetItemAndType", "budgetItem", budgetItem, "type", type);
     }
 
-    public BudgetItemValue findUnique(final BudgetItem budgetItem, final LocalDate date, final BudgetCalculationType type) {
-        QBudgetItemValue cand = QBudgetItemValue.candidate();
-        List<BudgetItemValue> results = isisJdoSupport.executeQuery(BudgetItemValue.class, cand.budgetItem.eq(budgetItem).and(cand.date.eq(date)).and(cand.type.eq(type)));
-        return results.size() > 0 ? results.get(0) : null;
-    }
-
-    public BudgetItemValue fU(final BudgetItem budgetItem, final LocalDate date, final BudgetCalculationType type){
+    public BudgetItemValue findUnique(final BudgetItem budgetItem, final LocalDate date, final BudgetCalculationType type){
         return uniqueMatch("findUnique", "budgetItem", budgetItem, "date", date, "type", type);
     }
 
@@ -97,7 +85,7 @@ public class BudgetItemValueRepository extends UdoDomainRepositoryAndFactory<Bud
     }
 
     public BudgetItemValue updateOrCreateBudgetItemValue(final BigDecimal value, final BudgetItem budgetItem, final LocalDate date, final BudgetCalculationType type) {
-        BudgetItemValue itemValue = fU(budgetItem, date, type);
+        BudgetItemValue itemValue = findUnique(budgetItem, date, type);
         if (itemValue != null) {
             itemValue.setValue(value);
         } else {
@@ -107,7 +95,10 @@ public class BudgetItemValueRepository extends UdoDomainRepositoryAndFactory<Bud
     }
 
     public String validateUpdateOrCreateBudgetItemValue(final BigDecimal value, final BudgetItem budgetItem, final LocalDate date, final BudgetCalculationType type) {
-        return validateNewBudgetItemValue(budgetItem, value, date, type);
+        if (findUnique(budgetItem, date, type) == null) {
+            return validateNewBudgetItemValue(budgetItem, value, date, type);
+        }
+        return null;
     }
 
     @Inject

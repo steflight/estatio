@@ -7,7 +7,6 @@ import javax.inject.Inject;
 
 import org.joda.time.LocalDate;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.isis.applib.fixturescripts.FixtureScript;
@@ -47,8 +46,7 @@ public class BudgetItemValueRepositoryTest extends EstatioIntegrationTest {
     }
 
     @Test
-    @Ignore // TODO: fails when running all integration tests while other, not type-safe version, works; fine when running tests in this class only
-    public void findByBudgetItemAndTypeTest() {
+    public void findByBudgetItemAndType() {
 
         // given
         Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
@@ -59,26 +57,7 @@ public class BudgetItemValueRepositoryTest extends EstatioIntegrationTest {
         assertThat(budgetItem.getValues().first().getType()).isEqualTo(BudgetCalculationType.BUDGETED);
 
         // when
-        List<BudgetItemValue> results = wrap(budgetItemValueRepository).findByBudgetItemAndType(budgetItem, BudgetCalculationType.BUDGETED);
-
-        // then
-        assertThat(results.size()).isEqualTo(1);
-    }
-
-    // TODO: This temporary method and test is for comparison reasons
-    @Test
-    public void findByBudgetItemAndType_NotTypeSafe_Test() {
-
-        // given
-        Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-        Budget budget = budgetRepository.findByPropertyAndStartDate(property, new LocalDate(2015, 01, 01));
-        BudgetItem budgetItem = budget.getItems().first();
-
-        assertThat(budgetItem.getValues().size()).isEqualTo(1);
-        assertThat(budgetItem.getValues().first().getType()).isEqualTo(BudgetCalculationType.BUDGETED);
-
-        // when
-        List<BudgetItemValue> results = budgetItemValueRepository.fbBIandT(budgetItem, BudgetCalculationType.BUDGETED);
+        List<BudgetItemValue> results = budgetItemValueRepository.findByBudgetItemAndType(budgetItem, BudgetCalculationType.BUDGETED);
 
         // then
         assertThat(results.size()).isEqualTo(1);
