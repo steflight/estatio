@@ -19,6 +19,7 @@
 package org.estatio.integtests.invoice.viewmodel;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -39,6 +40,7 @@ import org.incode.module.communications.dom.impl.commchannel.EmailAddress;
 import org.incode.module.communications.dom.impl.comms.Communication;
 import org.incode.module.communications.dom.impl.comms.CommunicationState;
 import org.incode.module.document.dom.impl.docs.Document;
+import org.incode.module.document.dom.impl.docs.DocumentAbstract;
 import org.incode.module.document.dom.impl.docs.DocumentSort;
 import org.incode.module.document.dom.impl.docs.DocumentState;
 import org.incode.module.document.dom.impl.paperclips.Paperclip;
@@ -46,6 +48,7 @@ import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
 import org.incode.module.document.dom.impl.types.DocumentType;
 import org.incode.module.document.dom.impl.types.DocumentTypeRepository;
 
+import org.estatio.dom.invoice.Constants;
 import org.estatio.dom.invoice.Invoice;
 import org.estatio.dom.invoice.InvoiceStatus;
 import org.estatio.dom.invoice.viewmodel.InvoiceSummaryForPropertyDueDateStatus;
@@ -59,7 +62,6 @@ import org.estatio.dom.invoice.viewmodel.dnc.InvoiceSummaryForPropertyDueDateSta
 import org.estatio.dom.invoice.viewmodel.dnc.InvoiceSummaryForPropertyDueDateStatus_preparePreliminaryLetters;
 import org.estatio.dom.invoice.viewmodel.dnc.InvoiceSummaryForPropertyDueDateStatus_sendByEmailPreliminaryLetters;
 import org.estatio.fixture.EstatioBaseLineFixture;
-import org.estatio.fixture.documents.DocumentTypeAndTemplatesFSForInvoicesUsingSsrs;
 import org.estatio.fixture.invoice.InvoiceForLeaseItemTypeOfRentOneQuarterForOxfPoison003;
 import org.estatio.fixturescripts.ApplicationSettingsForReportServerForDemo;
 import org.estatio.fixturescripts.SeedDocumentAndCommsFixture;
@@ -122,8 +124,7 @@ public class InvoiceSummaryforPropertyDueDateStatus_preparePrelimaryLetters_Inte
             assertThat(prelimLetterDoc.getName()).isNotNull();
             assertThat(prelimLetterDoc.getId()).isNotNull();
             assertThat(prelimLetterDoc.getCreatedAt()).isNotNull();
-            final DocumentType docTypePrelimLetter =
-                    documentTypeRepository.findByReference(DocumentTypeAndTemplatesFSForInvoicesUsingSsrs.DOC_TYPE_REF_INVOICE_PRELIM);
+            final DocumentType docTypePrelimLetter = documentTypeRepository.findByReference(Constants.DOC_TYPE_REF_PRELIM);
             assertThat(prelimLetterDoc.getType()).isEqualTo(docTypePrelimLetter);
 
             assertThat(prelimLetterDoc.getState()).isEqualTo(DocumentState.NOT_RENDERED);
@@ -131,8 +132,8 @@ public class InvoiceSummaryforPropertyDueDateStatus_preparePrelimaryLetters_Inte
             assertThat(prelimLetterDoc.getSort()).isEqualTo(DocumentSort.EMPTY);
             assertThat(prelimLetterDoc.getMimeType()).isEqualTo("application/pdf");
 
-            // and also
-            final List<Paperclip> paperclips = paperclipRepository.findByDocument(prelimLetterDoc);
+            // and also attached to invoice, buyer and seller
+            List<Paperclip> paperclips = paperclipRepository.findByDocument(prelimLetterDoc);
             assertThat(paperclips).hasSize(3);
             assertThat(paperclips).extracting(x -> x.getAttachedTo()).contains(invoice, invoice.getBuyer(), invoice.getSeller());
 
@@ -160,6 +161,35 @@ public class InvoiceSummaryforPropertyDueDateStatus_preparePrelimaryLetters_Inte
             final Communication prelimLetterComm = mixin(DocAndCommForPrelimLetter_communication.class, prelimLetterViewModel).$$();
             assertThat(prelimLetterComm).isNotNull();
             assertThat(mixin(DocAndCommForPrelimLetter_communicationState.class, prelimLetterViewModel).$$()).isEqualTo(CommunicationState.PENDING);
+
+            // and PL doc now also attached to comm (as well as invoice, buyer and seller)
+            paperclips = paperclipRepository.findByDocument(prelimLetterDoc);
+            assertThat(paperclips).hasSize(4);
+            assertThat(paperclips).extracting(x -> x.getAttachedTo()).contains(invoice, invoice.getBuyer(), invoice.getSeller(), prelimLetterComm);
+
+            // and comm attached to PL and also to a new covernote
+            paperclips = paperclipRepository.findByAttachedTo(prelimLetterComm);
+            assertThat(paperclips).hasSize(2);
+            assertThat(paperclips).extracting(x -> x.getDocument()).contains(prelimLetterDoc);
+
+            final DocumentAbstract prelimLetterDocF = prelimLetterDoc;
+            final Optional<Paperclip> paperclipToCoverNoteIfAny = paperclips.stream().filter(x -> x.getDocument() != prelimLetterDocF) .findFirst();
+            assertThat(paperclipToCoverNoteIfAny.isPresent()).isTrue();
+            final Paperclip paperclip = paperclipToCoverNoteIfAny.get();
+            assertThat(paperclip.getDocument()).isInstanceOf(Document.class);
+            final Document coverNote = (Document) paperclip.getDocument();
+
+            // and also cover note is populated
+            assertThat(coverNote.getName()).isNotNull();
+            assertThat(coverNote.getId()).isNotNull();
+            assertThat(coverNote.getCreatedAt()).isNotNull();
+            final DocumentType docTypePrelimLetterCoverNote = documentTypeRepository.findByReference(Constants.DOC_TYPE_REF_PRELIM_EMAIL_COVER_NOTE);
+            assertThat(coverNote.getType()).isEqualTo(docTypePrelimLetterCoverNote);
+
+            assertThat(coverNote.getState()).isEqualTo(DocumentState.RENDERED);
+            assertThat(coverNote.getRenderedAt()).isNotNull();
+            assertThat(coverNote.getSort()).isEqualTo(DocumentSort.CLOB);
+            assertThat(coverNote.getMimeType()).isEqualTo("text/html");
 
             // and when comm sent
             runBackgroundCommands();
