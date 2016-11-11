@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import org.incode.module.document.dom.impl.applicability.BinderAbstract;
 import org.incode.module.document.dom.impl.docs.Document;
 import org.incode.module.document.dom.impl.docs.DocumentTemplate;
 import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;

@@ -31,13 +31,13 @@ public class EstatioAppManifest implements AppManifest {
     @Override
     public List<Class<?>> getModules() {
         List<Class<?>> modules = Lists.newArrayList();
-        appendDomModulesAndSecurityAddon(modules);
+        appendDomModulesAndSecurityAndCommandAddon(modules);
         appendAddonModules(modules);
         appendAddonWicketComponents(modules);
         return modules;
     }
 
-    protected List<Class<?>> appendDomModulesAndSecurityAddon(List<Class<?>> modules) {
+    protected List<Class<?>> appendDomModulesAndSecurityAndCommandAddon(List<Class<?>> modules) {
         modules.addAll(
                 Arrays.asList(
                         // TODO: sort out packages for the 'dom' module
@@ -57,6 +57,8 @@ public class EstatioAppManifest implements AppManifest {
                         EstatioFixtureScriptsModule.class,
 
                         SecurityModule.class,
+                        org.isisaddons.module.command.CommandModule.class,
+
                         EstatioAppModule.class
                 )
         );

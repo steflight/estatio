@@ -335,11 +335,11 @@ public class Communication implements Comparable<Communication> {
     //region > scheduleSend (programmatic), send (action)
     @Programmatic
     public void scheduleSend() {
-        backgroundService.execute(this).send();
+        backgroundService.execute(this).sendByEmail();
     }
 
     @Action(hidden = Where.EVERYWHERE) // so can invoke via BackgroundService
-    public Communication send() {
+    public Communication sendByEmail() {
 
         final Document attachment = findDocument(DocumentConstants.PAPERCLIP_ROLE_ATTACHMENT);
         final Document coverNoteDoc = findDocument(DocumentConstants.PAPERCLIP_ROLE_COVER);

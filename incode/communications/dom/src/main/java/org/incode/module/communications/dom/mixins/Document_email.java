@@ -91,7 +91,7 @@ public class Document_email  {
             final String message) throws IOException {
 
         if(this.document.getState() == DocumentState.NOT_RENDERED) {
-            // can't send the email yet, so schedule to try again in shortly.
+            // can't send the email yet, so schedule to try again shortly.
             backgroundService.executeMixin(Document_email.class, document).$$(toChannel, cc, bcc, message);
             return null;
         }
