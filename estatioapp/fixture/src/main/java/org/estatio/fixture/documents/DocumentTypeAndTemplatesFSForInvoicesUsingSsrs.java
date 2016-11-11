@@ -41,7 +41,7 @@ import org.incode.module.document.fixture.DocumentTemplateFSAbstract;
 
 import org.estatio.dom.documents.binders.BinderForDocumentAttachedToPrelimLetterOrInvoice;
 import org.estatio.dom.documents.binders.BinderForReportServerAttachNone;
-import org.estatio.dom.documents.binders.BinderForReportServerForInvoiceAttachToInvoiceAndBuyerAndSeller;
+import org.estatio.dom.documents.binders.BinderForReportServerForInvoiceAttachToInvoiceOnly;
 import org.estatio.dom.invoice.Constants;
 import org.estatio.dom.invoice.Invoice;
 import org.estatio.dom.invoice.viewmodel.InvoiceSummaryForPropertyDueDateStatus;
@@ -132,7 +132,7 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 sipcRenderingStrategy,
                 "Preliminary letter for Invoice ${this.number}",
                 siRenderingStrategy,
-                Invoice.class, BinderForReportServerForInvoiceAttachToInvoiceAndBuyerAndSeller.class,
+                Invoice.class, BinderForReportServerForInvoiceAttachToInvoiceOnly.class,
                 executionContext
         );
 
@@ -148,7 +148,7 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 sipcRenderingStrategy,
                 "Preliminary letter for Invoice ${this.number} (Italy)",
                 siRenderingStrategy,
-                Invoice.class, BinderForReportServerForInvoiceAttachToInvoiceAndBuyerAndSeller.class,
+                Invoice.class, BinderForReportServerForInvoiceAttachToInvoiceOnly.class,
                 executionContext
         );
 
@@ -176,7 +176,7 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 ApplicationTenancyForIt.PATH, " (Italy)",
                 contentText, fmkRenderingStrategy,
                 NAME_TEXT_INVOICE_ITA, fmkRenderingStrategy,
-                Document.class, BinderForDocumentAttachedToPrelimLetterOrInvoice.class, 
+                Document.class, BinderForDocumentAttachedToPrelimLetterOrInvoice.class,
 				executionContext
         );
 
@@ -194,7 +194,7 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 + "&rs:Command=Render&rs:Format=PDF",
                 sipcRenderingStrategy,
                 "Invoice for ${this.number}", siRenderingStrategy,
-                Invoice.class, BinderForReportServerForInvoiceAttachToInvoiceAndBuyerAndSeller.class,
+                Invoice.class, BinderForReportServerForInvoiceAttachToInvoiceOnly.class,
                 executionContext
         );
 
@@ -209,7 +209,7 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 + "&rs:Command=Render&rs:Format=PDF",
                 sipcRenderingStrategy,
                 "Invoice for ${this.number}", siRenderingStrategy,
-                Invoice.class, BinderForReportServerForInvoiceAttachToInvoiceAndBuyerAndSeller.class,
+                Invoice.class, BinderForReportServerForInvoiceAttachToInvoiceOnly.class,
                 executionContext
         );
     }
@@ -321,7 +321,7 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
             final RenderingStrategy contentRenderingStrategy,
             final String nameText,
             final RenderingStrategy nameRenderingStrategy,
-            final Class<Document> domainClass,
+            final Class<?> domainClass,
             final Class<? extends Binder> binderClass,
             final ExecutionContext executionContext) {
 

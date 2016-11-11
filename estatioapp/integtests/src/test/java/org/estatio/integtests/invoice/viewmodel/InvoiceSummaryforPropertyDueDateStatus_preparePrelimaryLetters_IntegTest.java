@@ -132,10 +132,10 @@ public class InvoiceSummaryforPropertyDueDateStatus_preparePrelimaryLetters_Inte
             assertThat(prelimLetterDoc.getSort()).isEqualTo(DocumentSort.EMPTY);
             assertThat(prelimLetterDoc.getMimeType()).isEqualTo("application/pdf");
 
-            // and also attached to invoice, buyer and seller
+            // and also attached to only invoice
             List<Paperclip> paperclips = paperclipRepository.findByDocument(prelimLetterDoc);
-            assertThat(paperclips).hasSize(3);
-            assertThat(paperclips).extracting(x -> x.getAttachedTo()).contains(invoice, invoice.getBuyer(), invoice.getSeller());
+            assertThat(paperclips).hasSize(1);
+            assertThat(paperclips).extracting(x -> x.getAttachedTo()).contains(invoice);
 
             // and when rendered
             runBackgroundCommands();
@@ -151,7 +151,9 @@ public class InvoiceSummaryforPropertyDueDateStatus_preparePrelimaryLetters_Inte
             assertThat(prelimLetterDoc.getRenderedAt()).isNotNull();
             assertThat(prelimLetterDoc.getSort()).isEqualTo(DocumentSort.BLOB);
 
+            //
             // and when send by email
+            //
             mixin(InvoiceSummaryForPropertyDueDateStatus_sendByEmailPreliminaryLetters.class, summary).$$();
 
             summary = findSummary();
@@ -162,7 +164,7 @@ public class InvoiceSummaryforPropertyDueDateStatus_preparePrelimaryLetters_Inte
             assertThat(prelimLetterComm).isNotNull();
             assertThat(mixin(DocAndCommForPrelimLetter_communicationState.class, prelimLetterViewModel).$$()).isEqualTo(CommunicationState.PENDING);
 
-            // and PL doc now also attached to comm (as well as invoice, buyer and seller)
+            // and PL doc now also attached to comm, invoice.buyer and invoice.seller (as well as invoice)
             paperclips = paperclipRepository.findByDocument(prelimLetterDoc);
             assertThat(paperclips).hasSize(4);
             assertThat(paperclips).extracting(x -> x.getAttachedTo()).contains(invoice, invoice.getBuyer(), invoice.getSeller(), prelimLetterComm);

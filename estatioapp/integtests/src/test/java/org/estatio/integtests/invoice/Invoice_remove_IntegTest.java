@@ -19,7 +19,6 @@
 package org.estatio.integtests.invoice;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -29,38 +28,24 @@ import org.junit.Test;
 import org.apache.isis.applib.fixturescripts.FixtureScript;
 import org.apache.isis.applib.services.email.EmailService;
 import org.apache.isis.applib.services.xactn.TransactionService;
-import org.apache.isis.core.runtime.authentication.standard.SimpleSession;
 
-import org.isisaddons.module.command.dom.BackgroundCommandExecutionFromBackgroundCommandServiceJdo;
 import org.isisaddons.module.command.dom.BackgroundCommandServiceJdoRepository;
-import org.isisaddons.module.command.dom.CommandJdo;
 import org.isisaddons.wicket.gmap3.cpt.service.LocationLookupService;
 
-import org.incode.module.communications.dom.impl.commchannel.EmailAddress;
-import org.incode.module.communications.dom.impl.comms.Communication;
-import org.incode.module.communications.dom.impl.comms.CommunicationState;
 import org.incode.module.document.dom.impl.docs.Document;
-import org.incode.module.document.dom.impl.docs.DocumentAbstract;
-import org.incode.module.document.dom.impl.docs.DocumentSort;
-import org.incode.module.document.dom.impl.docs.DocumentState;
 import org.incode.module.document.dom.impl.paperclips.Paperclip;
 import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
-import org.incode.module.document.dom.impl.types.DocumentType;
 import org.incode.module.document.dom.impl.types.DocumentTypeRepository;
 
-import org.estatio.dom.invoice.Constants;
 import org.estatio.dom.invoice.Invoice;
 import org.estatio.dom.invoice.InvoiceStatus;
 import org.estatio.dom.invoice.viewmodel.InvoiceSummaryForPropertyDueDateStatus;
 import org.estatio.dom.invoice.viewmodel.InvoiceSummaryForPropertyDueDateStatusRepository;
 import org.estatio.dom.invoice.viewmodel.dnc.DocAndCommForPrelimLetter;
-import org.estatio.dom.invoice.viewmodel.dnc.DocAndCommForPrelimLetter_communication;
-import org.estatio.dom.invoice.viewmodel.dnc.DocAndCommForPrelimLetter_communicationState;
 import org.estatio.dom.invoice.viewmodel.dnc.DocAndCommForPrelimLetter_document;
-import org.estatio.dom.invoice.viewmodel.dnc.DocAndCommForPrelimLetter_documentState;
 import org.estatio.dom.invoice.viewmodel.dnc.InvoiceSummaryForPropertyDueDateStatus_preliminaryLetters;
 import org.estatio.dom.invoice.viewmodel.dnc.InvoiceSummaryForPropertyDueDateStatus_preparePreliminaryLetters;
-import org.estatio.dom.invoice.viewmodel.dnc.InvoiceSummaryForPropertyDueDateStatus_sendByEmailPreliminaryLetters;
+import org.estatio.dom.party.Party;
 import org.estatio.fixture.EstatioBaseLineFixture;
 import org.estatio.fixture.invoice.InvoiceForLeaseItemTypeOfRentOneQuarterForOxfPoison003;
 import org.estatio.fixturescripts.ApplicationSettingsForReportServerForDemo;
@@ -96,111 +81,36 @@ public class Invoice_remove_IntegTest extends EstatioIntegrationTest {
             DocAndCommForPrelimLetter prelimLetterViewModel = prelimLetterViewModelOf(summary);
 
             Invoice invoice = prelimLetterViewModel.getInvoice();
-            assertThat(invoice).isNotNull();
-            assertThat(prelimLetterViewModel.getSendTo()).isNotNull();
-            assertThat(prelimLetterViewModel.getSendTo()).isInstanceOf(EmailAddress.class);
+            assertThat(invoice.getStatus().invoiceIsChangable()).isTrue();
 
-            assertThat(mixin(DocAndCommForPrelimLetter_document.class, prelimLetterViewModel).$$()).isNull();
-            assertThat(mixin(DocAndCommForPrelimLetter_documentState.class, prelimLetterViewModel).$$()).isNull();
-            assertThat(mixin(DocAndCommForPrelimLetter_communication.class, prelimLetterViewModel).$$()).isNull();
-            assertThat(mixin(DocAndCommForPrelimLetter_communicationState.class, prelimLetterViewModel).$$()).isNull();
 
-            // when prepare
+            // and given have a PL doc
             mixin(InvoiceSummaryForPropertyDueDateStatus_preparePreliminaryLetters.class, summary).$$();
 
             // (clearing queryResultsCache)
             summary = findSummary();
             prelimLetterViewModel = prelimLetterViewModelOf(summary);
 
-            // then
+            // and given is attached to invoice, buyer and seller
             Document prelimLetterDoc = mixin(DocAndCommForPrelimLetter_document.class, prelimLetterViewModel).$$();
-            assertThat(prelimLetterDoc).isNotNull();
-            assertThat(mixin(DocAndCommForPrelimLetter_documentState.class, prelimLetterViewModel).$$()).isEqualTo(DocumentState.NOT_RENDERED);
-
-            assertThat(mixin(DocAndCommForPrelimLetter_communication.class, prelimLetterViewModel).$$()).isNull();
-            assertThat(mixin(DocAndCommForPrelimLetter_communicationState.class, prelimLetterViewModel).$$()).isNull();
-
-            // and also
-            assertThat(prelimLetterDoc.getName()).isNotNull();
-            assertThat(prelimLetterDoc.getId()).isNotNull();
-            assertThat(prelimLetterDoc.getCreatedAt()).isNotNull();
-            final DocumentType docTypePrelimLetter = documentTypeRepository.findByReference(Constants.DOC_TYPE_REF_PRELIM);
-            assertThat(prelimLetterDoc.getType()).isEqualTo(docTypePrelimLetter);
-
-            assertThat(prelimLetterDoc.getState()).isEqualTo(DocumentState.NOT_RENDERED);
-            assertThat(prelimLetterDoc.getRenderedAt()).isNull();
-            assertThat(prelimLetterDoc.getSort()).isEqualTo(DocumentSort.EMPTY);
-            assertThat(prelimLetterDoc.getMimeType()).isEqualTo("application/pdf");
-
-            // and also attached to invoice, buyer and seller
             List<Paperclip> paperclips = paperclipRepository.findByDocument(prelimLetterDoc);
             assertThat(paperclips).hasSize(3);
-            assertThat(paperclips).extracting(x -> x.getAttachedTo()).contains(invoice, invoice.getBuyer(), invoice.getSeller());
 
-            // and when rendered
-            runBackgroundCommands();
+            final Party invoiceSeller = invoice.getSeller();
+            final Party invoiceBuyer = invoice.getBuyer();
+            assertThat(paperclips).extracting(x -> x.getAttachedTo()).contains(invoice, invoiceBuyer, invoiceSeller);
 
-            summary = findSummary();
-            prelimLetterViewModel = prelimLetterViewModelOf(summary);
+            // when remove the invoice
+            wrap(invoice).remove();
 
-            // then
-            assertThat(mixin(DocAndCommForPrelimLetter_documentState.class, prelimLetterViewModel).$$()).isEqualTo(DocumentState.RENDERED);
-
-            prelimLetterDoc = mixin(DocAndCommForPrelimLetter_document.class, prelimLetterViewModel).$$();
-            assertThat(prelimLetterDoc.getState()).isEqualTo(DocumentState.RENDERED);
-            assertThat(prelimLetterDoc.getRenderedAt()).isNotNull();
-            assertThat(prelimLetterDoc.getSort()).isEqualTo(DocumentSort.BLOB);
-
-            // and when send by email
-            mixin(InvoiceSummaryForPropertyDueDateStatus_sendByEmailPreliminaryLetters.class, summary).$$();
-
-            summary = findSummary();
-            prelimLetterViewModel = prelimLetterViewModelOf(summary);
+            transactionService.flushTransaction();
 
             // then
-            final Communication prelimLetterComm = mixin(DocAndCommForPrelimLetter_communication.class, prelimLetterViewModel).$$();
-            assertThat(prelimLetterComm).isNotNull();
-            assertThat(mixin(DocAndCommForPrelimLetter_communicationState.class, prelimLetterViewModel).$$()).isEqualTo(CommunicationState.PENDING);
-
-            // and PL doc now also attached to comm (as well as invoice, buyer and seller)
             paperclips = paperclipRepository.findByDocument(prelimLetterDoc);
-            assertThat(paperclips).hasSize(4);
-            assertThat(paperclips).extracting(x -> x.getAttachedTo()).contains(invoice, invoice.getBuyer(), invoice.getSeller(), prelimLetterComm);
-
-            // and comm attached to PL and also to a new covernote
-            paperclips = paperclipRepository.findByAttachedTo(prelimLetterComm);
             assertThat(paperclips).hasSize(2);
-            assertThat(paperclips).extracting(x -> x.getDocument()).contains(prelimLetterDoc);
+            assertThat(paperclips).extracting(x -> x.getAttachedTo()).contains(invoiceBuyer, invoiceSeller);
 
-            final DocumentAbstract prelimLetterDocF = prelimLetterDoc;
-            final Optional<Paperclip> paperclipToCoverNoteIfAny = paperclips.stream().filter(x -> x.getDocument() != prelimLetterDocF) .findFirst();
-            assertThat(paperclipToCoverNoteIfAny.isPresent()).isTrue();
-            final Paperclip paperclip = paperclipToCoverNoteIfAny.get();
-            assertThat(paperclip.getDocument()).isInstanceOf(Document.class);
-            final Document coverNote = (Document) paperclip.getDocument();
-
-            // and also cover note is populated
-            assertThat(coverNote.getName()).isNotNull();
-            assertThat(coverNote.getId()).isNotNull();
-            assertThat(coverNote.getCreatedAt()).isNotNull();
-            final DocumentType docTypePrelimLetterCoverNote = documentTypeRepository.findByReference(Constants.DOC_TYPE_REF_PRELIM_EMAIL_COVER_NOTE);
-            assertThat(coverNote.getType()).isEqualTo(docTypePrelimLetterCoverNote);
-
-            assertThat(coverNote.getState()).isEqualTo(DocumentState.RENDERED);
-            assertThat(coverNote.getRenderedAt()).isNotNull();
-            assertThat(coverNote.getSort()).isEqualTo(DocumentSort.CLOB);
-            assertThat(coverNote.getMimeType()).isEqualTo("text/html");
-
-            // and when comm sent
-            runBackgroundCommands();
-
-            summary = findSummary();
-            prelimLetterViewModel = prelimLetterViewModelOf(summary);
-
-            // then
-            assertThat(mixin(DocAndCommForPrelimLetter_communicationState.class, prelimLetterViewModel).$$()).isEqualTo(CommunicationState.SENT);
         }
-
     }
 
 
@@ -223,26 +133,6 @@ public class Invoice_remove_IntegTest extends EstatioIntegrationTest {
 
 
         return prelimLetterViewModels.get(0);
-    }
-
-    void runBackgroundCommands() throws InterruptedException {
-
-        List<CommandJdo> commands = backgroundCommandRepository.findBackgroundCommandsNotYetStarted();
-        assertThat(commands).hasSize(1);
-
-        BackgroundCommandExecutionFromBackgroundCommandServiceJdo backgroundExec =
-                new BackgroundCommandExecutionFromBackgroundCommandServiceJdo();
-        final SimpleSession session = new SimpleSession("scheduler_user", new String[] { "admin_role" });
-
-        final Thread thread = new Thread(() -> backgroundExec.execute(session, null));
-        thread.start();
-
-        thread.join(5000L);
-
-        transactionService.flushTransaction();
-
-        commands = backgroundCommandRepository.findBackgroundCommandsNotYetStarted();
-        assertThat(commands).isEmpty();
     }
 
     @Inject

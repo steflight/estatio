@@ -91,15 +91,13 @@ public class Document_email  {
             final String message) throws IOException {
 
         if(this.document.getState() == DocumentState.NOT_RENDERED) {
-            // can't send the email yet, so schedule to try again shortly.
-            backgroundService.executeMixin(Document_email.class, document).$$(toChannel, cc, bcc, message);
-            return null;
+            // this shouldn't happen, but want to fail-fast in case a future programmer calls this directly
+            throw new IllegalArgumentException("Document is not yet rendered");
         }
 
         // create and attach cover note
         final DocumentTemplate coverNoteTemplate = determineEmailCoverNoteTemplate();
-        final Document coverNoteDoc = coverNoteTemplate.createDocumentUsingBinding(this.document, message
-        );
+        final Document coverNoteDoc = coverNoteTemplate.createDocumentUsingBinding(this.document, message);
 
         coverNoteDoc.render(coverNoteTemplate, this.document, message);
 

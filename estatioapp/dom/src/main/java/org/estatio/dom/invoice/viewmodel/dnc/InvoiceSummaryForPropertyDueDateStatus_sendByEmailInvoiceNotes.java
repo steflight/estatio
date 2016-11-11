@@ -22,9 +22,8 @@ import javax.inject.Inject;
 
 import org.apache.isis.applib.annotation.Mixin;
 
-import org.incode.module.document.dom.impl.docs.Document;
-
 import org.estatio.dom.invoice.Constants;
+import org.estatio.dom.invoice.dnc.InvoicePrintAndEmailPolicyService;
 import org.estatio.dom.invoice.viewmodel.InvoiceSummaryForPropertyDueDateStatus;
 
 @Mixin
@@ -36,10 +35,10 @@ public class InvoiceSummaryForPropertyDueDateStatus_sendByEmailInvoiceNotes exte
     }
 
     @Override
-    protected boolean exclude(final Document document) {
-        return invoiceEmailPolicyService.disableSendInvoiceNote(document) != null;
+    protected boolean exclude(final Tuple tuple) {
+        return invoiceEmailPolicyService.disableSendInvoiceNote(tuple.getInvoice(), tuple.getDocument()) != null;
     }
 
     @Inject
-    InvoiceEmailPolicyService invoiceEmailPolicyService;
+    InvoicePrintAndEmailPolicyService invoiceEmailPolicyService;
 }

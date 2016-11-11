@@ -35,7 +35,15 @@ import org.incode.module.document.dom.impl.docs.DocumentState;
 import org.estatio.dom.invoice.Invoice;
 import org.estatio.dom.invoice.viewmodel.InvoiceSummaryForPropertyDueDateStatus;
 
+import lombok.Data;
+
 public abstract class InvoiceSummaryForPropertyDueDateStatus_sendAbstract extends InvoiceSummaryForPropertyDueDateStatus_actionAbstract {
+
+    @Data
+    public static class Tuple {
+        final Invoice invoice;
+        final Document document;
+    }
 
     private final CommunicationChannelType communicationChannelType;
 
@@ -47,41 +55,48 @@ public abstract class InvoiceSummaryForPropertyDueDateStatus_sendAbstract extend
         this.communicationChannelType = communicationChannelType;
     }
 
+    abstract Predicate<Tuple> filter();
 
-    abstract List<Document> documentsToSend();
-
-    List<Document> documentsToSend(Predicate<Document> filter) {
-        List<Document> documents = Lists.newArrayList();
-
-        final List<Invoice> invoices = invoiceSummary.getInvoices();
-        for (Invoice invoice : invoices) {
-
-            final CommunicationChannel sendTo = invoice.getSendTo();
-            if (sendTo == null) {
-                continue;
-            }
-
-            final CommunicationChannelType channelType = sendTo.getType();
-            if (channelType != communicationChannelType) {
-                continue;
-            }
-
-            final Document document = findMostRecentAttachedTo(invoice, getDocumentType());
-            if(document == null) {
-                continue;
-            }
-            if(document.getState() == DocumentState.NOT_RENDERED) {
-                continue;
-            }
-
-            if(!filter.apply(document)) {
-                continue;
-            }
-            documents.add(document);
-        }
-        return documents;
+    List<Tuple> tuplesToSend() {
+        return tuplesToSend(filter());
     }
 
+    private List<Tuple> tuplesToSend(Predicate<Tuple> filter) {
+        final List<Tuple> tuples = Lists.newArrayList();
+        final List<Invoice> invoices = invoiceSummary.getInvoices();
+        for (Invoice invoice : invoices) {
+            appendTuplesToSend(invoice, filter, tuples);
+        }
+        return tuples;
+    }
+
+    private void appendTuplesToSend(
+            final Invoice invoice,
+            final Predicate<Tuple> filter, final List<Tuple> tuples) {
+        final CommunicationChannel sendTo = invoice.getSendTo();
+        if (sendTo == null) {
+            return;
+        }
+
+        final CommunicationChannelType channelType = sendTo.getType();
+        if (channelType != communicationChannelType) {
+            return;
+        }
+
+        final Document document = findMostRecentAttachedTo(invoice, getDocumentType());
+        if(document == null) {
+            return;
+        }
+        if(document.getState() == DocumentState.NOT_RENDERED) {
+            return;
+        }
+
+        final Tuple tuple = new Tuple(invoice, document);
+        if(!filter.apply(tuple)) {
+            return;
+        }
+        tuples.add(tuple);
+    }
 
     @Inject
     FactoryService factoryService;

@@ -65,9 +65,8 @@ public class Document_print {
             final PostalAddress toChannel) throws IOException {
 
         if(this.document.getState() == DocumentState.NOT_RENDERED) {
-            // can't generate the comm yet, so schedule to try again shortly.
-            backgroundService.executeMixin(Document_print.class, document).$$(toChannel);
-            return null;
+            // this shouldn't happen, but want to fail-fast in case a future programmer calls this directly
+            throw new IllegalArgumentException("Document is not yet rendered");
         }
 
         // create comm and correspondents

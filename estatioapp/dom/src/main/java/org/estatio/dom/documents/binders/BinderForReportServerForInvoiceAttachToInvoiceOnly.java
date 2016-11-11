@@ -19,6 +19,7 @@
 package org.estatio.dom.documents.binders;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.isisaddons.module.security.dom.tenancy.WithApplicationTenancy;
@@ -33,15 +34,13 @@ import org.estatio.dom.party.Party;
  *
  * The input object is used for 'attachTo'.
  */
-public class BinderForReportServerForInvoiceAttachToInvoiceAndBuyerAndSeller extends BinderForReportServerAbstract<Invoice> {
+public class BinderForReportServerForInvoiceAttachToInvoiceOnly extends BinderForReportServerAbstract<Invoice> {
 
-    public BinderForReportServerForInvoiceAttachToInvoiceAndBuyerAndSeller() {
+    public BinderForReportServerForInvoiceAttachToInvoiceOnly() {
         super(Invoice.class);
     }
 
     protected List<Object> determineAttachTo(final Invoice invoice) {
-        final Party buyer = invoice.getBuyer();
-        final Party seller = invoice.getSeller();
-        return Arrays.asList(buyer, seller, invoice);
+        return Collections.singletonList(invoice);
     }
 }

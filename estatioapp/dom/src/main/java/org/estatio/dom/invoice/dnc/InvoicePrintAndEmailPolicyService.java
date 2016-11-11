@@ -16,22 +16,16 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.estatio.dom.invoice.viewmodel.dnc;
-
-import java.util.List;
+package org.estatio.dom.invoice.dnc;
 
 import javax.inject.Inject;
-
-import com.google.common.eventbus.Subscribe;
 
 import org.apache.isis.applib.AbstractSubscriber;
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 import org.apache.isis.applib.annotation.Programmatic;
 
-import org.incode.module.communications.dom.mixins.Document_email;
 import org.incode.module.document.dom.impl.docs.Document;
-import org.incode.module.document.dom.impl.paperclips.Paperclip;
 import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
 import org.incode.module.document.dom.impl.types.DocumentType;
 import org.incode.module.document.dom.impl.types.DocumentTypeRepository;
@@ -40,32 +34,15 @@ import org.estatio.dom.invoice.Constants;
 import org.estatio.dom.invoice.Invoice;
 
 @DomainService(nature = NatureOfService.DOMAIN)
-public class InvoiceEmailPolicyService extends AbstractSubscriber {
-
-    @Subscribe
-    public void on(Document_email.ActionDomainEvent ev) {
-
-        switch (ev.getEventPhase()) {
-        case DISABLE:
-            final Document document = (Document) ev.getMixedIn();
-            ev.disable(disableSendInvoiceNote(document));
-            break;
-        }
-    }
+public class InvoicePrintAndEmailPolicyService extends AbstractSubscriber {
 
     @Programmatic
-    String disableSendInvoiceNote(final Document document) {
+    public String disableSendInvoiceNote(final Invoice invoice, final Document document) {
 
         // only applies to InvoiceNote documents
         final DocumentType documentType = documentTypeRepository.findByReference(Constants.DOC_TYPE_REF_INVOICE);
         if(document.getType() != documentType) {
             return null;
-        }
-
-        // if so, then find the Invoice it is attached to.
-        Invoice invoice = determineAttachedTo(document);
-        if(invoice == null) {
-            return "Document is not attached to an Invoice";
         }
 
         if (invoice.getInvoiceNumber() == null) {
@@ -76,16 +53,6 @@ public class InvoiceEmailPolicyService extends AbstractSubscriber {
         return null;
     }
 
-    private Invoice determineAttachedTo(final Document document) {
-        final List<Paperclip> paperclips = paperclipRepository.findByDocument(document);
-        for (Paperclip paperclip : paperclips) {
-            final Object attachedTo = paperclip.getAttachedTo();
-            if(attachedTo instanceof Invoice) {
-                return (Invoice) attachedTo;
-            }
-        }
-        return null;
-    }
 
     @Inject
     PaperclipRepository paperclipRepository;

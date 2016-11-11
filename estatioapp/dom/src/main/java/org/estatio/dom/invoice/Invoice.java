@@ -706,7 +706,7 @@ public class Invoice
             for (InvoiceItem item : getItems()) {
                 item.remove();
             }
-            paperclipRepository.deleteIfAttachedTo(this);
+            paperclipRepository.deleteIfAttachedTo(this, PaperclipRepository.Policy.PAPERCLIPS_AND_DOCUMENTS_IF_ORPHANED);
             repositoryService.remove(this);
         }
     }

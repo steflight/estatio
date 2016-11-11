@@ -110,7 +110,13 @@
                             <ns2:collection id="documents">
                                 <ns2:action id="preview"/>
                                 <ns2:action id="createAndAttachDocument">
-                                    <ns2:named>Create &amp; attach</ns2:named>
+                                    <ns2:named>Prepare</ns2:named>
+                                </ns2:action>
+                                <ns2:action id="email">
+                                    <ns2:named>Send by email</ns2:named>
+                                </ns2:action>
+                                <ns2:action id="print">
+                                    <ns2:named>Send by post</ns2:named>
                                 </ns2:action>
                             </ns2:collection>
                         </col>
