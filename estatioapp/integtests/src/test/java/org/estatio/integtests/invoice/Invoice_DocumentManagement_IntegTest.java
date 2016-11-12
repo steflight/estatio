@@ -23,9 +23,6 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
 import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,6 +39,7 @@ import org.incode.module.communications.dom.impl.comms.Communication;
 import org.incode.module.document.dom.impl.docs.Document;
 import org.incode.module.document.dom.impl.docs.DocumentTemplate;
 import org.incode.module.document.dom.impl.docs.DocumentTemplateRepository;
+import org.incode.module.document.dom.impl.docs.Document_delete;
 import org.incode.module.document.dom.impl.paperclips.Paperclip;
 import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
 import org.incode.module.document.dom.impl.types.DocumentType;
@@ -84,7 +82,7 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
     }
 
 
-    public static class _createAndAttachDocument_IntegTest extends Invoice_DocumentManagement_IntegTest {
+    public static class Invoice_createAndAttachDocument_IntegTest extends Invoice_DocumentManagement_IntegTest {
 
         public static class ActionInvocationIntegTest extends
                 Invoice_DocumentManagement_IntegTest {
@@ -111,7 +109,7 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
     }
 
 
-    public static class _remove_IntegTest extends Invoice_DocumentManagement_IntegTest {
+    public static class Invoice_remove_IntegTest extends Invoice_DocumentManagement_IntegTest {
 
         @Test
         public void when_has_associated_document_that_has_not_been_sent() throws Exception {
@@ -213,20 +211,69 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
 
     }
 
-    //region > helpers (matchers)
-    <T> Matcher<T> isPersistent(final T domainObject) {
-        return new TypeSafeMatcher<T>() {
-            @Override
-            protected boolean matchesSafely(final T t) {
-                return repositoryService.isPersistent(t);
-            }
 
-            @Override
-            public void describeTo(final Description description) {
-                description.appendText("is persistent");
-            }
-        };
+    public static class Document_delete_IntegTest extends Invoice_DocumentManagement_IntegTest {
+
+        @Test
+        public void can_delete_document_when_not_been_sent() throws Exception {
+
+            // given
+            Invoice invoice = findInvoice();
+            assertThat(invoice).isNotNull();
+            assertThat(invoice.getStatus().invoiceIsChangable()).isTrue();
+
+            // and given have a PL doc
+            DocumentTemplate prelimLetterTemplate = findDocumentTemplateFor(Constants.DOC_TYPE_REF_PRELIM, invoice);
+            final Document document = wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+            assertThat(document).isNotNull();
+
+            assertThat(paperclipRepository.findByAttachedTo(invoice)).hasSize(1);
+
+            // when
+            final Bookmark documentBookmark = bookmarkService.bookmarkFor(document);
+
+            wrap(mixin(Document_delete.class, document)).$$();
+
+            transactionService.nextTransaction();
+
+            // then expect
+            expectedExceptions.expectMessage("only resolve object that is persistent");
+
+            // when attempt to find
+            bookmarkService.lookup(documentBookmark);
+
+        }
+
+        @Test
+        public void canNOT_delete_document_once_it_has_been_sent() throws Exception {
+
+            // given
+            Invoice invoice = findInvoice();
+            assertThat(invoice).isNotNull();
+            assertThat(invoice.getStatus().invoiceIsChangable()).isTrue();
+
+            // and given have a PL doc
+            DocumentTemplate prelimLetterTemplate = findDocumentTemplateFor(Constants.DOC_TYPE_REF_PRELIM, invoice);
+            final Document document = wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+
+            // and given document sent
+            final CommunicationChannel sendTo = invoice.getSendTo();
+            assertThat(sendTo).isInstanceOf(EmailAddress.class);
+            mixin(Invoice_email.class, invoice).$$(document, (EmailAddress)sendTo, null, null, null);
+
+            transactionService.flushTransaction();
+
+            // then expect
+            expectedExceptions.expectMessage("Document has already been sent as a communication");
+
+            // when attempt to
+            wrap(mixin(Document_delete.class, document)).$$();
+        }
+
     }
+
+
+
     //endregion
 
     //region > helpers (finders)
