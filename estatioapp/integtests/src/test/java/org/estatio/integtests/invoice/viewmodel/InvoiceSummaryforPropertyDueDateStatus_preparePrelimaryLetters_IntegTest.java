@@ -27,14 +27,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.isis.applib.fixturescripts.FixtureScript;
-import org.apache.isis.applib.services.email.EmailService;
-import org.apache.isis.applib.services.xactn.TransactionService;
-import org.apache.isis.core.runtime.authentication.standard.SimpleSession;
-
-import org.isisaddons.module.command.dom.BackgroundCommandExecutionFromBackgroundCommandServiceJdo;
-import org.isisaddons.module.command.dom.BackgroundCommandServiceJdoRepository;
-import org.isisaddons.module.command.dom.CommandJdo;
-import org.isisaddons.wicket.gmap3.cpt.service.LocationLookupService;
 
 import org.incode.module.communications.dom.impl.commchannel.EmailAddress;
 import org.incode.module.communications.dom.impl.comms.Communication;
@@ -227,25 +219,6 @@ public class InvoiceSummaryforPropertyDueDateStatus_preparePrelimaryLetters_Inte
         return prelimLetterViewModels.get(0);
     }
 
-    void runBackgroundCommands() throws InterruptedException {
-
-        List<CommandJdo> commands = backgroundCommandRepository.findBackgroundCommandsNotYetStarted();
-        assertThat(commands).hasSize(1);
-
-        BackgroundCommandExecutionFromBackgroundCommandServiceJdo backgroundExec =
-                new BackgroundCommandExecutionFromBackgroundCommandServiceJdo();
-        final SimpleSession session = new SimpleSession("scheduler_user", new String[] { "admin_role" });
-
-        final Thread thread = new Thread(() -> backgroundExec.execute(session, null));
-        thread.start();
-
-        thread.join(5000L);
-
-        transactionService.flushTransaction();
-
-        commands = backgroundCommandRepository.findBackgroundCommandsNotYetStarted();
-        assertThat(commands).isEmpty();
-    }
 
     @Inject
     InvoiceSummaryForPropertyDueDateStatusRepository invoiceSummaryRepository;
@@ -254,13 +227,4 @@ public class InvoiceSummaryforPropertyDueDateStatus_preparePrelimaryLetters_Inte
     PaperclipRepository paperclipRepository;
     @Inject
     DocumentTypeRepository documentTypeRepository;
-    @Inject
-    BackgroundCommandServiceJdoRepository backgroundCommandRepository;
-    @Inject
-    TransactionService transactionService;
-
-    @Inject
-    List<EmailService> emailServices;
-
-    @Inject LocationLookupService locationLookupService;
 }

@@ -19,6 +19,7 @@
 package org.estatio.integtests.invoice;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -35,6 +36,9 @@ import org.apache.isis.applib.services.bookmark.BookmarkService2;
 import org.apache.isis.applib.services.repository.RepositoryService;
 import org.apache.isis.applib.services.xactn.TransactionService;
 
+import org.incode.module.communications.dom.impl.commchannel.CommunicationChannel;
+import org.incode.module.communications.dom.impl.commchannel.EmailAddress;
+import org.incode.module.communications.dom.impl.comms.Communication;
 import org.incode.module.document.dom.impl.docs.Document;
 import org.incode.module.document.dom.impl.docs.DocumentTemplate;
 import org.incode.module.document.dom.impl.docs.DocumentTemplateRepository;
@@ -49,6 +53,7 @@ import org.estatio.dom.invoice.InvoiceRepository;
 import org.estatio.dom.invoice.InvoiceStatus;
 import org.estatio.dom.invoice.Invoice_createAndAttachDocument;
 import org.estatio.dom.invoice.PaymentMethod;
+import org.estatio.dom.invoice.dnc.Invoice_email;
 import org.estatio.dom.invoice.viewmodel.InvoiceSummaryForPropertyDueDateStatusRepository;
 import org.estatio.dom.lease.Lease;
 import org.estatio.dom.lease.LeaseRepository;
@@ -109,7 +114,7 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
     public static class _remove_IntegTest extends Invoice_DocumentManagement_IntegTest {
 
         @Test
-        public void happy_case() throws Exception {
+        public void when_has_associated_document_that_has_not_been_sent() throws Exception {
 
             // given
             Invoice invoice = findInvoice();
@@ -142,6 +147,67 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
             expectedExceptions.expectMessage("only resolve object that is persistent");
 
             // when
+            bookmarkService.lookup(documentBookmark);
+        }
+
+        @Test
+        public void when_has_associated_document_that_HAS_been_sent() throws Exception {
+
+            // given
+            Invoice invoice = findInvoice();
+            assertThat(invoice).isNotNull();
+            assertThat(invoice.getStatus().invoiceIsChangable()).isTrue();
+
+            // and given have a PL doc
+            DocumentTemplate prelimLetterTemplate = findDocumentTemplateFor(Constants.DOC_TYPE_REF_PRELIM, invoice);
+            final Document document = wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+            assertThat(document).isNotNull();
+
+            // and given document sent
+            final CommunicationChannel sendTo = invoice.getSendTo();
+            assertThat(sendTo).isInstanceOf(EmailAddress.class);
+            mixin(Invoice_email.class, invoice).$$(document, (EmailAddress)sendTo, null, null, null);
+
+            transactionService.flushTransaction();
+
+            // and given is attached to invoice, buyer and seller and the comm
+            List<Paperclip> paperclips = paperclipRepository.findByDocument(document);
+            assertThat(paperclips).hasSize(4);
+
+            final Party invoiceSeller = invoice.getSeller();
+            final Party invoiceBuyer = invoice.getBuyer();
+            final Optional<Communication> commIfAny =
+                    paperclips.stream()
+                            .map(x -> x.getAttachedTo())
+                            .filter(x -> x instanceof Communication)
+                            .map(Communication.class::cast)
+                            .findFirst();
+            assertThat(commIfAny.isPresent()).isTrue();
+            final Communication communication = commIfAny.get();
+
+            assertThat(paperclips)
+                    .extracting(x -> x.getAttachedTo())
+                    .contains(invoice, invoiceBuyer, invoiceSeller, communication);
+
+            // when remove the invoice
+            wrap(invoice).remove();
+
+            transactionService.flushTransaction();
+
+            // then (deletes invoice, one of its paperclips)
+            invoice = findInvoice();
+            assertThat(invoice).isNull();
+
+            // but still attached to buyer, seller and communication
+            assertThat(paperclipRepository.findByAttachedTo(invoiceBuyer)).extracting(x -> x.getDocument()).contains(document);
+            assertThat(paperclipRepository.findByAttachedTo(invoiceSeller)).extracting(x -> x.getDocument()).contains(document);
+            assertThat(paperclipRepository.findByAttachedTo(communication)).extracting(x -> x.getDocument()).contains(document);
+
+            // and document still exists
+            final Bookmark documentBookmark = bookmarkService.bookmarkFor(document);
+            transactionService.nextTransaction();
+
+            // (ie no exception thrown)
             bookmarkService.lookup(documentBookmark);
         }
 
