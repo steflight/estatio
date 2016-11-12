@@ -18,9 +18,12 @@
  */
 package org.estatio.dom.invoice.viewmodel.dnc;
 
+import com.google.common.base.Predicate;
+
 import org.apache.isis.applib.annotation.Mixin;
 
 import org.estatio.dom.invoice.Constants;
+import org.estatio.dom.invoice.Invoice;
 import org.estatio.dom.invoice.viewmodel.InvoiceSummaryForPropertyDueDateStatus;
 
 @Mixin
@@ -28,6 +31,12 @@ public class InvoiceSummaryForPropertyDueDateStatus_prepareInvoiceNotes extends 
 
     public InvoiceSummaryForPropertyDueDateStatus_prepareInvoiceNotes(final InvoiceSummaryForPropertyDueDateStatus invoiceSummary) {
         super(invoiceSummary, Constants.DOC_TYPE_REF_INVOICE);
+    }
+
+    @Override
+    Predicate<Invoice> filter() {
+        // can only create invoice notes that have been invoiced (no longer changeable)
+        return Invoice.Predicates.noLongerChangeable();
     }
 
 }

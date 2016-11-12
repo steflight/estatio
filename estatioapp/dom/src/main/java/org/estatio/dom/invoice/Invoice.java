@@ -32,6 +32,8 @@ import javax.jdo.annotations.Indices;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.VersionStrategy;
 
+import com.google.common.base.Predicate;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.joda.time.LocalDate;
 
@@ -747,6 +749,18 @@ public class Invoice
     RepositoryService repositoryService;
 
 
+
+    public static class Predicates {
+
+        public static Predicate<Invoice> isChangeable() {
+            return invoice -> invoice.getStatus().invoiceIsChangable();
+        }
+
+        public static Predicate<Invoice> noLongerChangeable() {
+            return com.google.common.base.Predicates.not(Invoice.Predicates.isChangeable());
+        }
+
+    }
 
 
     public static class InvoiceNumberType {
