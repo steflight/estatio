@@ -29,13 +29,11 @@ import org.apache.isis.applib.fixturescripts.FixtureScript;
 import org.apache.isis.applib.services.email.EmailService;
 import org.apache.isis.applib.services.xactn.TransactionService;
 
-import org.isisaddons.module.command.dom.BackgroundCommandServiceJdoRepository;
 import org.isisaddons.wicket.gmap3.cpt.service.LocationLookupService;
 
 import org.incode.module.document.dom.impl.docs.Document;
 import org.incode.module.document.dom.impl.paperclips.Paperclip;
 import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
-import org.incode.module.document.dom.impl.types.DocumentTypeRepository;
 
 import org.estatio.dom.invoice.Invoice;
 import org.estatio.dom.invoice.InvoiceStatus;
@@ -141,14 +139,5 @@ public class Invoice_remove_IntegTest extends EstatioIntegrationTest {
     @Inject
     PaperclipRepository paperclipRepository;
     @Inject
-    DocumentTypeRepository documentTypeRepository;
-    @Inject
-    BackgroundCommandServiceJdoRepository backgroundCommandRepository;
-    @Inject
     TransactionService transactionService;
-
-    @Inject
-    List<EmailService> emailServices;
-
-    @Inject LocationLookupService locationLookupService;
 }
