@@ -26,6 +26,8 @@ import com.google.common.base.Strings;
 import org.apache.isis.applib.fixturescripts.FixtureScript;
 import org.apache.isis.applib.services.jdosupport.IsisJdoSupport;
 
+import org.isisaddons.module.command.dom.CommandJdo;
+
 import org.incode.module.communications.dom.impl.commchannel.CommunicationChannel;
 import org.incode.module.communications.dom.impl.commchannel.CommunicationChannelOwnerLink;
 import org.incode.module.communications.dom.impl.comms.CommChannelRole;
@@ -193,6 +195,8 @@ public class EstatioOperationalTeardownFixture extends FixtureScript {
         deleteFrom(RenderingStrategy.class);
 
         deleteFrom(Numerator.class);
+
+        deleteFrom(CommandJdo.class);
     }
 
     protected void deleteFrom(final Class cls) {
