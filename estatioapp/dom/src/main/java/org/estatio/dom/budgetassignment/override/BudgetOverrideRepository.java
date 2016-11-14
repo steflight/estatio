@@ -95,4 +95,8 @@ public class BudgetOverrideRepository extends UdoDomainRepositoryAndFactory<Budg
     public List<BudgetOverride> findByLease(final Lease lease) {
         return allMatches("findByLease", "lease", lease);
     }
+
+    public List<BudgetOverride> findByLeaseAndInvoiceChargeAndType(final Lease lease, final Charge invoiceCharge, final BudgetCalculationType type) {
+        return allMatches("findByLeaseAndInvoiceChargeAndType", "lease", lease, "invoiceCharge", invoiceCharge, "type", type);
+    }
 }

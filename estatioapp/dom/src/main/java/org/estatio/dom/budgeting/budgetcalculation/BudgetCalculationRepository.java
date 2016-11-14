@@ -8,10 +8,11 @@ import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 
 import org.estatio.dom.UdoDomainRepositoryAndFactory;
-import org.estatio.dom.budgeting.partioning.PartitionItem;
+import org.estatio.dom.asset.Unit;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keyitem.KeyItem;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.charge.Charge;
 
 @DomainService(repositoryFor = BudgetCalculation.class, nature = NatureOfService.DOMAIN)
@@ -50,6 +51,10 @@ public class BudgetCalculationRepository extends UdoDomainRepositoryAndFactory<B
         budgetCalculation.setValue(value);
         budgetCalculation.setCalculationType(calculationType);
         budgetCalculation.setStatus(status);
+        budgetCalculation.setBudget(partitionItem.getBudget());
+        budgetCalculation.setInvoiceCharge(partitionItem.getCharge());
+        budgetCalculation.setIncomingCharge(partitionItem.getBudgetItem().getCharge());
+        budgetCalculation.setUnit(keyItem.getUnit());
 
         persist(budgetCalculation);
 
@@ -188,5 +193,8 @@ public class BudgetCalculationRepository extends UdoDomainRepositoryAndFactory<B
         return result;
     }
 
+    public List<BudgetCalculation> findByBudgetAndUnitAndInvoiceChargeAndType(final Budget budget, final Unit unit, final Charge invoiceCharge, final BudgetCalculationType type) {
+        return allMatches("findByBudgetAndUnitAndInvoiceChargeAndType", "budget", budget, "unit", unit, "invoiceCharge", invoiceCharge, "type", type);
+    }
 }
 

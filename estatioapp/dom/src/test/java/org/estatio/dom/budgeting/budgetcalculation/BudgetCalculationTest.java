@@ -20,8 +20,13 @@ package org.estatio.dom.budgeting.budgetcalculation;
 import org.junit.Test;
 
 import org.incode.module.base.dom.testing.AbstractBeanPropertiesTest;
-import org.estatio.dom.budgeting.partioning.PartitionItem;
+
+import org.estatio.dom.asset.Unit;
+import org.estatio.dom.budgeting.ChargeForTesting;
+import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.keyitem.KeyItem;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
+import org.estatio.dom.charge.Charge;
 
 public class BudgetCalculationTest {
 
@@ -33,6 +38,9 @@ public class BudgetCalculationTest {
             newPojoTester()
                     .withFixture(pojos(PartitionItem.class, PartitionItem.class))
                     .withFixture(pojos(KeyItem.class, KeyItem.class))
+                    .withFixture(pojos(Charge.class, ChargeForTesting.class))
+                    .withFixture(pojos(Unit.class, Unit.class))
+                    .withFixture(pojos(Budget.class, Budget.class))
                     .exercise(pojo);
         }
 

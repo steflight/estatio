@@ -32,9 +32,13 @@ import org.apache.isis.core.unittestsupport.jmocking.JUnitRuleMockery2;
 
 import org.incode.module.base.dom.testing.FinderInteraction;
 
-import org.estatio.dom.budgeting.partioning.PartitionItem;
+import org.estatio.dom.asset.Unit;
+import org.estatio.dom.budgeting.budget.Budget;
+import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keyitem.KeyItem;
 import org.estatio.dom.budgeting.keyitem.KeyItemForTesting;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
+import org.estatio.dom.charge.Charge;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -174,6 +178,28 @@ public class BudgetCalculationRepositoryTest {
 
     }
 
+    public static class FindByBudgetAndInvoiceChargeAndType extends BudgetCalculationRepositoryTest {
+
+        @Test
+        public void happyCase() {
+
+            Budget budget = new Budget();
+            Charge invoiceCharge = new Charge();
+            Unit unit = new Unit();
+            budgetCalculationRepository.findByBudgetAndUnitAndInvoiceChargeAndType(budget, unit, invoiceCharge, BudgetCalculationType.BUDGETED);
+
+            assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.ALL_MATCHES);
+            assertThat(finderInteraction.getResultType()).isEqualTo(BudgetCalculation.class);
+            assertThat(finderInteraction.getQueryName()).isEqualTo("findByBudgetAndUnitAndInvoiceChargeAndType");
+            assertThat(finderInteraction.getArgumentsByParameterName().get("budget")).isEqualTo((Object) budget);
+            assertThat(finderInteraction.getArgumentsByParameterName().get("unit")).isEqualTo((Object) unit);
+            assertThat(finderInteraction.getArgumentsByParameterName().get("invoiceCharge")).isEqualTo((Object) invoiceCharge);
+            assertThat(finderInteraction.getArgumentsByParameterName().get("type")).isEqualTo((Object) BudgetCalculationType.BUDGETED);
+            assertThat(finderInteraction.getArgumentsByParameterName()).hasSize(4);
+        }
+
+    }
+
     @Rule
     public JUnitRuleMockery2 context = JUnitRuleMockery2.createFor(JUnitRuleMockery2.Mode.INTERFACES_AND_CLASSES);
 
@@ -202,7 +228,25 @@ public class BudgetCalculationRepositoryTest {
         public void updateOrCreateBudgetCalculation() {
 
             //given
-            PartitionItem partitionItem = new PartitionItem();
+            Budget budget = new Budget();
+            Charge charge = new Charge();
+            BudgetItem budgetItem = new BudgetItem(){
+                @Override
+                public Charge getCharge(){
+                    return charge;
+                }
+            };
+            PartitionItem partitionItem = new PartitionItem(){
+                @Override
+                public Budget getBudget(){
+                    return budget;
+                }
+
+                @Override
+                public BudgetItem getBudgetItem(){
+                    return budgetItem;
+                }
+            };
             KeyItem keyItem = new KeyItem();
             BigDecimal value = new BigDecimal("100");
             final BudgetCalculation budgetCalculation = new BudgetCalculation();

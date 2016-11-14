@@ -25,6 +25,8 @@ import javax.jdo.annotations.Column;
 import javax.jdo.annotations.DatastoreIdentity;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Index;
+import javax.jdo.annotations.Indices;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Query;
 import javax.jdo.annotations.Unique;
@@ -49,10 +51,12 @@ import org.incode.module.base.dom.utils.TitleBuilder;
 
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
-import org.estatio.dom.budgeting.partioning.PartitionItem;
+import org.estatio.dom.asset.Unit;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keyitem.KeyItem;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
+import org.estatio.dom.charge.Charge;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -98,7 +102,19 @@ import lombok.Setter;
                 name = "findByPartitionItem", language = "JDOQL",
                 value = "SELECT " +
                         "FROM org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation " +
-                        "WHERE partitionItem == :partitionItem")
+                        "WHERE partitionItem == :partitionItem"),
+        @Query(
+                name = "findByBudgetAndUnitAndInvoiceChargeAndType", language = "JDOQL",
+                value = "SELECT " +
+                        "FROM org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation " +
+                        "WHERE budget == :budget && "
+                        + "unit == :unit && "
+                        + "invoiceCharge == :invoiceCharge && "
+                        + "calculationType == :type")
+})
+@Indices({
+        @Index(name = "BudgetCalculation_budget_unit_invoiceCharge_IDX",
+                members = { "budget", "unit", "invoiceCharge" })
 })
 @Unique(name = "BudgetCalculation_partitionItem_keyItem_calculationType_status_UNQ", members = {"partitionItem", "keyItem", "calculationType", "status"})
 @DomainObject(
@@ -143,6 +159,22 @@ public class BudgetCalculation extends UdoDomainObject2<BudgetCalculation>
     @Column(allowsNull = "false")
     private BudgetCalculationStatus status;
 
+    @Getter @Setter
+    @Column(name = "budgetId", allowsNull = "false")
+    private Budget budget;
+
+    @Getter @Setter
+    @Column(name = "unitId", allowsNull = "false")
+    private Unit unit;
+
+    @Getter @Setter
+    @Column(name = "invoiceChargeId", allowsNull = "false")
+    private Charge invoiceCharge;
+
+    @Getter @Setter
+    @Column(name = "incomingChargeId", allowsNull = "false")
+    private Charge incomingCharge;
+
     @Override
     @PropertyLayout(hidden = Where.EVERYWHERE)
     public ApplicationTenancy getApplicationTenancy() {
@@ -158,12 +190,6 @@ public class BudgetCalculation extends UdoDomainObject2<BudgetCalculation>
     @PropertyLayout(hidden = Where.ALL_TABLES)
     @Column(allowsNull = "true")
     private String updatedBy;
-
-    @Action(semantics = SemanticsOf.SAFE)
-    @ActionLayout(contributed = Contributed.AS_ASSOCIATION, hidden = Where.ALL_TABLES)
-    public Budget getBudget(){
-        return this.getPartitionItem().getBudget();
-    }
 
     @Action(semantics = SemanticsOf.SAFE)
     @ActionLayout(contributed = Contributed.AS_ASSOCIATION, hidden = Where.ALL_TABLES)

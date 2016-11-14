@@ -152,4 +152,24 @@ public class BudgetCalculationRepositoryTest extends EstatioIntegrationTest {
         }
     }
 
+    public static class FindByBudgetAndUnitAndInvoiceChargeAndType extends BudgetCalculationRepositoryTest {
+
+        @Test
+        public void happyCase() throws Exception {
+
+            // given
+            Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
+            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            PartitionItem partitionItem = budget.getItems().first().getPartitionItems().get(0);
+            budget.calculate();
+
+            // when
+            List<BudgetCalculation> budgetCalculations = budgetCalculationRepository.findByBudgetAndUnitAndInvoiceChargeAndType(budget, property.getUnits().first(), partitionItem.getCharge(), BudgetCalculationType.BUDGETED);
+
+            // then
+            assertThat(budgetCalculations.size()).isEqualTo(3);
+
+        }
+    }
+
 }

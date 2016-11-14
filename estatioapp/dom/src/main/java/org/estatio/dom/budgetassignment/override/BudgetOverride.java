@@ -49,7 +49,14 @@ import lombok.Setter;
                 name = "findByLease", language = "JDOQL",
                 value = "SELECT " +
                         "FROM org.estatio.dom.budgetassignment.override.BudgetOverride " +
-                        "WHERE lease == :lease")
+                        "WHERE lease == :lease"),
+        @Query(
+                name = "findByLeaseAndInvoiceChargeAndType", language = "JDOQL",
+                value = "SELECT " +
+                        "FROM org.estatio.dom.budgetassignment.override.BudgetOverride " +
+                        "WHERE lease == :lease && "
+                        + "invoiceCharge == :invoiceCharge && "
+                        + "type == :type")
 })
 
 @DomainObject()
