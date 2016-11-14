@@ -130,6 +130,8 @@ public abstract class EstatioIntegrationTest extends IntegrationTestAbstract {
         List<CommandJdo> commands = backgroundCommandRepository.findBackgroundCommandsNotYetStarted();
         assertThat(commands).hasSize(1);
 
+        transactionService.nextTransaction();
+
         BackgroundCommandExecutionFromBackgroundCommandServiceJdo backgroundExec =
                 new BackgroundCommandExecutionFromBackgroundCommandServiceJdo();
         final SimpleSession session = new SimpleSession("scheduler_user", new String[] { "admin_role" });
@@ -138,8 +140,6 @@ public abstract class EstatioIntegrationTest extends IntegrationTestAbstract {
         thread.start();
 
         thread.join(5000L);
-
-        transactionService.flushTransaction();
 
         commands = backgroundCommandRepository.findBackgroundCommandsNotYetStarted();
         assertThat(commands).isEmpty();

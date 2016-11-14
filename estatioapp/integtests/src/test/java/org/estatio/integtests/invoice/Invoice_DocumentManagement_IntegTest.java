@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.apache.isis.applib.fixturescripts.FixtureScript;
 import org.apache.isis.applib.services.bookmark.Bookmark;
 import org.apache.isis.applib.services.bookmark.BookmarkService2;
+import org.apache.isis.applib.services.clock.ClockService;
 import org.apache.isis.applib.services.repository.RepositoryService;
 import org.apache.isis.applib.services.xactn.TransactionService;
 
@@ -88,7 +89,7 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
                 Invoice_DocumentManagement_IntegTest {
 
             @Test
-            public void happy_case() throws Exception {
+            public void for_prelim_letter() throws Exception {
 
                 // given
                 Invoice invoice = findInvoice();
@@ -103,6 +104,47 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
                 assertThat(paperclips).hasSize(1);
 
                 assertThat(paperclips).extracting(x -> x.getAttachedTo()).contains(invoice);
+            }
+
+
+            @Test
+            public void for_invoice_note() throws Exception {
+
+                // given
+                Invoice invoice = findInvoice();
+                DocumentTemplate invoiceNoteTemplate = findDocumentTemplateFor(Constants.DOC_TYPE_REF_INVOICE, invoice);
+
+                // given the invoice has been invoiced
+                invoice.setStatus(InvoiceStatus.INVOICED);
+                invoice.setInvoiceNumber("12345");
+                invoice.setInvoiceDate(clockService.now());
+
+                // when
+                final Document document = wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(invoiceNoteTemplate);
+
+                // then
+                assertThat(document).isNotNull();
+                List<Paperclip> paperclips = paperclipRepository.findByDocument(document);
+                assertThat(paperclips).hasSize(1);
+
+                assertThat(paperclips).extracting(x -> x.getAttachedTo()).contains(invoice);
+            }
+
+            @Test
+            public void cannot_create_invoice_note_if_the_invoice_has_not_yet_been_invoied() throws Exception {
+
+                // given
+                Invoice invoice = findInvoice();
+                DocumentTemplate prelimLetterTemplate = findDocumentTemplateFor(Constants.DOC_TYPE_REF_PRELIM, invoice);
+                DocumentTemplate invoiceNoteTemplate = findDocumentTemplateFor(Constants.DOC_TYPE_REF_INVOICE, invoice);
+
+                // when
+                final List<DocumentTemplate> documentTemplates =
+                        mixin(Invoice_createAndAttachDocument.class, invoice).choices0$$();
+
+                // then
+                assertThat(documentTemplates).doesNotContain(invoiceNoteTemplate);
+                assertThat(documentTemplates).contains(prelimLetterTemplate);
             }
         }
 
@@ -337,6 +379,7 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
     @Inject
     TransactionService transactionService;
 
-    //endregion
+    @Inject
+    ClockService clockService;
 
 }

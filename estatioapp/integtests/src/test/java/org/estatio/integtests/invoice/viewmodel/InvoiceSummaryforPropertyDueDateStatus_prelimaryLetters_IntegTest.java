@@ -61,10 +61,10 @@ import org.estatio.integtests.EstatioIntegrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class InvoiceSummaryforPropertyDueDateStatus_preparePrelimaryLetters_IntegTest extends EstatioIntegrationTest {
+public class InvoiceSummaryforPropertyDueDateStatus_prelimaryLetters_IntegTest extends EstatioIntegrationTest {
 
     public static class ActionInvocationIntegTest extends
-            InvoiceSummaryforPropertyDueDateStatus_preparePrelimaryLetters_IntegTest {
+            InvoiceSummaryforPropertyDueDateStatus_prelimaryLetters_IntegTest {
 
         @Before
         public void setupData() {
@@ -209,14 +209,11 @@ public class InvoiceSummaryforPropertyDueDateStatus_preparePrelimaryLetters_Inte
     }
 
     DocAndCommForPrelimLetter prelimLetterViewModelOf(final InvoiceSummaryForPropertyDueDateStatus summary) {
-        List<DocAndCommForPrelimLetter> prelimLetterViewModels =
+        List<DocAndCommForPrelimLetter> viewModels =
                 mixin( InvoiceSummaryForPropertyDueDateStatus_preliminaryLetters.class, summary).$$();
-        assertThat(prelimLetterViewModels).hasSize(1);
+        assertThat(viewModels).hasSize(1);
 
-        prelimLetterViewModels = mixin(InvoiceSummaryForPropertyDueDateStatus_preliminaryLetters.class, summary).$$();
-
-
-        return prelimLetterViewModels.get(0);
+        return viewModels.get(0);
     }
 
 
