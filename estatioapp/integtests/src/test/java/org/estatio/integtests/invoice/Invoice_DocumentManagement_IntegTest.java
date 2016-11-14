@@ -32,6 +32,7 @@ import org.apache.isis.applib.services.bookmark.Bookmark;
 import org.apache.isis.applib.services.bookmark.BookmarkService2;
 import org.apache.isis.applib.services.clock.ClockService;
 import org.apache.isis.applib.services.repository.RepositoryService;
+import org.apache.isis.applib.services.wrapper.HiddenException;
 import org.apache.isis.applib.services.xactn.TransactionService;
 
 import org.incode.module.communications.dom.impl.commchannel.CommunicationChannel;
@@ -43,6 +44,7 @@ import org.incode.module.document.dom.impl.docs.DocumentTemplateRepository;
 import org.incode.module.document.dom.impl.docs.Document_delete;
 import org.incode.module.document.dom.impl.paperclips.Paperclip;
 import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
+import org.incode.module.document.dom.impl.paperclips.Paperclip_changeRole;
 import org.incode.module.document.dom.impl.types.DocumentType;
 import org.incode.module.document.dom.impl.types.DocumentTypeRepository;
 
@@ -315,8 +317,34 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
     }
 
 
+    public static class Paperclip_changeRole_IntegTest extends Invoice_DocumentManagement_IntegTest {
 
-    //endregion
+        @Test
+        public void for_prelim_letter() throws Exception {
+
+            // given
+            Invoice invoice = findInvoice();
+            DocumentTemplate prelimLetterTemplate = findDocumentTemplateFor(Constants.DOC_TYPE_REF_PRELIM, invoice);
+
+            // and given
+            final Document document = wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+            assertThat(document).isNotNull();
+
+            // and given
+            List<Paperclip> paperclips = paperclipRepository.findByDocument(document);
+            assertThat(paperclips).hasSize(1);
+            final Paperclip paperclip = paperclips.get(0);
+
+            // expect
+            expectedExceptions.expect(HiddenException.class);
+
+            // when
+            wrap(mixin(Paperclip_changeRole.class, paperclip)).$$("new role");
+        }
+
+    }
+
+
 
     //region > helpers (finders)
 
