@@ -23,6 +23,7 @@ import org.estatio.dom.budgetassignment.ServiceChargeItemRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationService;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.keytable.FoundationValueType;
 import org.estatio.dom.budgeting.keytable.KeyTable;
@@ -74,6 +75,9 @@ public class BudgetIntegrationTest extends EstatioIntegrationTest {
     @Inject
     OccupancyRepository occupancyRepository;
 
+    @Inject
+    BudgetCalculationService budgetCalculationService;
+
     @Before
     public void setupData() {
         runFixtureScript(new FixtureScript() {
@@ -105,7 +109,7 @@ public class BudgetIntegrationTest extends EstatioIntegrationTest {
             budget2015 = budgetRepository.findByPropertyAndStartDate(propertyOxf, BudgetsForOxf.BUDGET_2015_START_DATE);
 
             // calculate and assign budget2015
-            budget2015.calculate();
+            budgetCalculationService.calculatePersistedCalculations(budget2015);
             budgetAssignmentContributions.assignCalculations(budget2015);
 
             topmodelBudgetServiceChargeItem = leaseRepository.findLeaseByReference(LeaseForOxfTopModel001Gb.REF).findFirstItemOfType(LeaseItemType.SERVICE_CHARGE_BUDGETED);

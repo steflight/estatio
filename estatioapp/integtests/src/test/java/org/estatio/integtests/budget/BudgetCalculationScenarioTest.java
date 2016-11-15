@@ -14,8 +14,8 @@ import org.apache.isis.applib.fixturescripts.FixtureScript;
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
 import org.estatio.dom.budgetassignment.BudgetAssignmentService;
-import org.estatio.dom.budgetassignment.viewmodels.BudgetAssignmentResult;
-import org.estatio.dom.budgetassignment.viewmodels.DetailedBudgetAssignmentResult;
+import org.estatio.dom.budgetassignment.viewmodels.BudgetCalculationResultViewModel;
+import org.estatio.dom.budgetassignment.viewmodels.DetailedBudgetCalculationResultViewmodel;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationService;
@@ -74,8 +74,8 @@ BudgetCalculationScenarioTest extends EstatioIntegrationTest {
         Property property;
         Budget budget;
         List<BudgetCalculationViewmodel> calculationResults;
-        List<BudgetAssignmentResult> budgetAssignmentResults;
-        List<DetailedBudgetAssignmentResult> detailedBudgetAssignmentResults;
+        List<BudgetCalculationResultViewModel> budgetCalculationResultViewModels;
+        List<DetailedBudgetCalculationResultViewmodel> detailedBudgetCalculationResultViewmodels;
 
         @Before
         public void setup() {
@@ -101,12 +101,12 @@ BudgetCalculationScenarioTest extends EstatioIntegrationTest {
         public void calculate() throws Exception {
 
             // when
-            calculationResults = budgetCalculationService.getCalculations(budget);
-            budgetAssignmentResults = budgetAssignmentService.getAssignmentResults(budget);
+            calculationResults = budgetCalculationService.getAllCalculations(budget);
+            budgetCalculationResultViewModels = budgetAssignmentService.getAssignmentResults(budget);
 
             // then
             assertThat(calculationResults.size()).isEqualTo(33);
-            assertThat(budgetAssignmentResults.size()).isEqualTo(20);
+            assertThat(budgetCalculationResultViewModels.size()).isEqualTo(20);
             assertThat(budgetedAmountFor(LeasesForBudNl.REF1, ChargeRefData.NL_SERVICE_CHARGE)).isEqualTo(new BigDecimal("1928.571437"));
             assertThat(budgetedAmountFor(LeasesForBudNl.REF1, ChargeRefData.NL_SERVICE_CHARGE2)).isEqualTo(new BigDecimal("964.285722"));
             assertThat(budgetedAmountFor(LeasesForBudNl.REF2, ChargeRefData.NL_SERVICE_CHARGE)).isEqualTo(new BigDecimal("2857.142847"));
@@ -126,15 +126,15 @@ BudgetCalculationScenarioTest extends EstatioIntegrationTest {
 
             BigDecimal resultValue = BigDecimal.ZERO;
 
-            for (BudgetAssignmentResult result : resultsForLease(leaseReference, invoiceChargeReference)){
+            for (BudgetCalculationResultViewModel result : resultsForLease(leaseReference, invoiceChargeReference)){
                 resultValue = resultValue.add(result.getBudgetedValue());
             }
 
             return resultValue;
         }
 
-        private List<BudgetAssignmentResult> resultsForLease(final String leaseReference, final String invoiceChargeReference){
-            return budgetAssignmentResults.stream().filter(x ->x.getLeaseReference().equals(leaseReference) && x.getInvoiceCharge().equals(invoiceChargeReference)).collect(Collectors.toList());
+        private List<BudgetCalculationResultViewModel> resultsForLease(final String leaseReference, final String invoiceChargeReference){
+            return budgetCalculationResultViewModels.stream().filter(x ->x.getLeaseReference().equals(leaseReference) && x.getInvoiceCharge().equals(invoiceChargeReference)).collect(Collectors.toList());
         }
 
         public void detailedCalculation() throws Exception {
@@ -147,31 +147,31 @@ BudgetCalculationScenarioTest extends EstatioIntegrationTest {
             Lease leaseForDago = leaseRepository.findLeaseByReference(LeasesForBudNl.REF4);
 
             // when
-            calculationResults = budgetCalculationService.getCalculations(budget);
-            detailedBudgetAssignmentResults = budgetAssignmentService.getDetailedBudgetAssignmentResults(budget, leaseForDago);
+            calculationResults = budgetCalculationService.getAllCalculations(budget);
+            detailedBudgetCalculationResultViewmodels = budgetAssignmentService.getDetailedBudgetAssignmentResults(budget, leaseForDago);
 
             // then
-            assertThat(detailedBudgetAssignmentResults.size()).isEqualTo(8);
+            assertThat(detailedBudgetCalculationResultViewmodels.size()).isEqualTo(8);
 
-            assertThat(detailedBudgetAssignmentResults.get(0).getBudgetedValue()).isEqualTo(new BigDecimal("1428.571430"));
-            assertThat(detailedBudgetAssignmentResults.get(0).getIncomingCharge()).isEqualTo(INCOMING_CHARGE_LABEL_1);
-            assertThat(detailedBudgetAssignmentResults.get(0).getInvoiceCharge()).isEqualTo(chargeRepository.findByReference(ChargeRefData.NL_SERVICE_CHARGE).getReference());
+            assertThat(detailedBudgetCalculationResultViewmodels.get(0).getBudgetedValue()).isEqualTo(new BigDecimal("1428.571430"));
+            assertThat(detailedBudgetCalculationResultViewmodels.get(0).getIncomingCharge()).isEqualTo(INCOMING_CHARGE_LABEL_1);
+            assertThat(detailedBudgetCalculationResultViewmodels.get(0).getInvoiceCharge()).isEqualTo(chargeRepository.findByReference(ChargeRefData.NL_SERVICE_CHARGE).getReference());
 
-            assertThat(detailedBudgetAssignmentResults.get(1).getBudgetedValue()).isEqualTo(new BigDecimal("2285.714288"));
-            assertThat(detailedBudgetAssignmentResults.get(1).getIncomingCharge()).isEqualTo(INCOMING_CHARGE_LABEL_2);
-            assertThat(detailedBudgetAssignmentResults.get(1).getInvoiceCharge()).isEqualTo(chargeRepository.findByReference(ChargeRefData.NL_SERVICE_CHARGE).getReference());
+            assertThat(detailedBudgetCalculationResultViewmodels.get(1).getBudgetedValue()).isEqualTo(new BigDecimal("2285.714288"));
+            assertThat(detailedBudgetCalculationResultViewmodels.get(1).getIncomingCharge()).isEqualTo(INCOMING_CHARGE_LABEL_2);
+            assertThat(detailedBudgetCalculationResultViewmodels.get(1).getInvoiceCharge()).isEqualTo(chargeRepository.findByReference(ChargeRefData.NL_SERVICE_CHARGE).getReference());
 
-            assertThat(detailedBudgetAssignmentResults.get(3).getBudgetedValue()).isEqualTo(new BigDecimal("3857.142861"));
-            assertThat(detailedBudgetAssignmentResults.get(3).getIncomingCharge()).isEqualTo(INCOMING_CHARGE_LABEL_3);
-            assertThat(detailedBudgetAssignmentResults.get(3).getInvoiceCharge()).isEqualTo(chargeRepository.findByReference(ChargeRefData.NL_SERVICE_CHARGE2).getReference());
+            assertThat(detailedBudgetCalculationResultViewmodels.get(3).getBudgetedValue()).isEqualTo(new BigDecimal("3857.142861"));
+            assertThat(detailedBudgetCalculationResultViewmodels.get(3).getIncomingCharge()).isEqualTo(INCOMING_CHARGE_LABEL_3);
+            assertThat(detailedBudgetCalculationResultViewmodels.get(3).getInvoiceCharge()).isEqualTo(chargeRepository.findByReference(ChargeRefData.NL_SERVICE_CHARGE2).getReference());
 
-            assertThat(detailedBudgetAssignmentResults.get(5).getBudgetedValue()).isEqualTo(new BigDecimal("2500.000000"));
-            assertThat(detailedBudgetAssignmentResults.get(5).getIncomingCharge()).isEqualTo(INCOMING_CHARGE_LABEL_1);
-            assertThat(detailedBudgetAssignmentResults.get(5).getInvoiceCharge()).isEqualTo(chargeRepository.findByReference(ChargeRefData.NL_SERVICE_CHARGE).getReference());
+            assertThat(detailedBudgetCalculationResultViewmodels.get(5).getBudgetedValue()).isEqualTo(new BigDecimal("2500.000000"));
+            assertThat(detailedBudgetCalculationResultViewmodels.get(5).getIncomingCharge()).isEqualTo(INCOMING_CHARGE_LABEL_1);
+            assertThat(detailedBudgetCalculationResultViewmodels.get(5).getInvoiceCharge()).isEqualTo(chargeRepository.findByReference(ChargeRefData.NL_SERVICE_CHARGE).getReference());
 
-            assertThat(detailedBudgetAssignmentResults.get(7).getBudgetedValue()).isEqualTo(new BigDecimal("6750.000000"));
-            assertThat(detailedBudgetAssignmentResults.get(7).getIncomingCharge()).isEqualTo(INCOMING_CHARGE_LABEL_3);
-            assertThat(detailedBudgetAssignmentResults.get(7).getInvoiceCharge()).isEqualTo(chargeRepository.findByReference(ChargeRefData.NL_SERVICE_CHARGE2).getReference());
+            assertThat(detailedBudgetCalculationResultViewmodels.get(7).getBudgetedValue()).isEqualTo(new BigDecimal("6750.000000"));
+            assertThat(detailedBudgetCalculationResultViewmodels.get(7).getIncomingCharge()).isEqualTo(INCOMING_CHARGE_LABEL_3);
+            assertThat(detailedBudgetCalculationResultViewmodels.get(7).getInvoiceCharge()).isEqualTo(chargeRepository.findByReference(ChargeRefData.NL_SERVICE_CHARGE2).getReference());
 
         }
 

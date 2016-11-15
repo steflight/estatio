@@ -14,8 +14,8 @@ import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 
 import org.estatio.dom.asset.Unit;
-import org.estatio.dom.budgetassignment.viewmodels.BudgetAssignmentResult;
-import org.estatio.dom.budgetassignment.viewmodels.DetailedBudgetAssignmentResult;
+import org.estatio.dom.budgetassignment.viewmodels.BudgetCalculationResultViewModel;
+import org.estatio.dom.budgetassignment.viewmodels.DetailedBudgetCalculationResultViewmodel;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
@@ -36,8 +36,8 @@ import org.estatio.dom.lease.OccupancyRepository;
 @DomainService(nature = NatureOfService.DOMAIN)
 public class BudgetAssignmentService {
 
-    public List<DetailedBudgetAssignmentResult> getDetailedBudgetAssignmentResults(final Budget budget, final Lease lease){
-        List<DetailedBudgetAssignmentResult> results = new ArrayList<>();
+    public List<DetailedBudgetCalculationResultViewmodel> getDetailedBudgetAssignmentResults(final Budget budget, final Lease lease){
+        List<DetailedBudgetCalculationResultViewmodel> results = new ArrayList<>();
 
         for (Occupancy occupancy : lease.getOccupancies()) {
             if (occupancy.getInterval().overlaps(budget.getInterval())) {
@@ -46,7 +46,7 @@ public class BudgetAssignmentService {
 
                     if (calculationResult.getCalculationType() == BudgetCalculationType.BUDGETED) {
                         results.add(
-                                new DetailedBudgetAssignmentResult(
+                                new DetailedBudgetCalculationResultViewmodel(
                                         occupancy.getUnit(),
                                         calculationResult.getPartitionItem().getBudgetItem().getCharge(),
                                         getRowLabelLastPart(calculationResult.getPartitionItem().getBudgetItem()),
@@ -68,7 +68,7 @@ public class BudgetAssignmentService {
     private BigDecimal getTotalBudgetedValue(final BudgetItem budgetItem){
         BigDecimal returnValue = BigDecimal.ZERO;
         List<BudgetCalculationViewmodel> resultsForItem =
-                budgetCalculationService.getCalculations(budgetItem.getBudget()).stream().filter(x -> x.getPartitionItem().getBudgetItem().equals(budgetItem)).collect(Collectors.toList()
+                budgetCalculationService.getAllCalculations(budgetItem.getBudget()).stream().filter(x -> x.getPartitionItem().getBudgetItem().equals(budgetItem)).collect(Collectors.toList()
         );
         for (BudgetCalculationViewmodel bcResult : resultsForItem){
             if (bcResult.getValue() != null && bcResult.getCalculationType() == BudgetCalculationType.BUDGETED) {
@@ -102,16 +102,16 @@ public class BudgetAssignmentService {
 
     }
 
-    public List<BudgetAssignmentResult> getAssignmentResults(final Budget budget){
-        List<BudgetAssignmentResult> results = new ArrayList<>();
+    public List<BudgetCalculationResultViewModel> getAssignmentResults(final Budget budget){
+        List<BudgetCalculationResultViewModel> results = new ArrayList<>();
         for (Lease lease : leaseRepository.findLeasesByProperty(budget.getProperty())){
            results.addAll(getAssignmentResults(budget, lease));
         }
         return results;
     }
 
-    private List<BudgetAssignmentResult> getAssignmentResults(final Budget budget, final Lease lease){
-        List<BudgetAssignmentResult> results = new ArrayList<>();
+    private List<BudgetCalculationResultViewModel> getAssignmentResults(final Budget budget, final Lease lease){
+        List<BudgetCalculationResultViewModel> results = new ArrayList<>();
         // TODO: this is an extra filter because currently occupancies can outrun terminated leases
         if (lease.getStatus() != LeaseStatus.TERMINATED) {
             for (Occupancy occupancy : lease.getOccupancies()) {
@@ -127,21 +127,21 @@ public class BudgetAssignmentService {
 
     private List<BudgetCalculationViewmodel> calculationResults(final Budget budget, final Unit u){
         return Lists.newArrayList(
-                budgetCalculationService.getCalculations(budget).stream().filter(x -> x.getKeyItem().getUnit().equals(u)).collect(Collectors.toList())
+                budgetCalculationService.getAllCalculations(budget).stream().filter(x -> x.getKeyItem().getUnit().equals(u)).collect(Collectors.toList())
         );
     }
 
-    private List<BudgetAssignmentResult> createFromCalculationResults(final Lease lease, final Unit unit, final List<BudgetCalculationViewmodel> calculationResultsForLease){
-        List<BudgetAssignmentResult> assignmentResults = new ArrayList<>();
+    private List<BudgetCalculationResultViewModel> createFromCalculationResults(final Lease lease, final Unit unit, final List<BudgetCalculationViewmodel> calculationResultsForLease){
+        List<BudgetCalculationResultViewModel> assignmentResults = new ArrayList<>();
         for (BudgetCalculationViewmodel calculationResult : calculationResultsForLease){
-            List<BudgetAssignmentResult> filteredByChargeAndKeyTable = assignmentResults.stream()
+            List<BudgetCalculationResultViewModel> filteredByChargeAndKeyTable = assignmentResults.stream()
                     .filter(x -> x.getInvoiceCharge().equals(calculationResult.getPartitionItem().getCharge().getReference()))
                     .filter(x -> x.getKeyTable().equals(calculationResult.getPartitionItem().getKeyTable().getName()))
                     .collect(Collectors.toList());
             if (filteredByChargeAndKeyTable.size()>0){
                 filteredByChargeAndKeyTable.get(0).add(calculationResult);
             } else {
-                assignmentResults.add(new BudgetAssignmentResult(
+                assignmentResults.add(new BudgetCalculationResultViewModel(
                     lease,
                     unit,
                     calculationResult.getKeyItem().getKeyTable(),

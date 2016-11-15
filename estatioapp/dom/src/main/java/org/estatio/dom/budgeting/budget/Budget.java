@@ -80,7 +80,6 @@ import org.estatio.dom.budgeting.partioning.PartitioningRepository;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.lease.Occupancy;
 import org.estatio.dom.lease.OccupancyRepository;
-import org.estatio.dom.roles.EstatioRole;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -217,17 +216,6 @@ public class Budget extends UdoDomainObject2<Budget>
             item.createCopyOn(newBudget);
         }
         return newBudget;
-    }
-
-    @Action(semantics = SemanticsOf.IDEMPOTENT_ARE_YOU_SURE)
-    @ActionLayout()
-    public Budget calculate(){
-        budgetCalculationService.calculatePersistedCalculations(this);
-        return this;
-    }
-
-    public String disableCalculate(){
-        return EstatioRole.ADMINISTRATOR.isApplicableFor(getUser()) ? null : "Disabled temporary; use overview";
     }
 
     @Programmatic
