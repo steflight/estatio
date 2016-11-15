@@ -43,6 +43,28 @@ public class BudgetOverrideRepository extends UdoDomainRepositoryAndFactory<Budg
         return newOverride;
     }
 
+    public BudgetOverrideForFlatRate newBudgetOverrideForFlatRate(
+            final BigDecimal valueM2,
+            final BigDecimal weightedArea,
+            final Lease lease,
+            @Parameter(optionality = Optionality.OPTIONAL)
+            final LocalDate startDate,
+            @Parameter(optionality = Optionality.OPTIONAL)
+            final LocalDate endDate,
+            final Charge invoiceCharge,
+            @Parameter(optionality = Optionality.OPTIONAL)
+            final Charge incomingCharge,
+            @Parameter(optionality = Optionality.OPTIONAL)
+            final BudgetCalculationType type,
+            final String reason){
+        BudgetOverrideForFlatRate newOverride = newTransientInstance(BudgetOverrideForFlatRate.class);
+        newOverride = (BudgetOverrideForFlatRate) setValues(newOverride, lease, startDate, endDate, invoiceCharge, incomingCharge, type, reason);
+        newOverride.setValuePerM2(valueM2);
+        newOverride.setWeightedArea(weightedArea);
+        persistIfNotAlready(newOverride);
+        return newOverride;
+    }
+
     public BudgetOverrideForMax newBudgetOverrideForMax(
             final BigDecimal maxValue,
             final Lease lease,
