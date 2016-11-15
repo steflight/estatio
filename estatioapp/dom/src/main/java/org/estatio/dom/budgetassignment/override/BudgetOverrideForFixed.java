@@ -9,8 +9,7 @@ import org.joda.time.LocalDate;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.estatio.dom.budgeting.budget.Budget;
-import org.estatio.dom.budgeting.budgetitem.BudgetItem;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -26,22 +25,13 @@ public class BudgetOverrideForFixed extends BudgetOverride {
     @Column(scale = 2)
     private BigDecimal fixedValue;
 
-    @Override
-    public void calculate(final LocalDate budgetStartDate){
-        if (isActiveOnCalculationDate(budgetStartDate)) {
-            Budget budget = budgetRepository.findByPropertyAndDate(getLease().getProperty(), budgetStartDate);
-            if (getIncomingCharge() == null) {
-                for (BudgetItem item : budget.getItems()) {
-                    // create budget override calculation
-                }
-            } else {
-                // create (one) budget override calculation
-            }
-        }
+    @Override BudgetOverrideCalculation resultFor(final LocalDate date, final BudgetCalculationType type) {
+        return createCalculation(fixedValue, type);
     }
 
     @Override
     public ApplicationTenancy getApplicationTenancy() {
         return getLease().getApplicationTenancy();
     }
+
 }

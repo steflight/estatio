@@ -14,6 +14,9 @@ import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 
 import org.estatio.dom.asset.Unit;
+import org.estatio.dom.budgetassignment.override.BudgetOverride;
+import org.estatio.dom.budgetassignment.override.BudgetOverrideCalculation;
+import org.estatio.dom.budgetassignment.override.BudgetOverrideRepository;
 import org.estatio.dom.budgetassignment.viewmodels.BudgetCalculationResultViewModel;
 import org.estatio.dom.budgetassignment.viewmodels.DetailedBudgetCalculationResultViewmodel;
 import org.estatio.dom.budgeting.budget.Budget;
@@ -31,6 +34,23 @@ import org.estatio.dom.lease.Occupancy;
 
 @DomainService(nature = NatureOfService.DOMAIN)
 public class BudgetAssignmentService {
+
+    public List<BudgetOverrideCalculation> calculateOverrides(final Budget budget){
+        List<BudgetOverrideCalculation> results = new ArrayList<>();
+        for (Lease lease : leaseRepository.findByAssetAndActiveOnDate(budget.getProperty(), budget.getStartDate())){
+            // TODO: this is an extra filter because currently occupancies can outrun terminated leases
+            if (lease.getStatus() != LeaseStatus.TERMINATED) {
+                for (BudgetOverride override : budgetOverrideRepository.findByLease(lease)) {
+                    results.addAll(override.calculate(budget.getStartDate()));
+                }
+            }
+        }
+        return results;
+    }
+
+    public void assign(final Budget budget){
+        // TODO: implement
+    }
 
     public List<DetailedBudgetCalculationResultViewmodel> getDetailedBudgetAssignmentResults(final Budget budget, final Lease lease){
         List<DetailedBudgetCalculationResultViewmodel> results = new ArrayList<>();
@@ -163,5 +183,8 @@ public class BudgetAssignmentService {
 
     @Inject
     private LeaseRepository leaseRepository;
+
+    @Inject
+    private BudgetOverrideRepository budgetOverrideRepository;
 
 }

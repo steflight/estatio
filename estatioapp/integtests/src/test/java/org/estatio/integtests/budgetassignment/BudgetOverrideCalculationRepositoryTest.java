@@ -14,6 +14,7 @@ import org.estatio.dom.budgetassignment.override.BudgetOverrideCalculation;
 import org.estatio.dom.budgetassignment.override.BudgetOverrideCalculationRepository;
 import org.estatio.dom.budgetassignment.override.BudgetOverrideForFixed;
 import org.estatio.dom.budgetassignment.override.BudgetOverrideRepository;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.charge.ChargeRepository;
 import org.estatio.dom.lease.Lease;
@@ -69,12 +70,13 @@ public class BudgetOverrideCalculationRepositoryTest extends EstatioIntegrationT
         assertThat(budgetOverrideCalculationRepository.allBudgetOverrideCalculations().size()).isEqualTo(0);
 
         // when
-        budgetOverrideCalculation = wrap(budgetOverrideCalculationRepository).newBudgetOverrideCalculation(calculatedValue, budgetOverrideForFixed);
+        budgetOverrideCalculation = wrap(budgetOverrideCalculationRepository).newBudgetOverrideCalculation(calculatedValue, budgetOverrideForFixed, BudgetCalculationType.BUDGETED);
 
         // then
         assertThat(budgetOverrideCalculationRepository.allBudgetOverrideCalculations().size()).isEqualTo(1);
         assertThat(budgetOverrideCalculation.getValue()).isEqualTo(calculatedValue);
         assertThat(budgetOverrideCalculation.getBudgetOverride()).isEqualTo(budgetOverrideForFixed);
+        assertThat(budgetOverrideCalculation.getType()).isEqualTo(BudgetCalculationType.BUDGETED);
         assertThat(budgetOverrideCalculation.getApplicationTenancy()).isEqualTo(budgetOverrideForFixed.getApplicationTenancy());
 
     }

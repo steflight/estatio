@@ -7,6 +7,7 @@ import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 
 import org.estatio.dom.UdoDomainRepositoryAndFactory;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 
 @DomainService(repositoryFor = BudgetOverrideCalculation.class, nature = NatureOfService.DOMAIN)
 public class BudgetOverrideCalculationRepository extends UdoDomainRepositoryAndFactory<BudgetOverrideCalculation> {
@@ -17,10 +18,12 @@ public class BudgetOverrideCalculationRepository extends UdoDomainRepositoryAndF
 
     public BudgetOverrideCalculation newBudgetOverrideCalculation(
             final BigDecimal value,
-            final BudgetOverride budgetOverride){
+            final BudgetOverride budgetOverride,
+            final BudgetCalculationType type){
         BudgetOverrideCalculation newCalculation = newTransientInstance(BudgetOverrideCalculation.class);
         newCalculation.setValue(value);
         newCalculation.setBudgetOverride(budgetOverride);
+        newCalculation.setType(type);
         persistIfNotAlready(newCalculation);
         return newCalculation;
     }

@@ -34,7 +34,8 @@ public class BudgetCalculationMenu {
         for (Budget budget : budgetRepository.allBudgets()){
             if (budget.getInterval().contains(localDate)) {
                 budgetCalculationService.calculatePersistedCalculations(budget);
-
+                budgetAssignmentService.calculateOverrides(budget);
+                budgetAssignmentService.assign(budget);
             }
         }
 

@@ -8,6 +8,7 @@ import org.apache.isis.applib.annotation.Contributed;
 import org.apache.isis.applib.annotation.Mixin;
 import org.apache.isis.applib.annotation.SemanticsOf;
 
+import org.estatio.dom.budgetassignment.BudgetAssignmentService;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationService;
 
@@ -23,9 +24,14 @@ public class Budget_Calculate {
     @ActionLayout(contributed = Contributed.AS_ACTION)
     public void calculate() {
         budgetCalculationService.calculatePersistedCalculations(budget);
+        budgetAssignmentService.calculateOverrides(budget);
+        budgetAssignmentService.assign(budget);
     }
 
     @Inject
     private BudgetCalculationService budgetCalculationService;
+
+    @Inject
+    private BudgetAssignmentService budgetAssignmentService;
 
 }

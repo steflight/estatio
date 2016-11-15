@@ -20,6 +20,7 @@ import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -53,6 +54,10 @@ public class BudgetOverrideCalculation extends UdoDomainObject2<BudgetOverrideCa
     @Getter @Setter
     @Column(scale = 2, allowsNull = "false")
     private BigDecimal value;
+
+    @Getter @Setter
+    @Column(allowsNull = "false")
+    private BudgetCalculationType type;
 
     @Getter @Setter
     @Column(allowsNull = "true")

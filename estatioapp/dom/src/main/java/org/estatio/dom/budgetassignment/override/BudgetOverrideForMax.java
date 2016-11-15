@@ -9,8 +9,7 @@ import org.joda.time.LocalDate;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.estatio.dom.budgeting.budget.Budget;
-import org.estatio.dom.budgeting.budgetitem.BudgetItem;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -27,17 +26,11 @@ public class BudgetOverrideForMax extends BudgetOverride {
     private BigDecimal maxValue;
 
     @Override
-    public void calculate(final LocalDate budgetStartDate){
-        if (isActiveOnCalculationDate(budgetStartDate)) {
-            Budget budget = budgetRepository.findByPropertyAndDate(getLease().getProperty(), budgetStartDate);
-            if (getIncomingCharge() == null) {
-                for (BudgetItem item : budget.getItems()) {
-                    // create budget override calculation
-                }
-            } else {
-                // create (one) budget override calculation
-            }
+    BudgetOverrideCalculation resultFor(final LocalDate date, final BudgetCalculationType type) {
+        if (getCalculatedValueByBudget(date, type).compareTo(maxValue) > 0) {
+            return createCalculation(maxValue, type);
         }
+        return null;
     }
 
     @Override

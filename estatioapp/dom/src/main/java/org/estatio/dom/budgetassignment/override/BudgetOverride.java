@@ -1,5 +1,8 @@
 package org.estatio.dom.budgetassignment.override;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -16,14 +19,20 @@ import javax.jdo.annotations.VersionStrategy;
 import org.joda.time.LocalDate;
 
 import org.apache.isis.applib.annotation.DomainObject;
+import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.annotation.PropertyLayout;
 import org.apache.isis.applib.annotation.Where;
 
 import org.estatio.dom.UdoDomainObject2;
+import org.estatio.dom.asset.Unit;
+import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.lease.Lease;
+import org.estatio.dom.lease.Occupancy;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -99,7 +108,28 @@ public abstract class BudgetOverride extends UdoDomainObject2<BudgetOverride> {
     @Persistent(mappedBy = "budgetOverride", dependentElement = "true")
     private SortedSet<BudgetOverrideCalculation> calculations = new TreeSet<>();
 
-    public abstract void calculate(final LocalDate calculationDate);
+    public List<BudgetOverrideCalculation> calculate(final LocalDate budgetStartDate){
+        List<BudgetOverrideCalculation> results = new ArrayList<>();
+        if (isActiveOnCalculationDate(budgetStartDate)) {
+            if (getType() == null) {
+                if (resultFor(budgetStartDate, BudgetCalculationType.BUDGETED)!=null) results.add(resultFor(budgetStartDate, BudgetCalculationType.BUDGETED));
+                if (resultFor(budgetStartDate, BudgetCalculationType.AUDITED)!=null) results.add(resultFor(budgetStartDate, BudgetCalculationType.AUDITED));
+            } else {
+                switch (getType()) {
+                case BUDGETED:
+                    if (resultFor(budgetStartDate, BudgetCalculationType.BUDGETED)!=null) results.add(resultFor(budgetStartDate, BudgetCalculationType.BUDGETED));
+                    break;
+
+                case AUDITED:
+                    if (resultFor(budgetStartDate, BudgetCalculationType.AUDITED)!=null) results.add(resultFor(budgetStartDate, BudgetCalculationType.AUDITED));
+                    break;
+                }
+            }
+        }
+        return results;
+    }
+
+    abstract BudgetOverrideCalculation resultFor(final LocalDate date, final BudgetCalculationType type);
 
     public boolean isActiveOnCalculationDate(final LocalDate calculationDate) {
         if (getStartDate()!=null && calculationDate.isBefore(getStartDate())){
@@ -111,7 +141,43 @@ public abstract class BudgetOverride extends UdoDomainObject2<BudgetOverride> {
         return true;
     }
 
+    @Programmatic
+    BigDecimal getCalculatedValueByBudget(final LocalDate budgetStartDate, final BudgetCalculationType type){
+        BigDecimal value = BigDecimal.ZERO;
+        List<Unit> unitsForLease = new ArrayList<>();
+        List<BudgetCalculation> calculationsForLeaseAndCharges = new ArrayList<>();
+        for (Occupancy occupancy : getLease().getOccupancies()){
+            unitsForLease.add(occupancy.getUnit());
+        }
+        Budget budget = budgetRepository.findByPropertyAndDate(getLease().getProperty(), budgetStartDate);
+        if (getIncomingCharge() == null) {
+            for (Unit unit : unitsForLease){
+                calculationsForLeaseAndCharges.addAll(budgetCalculationRepository.findByBudgetAndUnitAndInvoiceChargeAndType(budget, unit, getInvoiceCharge(), type));
+            }
+        } else {
+            for (Unit unit : unitsForLease){
+                calculationsForLeaseAndCharges.addAll(budgetCalculationRepository.findByBudgetAndUnitAndInvoiceChargeAndIncomingChargeAndType(budget, unit, getInvoiceCharge(), getIncomingCharge(), type));
+            }
+        }
+        for (BudgetCalculation calculation : calculationsForLeaseAndCharges){
+            //TODO - consolidate in test: NOTE!! the pro rata calculation is used !!
+            value = value.add(calculation.getValueForPartitionPeriod());
+        }
+        return value;
+    }
+
+    @Programmatic
+    public BudgetOverrideCalculation createCalculation(final BigDecimal value, final BudgetCalculationType type){
+        return budgetOverrideCalculationRepository.newBudgetOverrideCalculation(value, this, type);
+    }
+
     @Inject
     BudgetRepository budgetRepository;
+
+    @Inject
+    BudgetCalculationRepository budgetCalculationRepository;
+
+    @Inject
+    BudgetOverrideCalculationRepository budgetOverrideCalculationRepository;
 
 }
