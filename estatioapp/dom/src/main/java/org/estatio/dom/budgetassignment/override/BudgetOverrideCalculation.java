@@ -14,10 +14,12 @@ import javax.jdo.annotations.VersionStrategy;
 import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.PropertyLayout;
 import org.apache.isis.applib.annotation.Where;
+import org.apache.isis.applib.services.timestamp.Timestampable;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
 import org.estatio.dom.UdoDomainObject2;
+import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -37,7 +39,8 @@ import lombok.Setter;
 @DomainObject(
         objectType = "org.estatio.dom.budgetassignment.override.BudgetOverrideCalculation"
 )
-public class BudgetOverrideCalculation extends UdoDomainObject2<BudgetOverrideCalculation> {
+public class BudgetOverrideCalculation extends UdoDomainObject2<BudgetOverrideCalculation>
+        implements WithApplicationTenancyProperty, Timestampable {
 
     public BudgetOverrideCalculation() {
         super("budgetOverride, value");

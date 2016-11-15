@@ -21,12 +21,12 @@ public class BudgetCalculationService {
 
     public List<BudgetCalculation> calculatePersistedCalculations(final Budget budget) {
 
-        removeTemporaryCalculations(budget);
+        removeNewCalculations(budget);
 
         List<BudgetCalculation> budgetCalculations = new ArrayList<>();
         for (BudgetCalculationViewmodel result : getCalculations(budget)){
             budgetCalculations.add(
-                    budgetCalculationRepository.updateOrCreateTemporaryBudgetCalculation(
+                    budgetCalculationRepository.createBudgetCalculation(
                     result.getPartitionItem(),
                     result.getKeyItem(),
                     result.getValue(),
@@ -36,8 +36,8 @@ public class BudgetCalculationService {
         return budgetCalculations;
     }
 
-    public void removeTemporaryCalculations(final Budget budget) {
-        for (BudgetCalculation calc : budgetCalculationRepository.findByBudgetAndStatus(budget, BudgetCalculationStatus.TEMPORARY)){
+    public void removeNewCalculations(final Budget budget) {
+        for (BudgetCalculation calc : budgetCalculationRepository.findByBudgetAndStatus(budget, Status.NEW)){
             calc.remove();
         }
     }

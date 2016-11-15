@@ -1,7 +1,6 @@
 package org.estatio.dom.budgetassignment;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,21 +13,19 @@ import com.google.common.collect.Lists;
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 
-import org.incode.module.base.dom.valuetypes.LocalDateInterval;
-
 import org.estatio.dom.asset.Unit;
 import org.estatio.dom.budgetassignment.viewmodels.BudgetAssignmentResult;
 import org.estatio.dom.budgetassignment.viewmodels.DetailedBudgetAssignmentResult;
-import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationService;
-import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationStatus;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationViewmodel;
+import org.estatio.dom.budgeting.budgetcalculation.Status;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keytable.KeyTable;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.lease.Lease;
 import org.estatio.dom.lease.LeaseRepository;
@@ -186,7 +183,7 @@ public class BudgetAssignmentService {
     }
 
     private void removeCurrentlyAssignedCalculations(final Budget budget) {
-        for (BudgetCalculation calculation : budgetCalculationRepository.findByBudgetAndStatus(budget, BudgetCalculationStatus.ASSIGNED)){
+        for (BudgetCalculation calculation : budgetCalculationRepository.findByBudgetAndStatus(budget, Status.ASSIGNED)){
 
             for (BudgetCalculationLink link : budgetCalculationLinkRepository.findByBudgetCalculation(calculation)){
                 link.remove();
@@ -207,76 +204,6 @@ public class BudgetAssignmentService {
         }
 
         return result;
-    }
-
-    public BigDecimal getShortFallAmountBudgeted(final Budget budget){
-        return getShortFall(budget).getBudgetedShortFall().setScale(2, BigDecimal.ROUND_HALF_UP);
-    }
-
-    public BigDecimal getShortFallAmountAudited(final Budget budget){
-        return getShortFall(budget).getAuditedShortFall().setScale(2, BigDecimal.ROUND_HALF_UP);
-    }
-
-    public BigDecimal getShortFallAmount(final BudgetCalculation budgetCalculation){
-        return getShortFall(budgetCalculation).getShortFall(budgetCalculation.getCalculationType());
-    }
-
-    private ShortFall getShortFall(final Budget budget){
-        ShortFall shortFall = new ShortFall();
-        for (BudgetItem item : budget.getItems()){
-            shortFall = shortFall.add(getShortFall(item));
-        }
-        return shortFall;
-    }
-
-    private ShortFall getShortFall(final BudgetItem budgetItem){
-        ShortFall shortFall = new ShortFall();
-        for (PartitionItem partitionItem : budgetItem.getPartitionItems()){
-            shortFall = shortFall.add(getShortFallForTemporaryCalculations(partitionItem));
-        }
-        return shortFall;
-    }
-
-    private ShortFall getShortFallForTemporaryCalculations(final PartitionItem allocation){
-        ShortFall shortFall = new ShortFall();
-        List<BudgetCalculation> calculationsForPartitionItem = budgetCalculationRepository.findByPartitionItemAndStatus(allocation, BudgetCalculationStatus.TEMPORARY);
-        for (BudgetCalculation calculation : calculationsForPartitionItem){
-            shortFall = shortFall.add(getShortFall(calculation));
-        }
-        return shortFall;
-    }
-
-    ShortFall getShortFall(final BudgetCalculation budgetCalculation){
-
-        BigDecimal shortFallAmount = BigDecimal.ZERO;
-        ShortFall shortFall = new ShortFall();
-
-        List<Occupancy> associatedOccupancies = associatedOccupancies(budgetCalculation);
-        if (associatedOccupancies.size()>0){
-
-            BigDecimal recoverableAmountForCalculation = BigDecimal.ZERO;
-            for (Occupancy occupancy : associatedOccupancies){
-
-                recoverableAmountForCalculation = recoverableAmountForCalculation.add(recoverableAmountForOccupancy(occupancy, budgetCalculation));
-
-            }
-            shortFallAmount = shortFallAmount.add(budgetCalculation.getValueForBudgetPeriod().subtract(recoverableAmountForCalculation));
-
-        } else {
-
-            shortFallAmount = shortFallAmount.add(budgetCalculation.getValueForBudgetPeriod());
-
-        }
-
-        return shortFall.add(shortFallAmount, budgetCalculation.getCalculationType());
-    }
-
-    BigDecimal recoverableAmountForOccupancy(final Occupancy occupancy, final BudgetCalculation calculation){
-        LocalDateInterval budgetInterval = calculation.getBudget().getInterval();
-        BigDecimal numberOfDaysInBudgetInterval = BigDecimal.valueOf(budgetInterval.days());
-        BigDecimal numberOfDaysInOccupancyIntervalOverlap = BigDecimal.valueOf(occupancy.getInterval().overlap(budgetInterval).days());
-        BigDecimal factor = numberOfDaysInOccupancyIntervalOverlap.divide(numberOfDaysInBudgetInterval, MathContext.DECIMAL64);
-        return calculation.getValueForBudgetPeriod().multiply(factor);
     }
 
     List<Occupancy> associatedOccupancies(final BudgetCalculation calculation){

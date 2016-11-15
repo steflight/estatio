@@ -78,7 +78,6 @@ import lombok.Setter;
                         "FROM org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation " +
                         "WHERE partitionItem == :partitionItem " +
                         "&& keyItem == :keyItem " +
-                        "&& status == :status " +
                         "&& calculationType == :calculationType"),
         @Query(
                 name = "findByPartitionItemAndCalculationType", language = "JDOQL",
@@ -87,22 +86,16 @@ import lombok.Setter;
                         "WHERE partitionItem == :partitionItem " +
                         "&& calculationType == :calculationType"),
         @Query(
-                name = "findByPartitionItemAndStatus", language = "JDOQL",
-                value = "SELECT " +
-                        "FROM org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation " +
-                        "WHERE partitionItem == :partitionItem " +
-                        "&& status == :status"),
-        @Query(
-                name = "findByPartitionItemAndStatusAndCalculationType", language = "JDOQL",
-                value = "SELECT " +
-                        "FROM org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation " +
-                        "WHERE partitionItem == :partitionItem " +
-                        "&& status == :status && calculationType == :calculationType"),
-        @Query(
                 name = "findByPartitionItem", language = "JDOQL",
                 value = "SELECT " +
                         "FROM org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation " +
                         "WHERE partitionItem == :partitionItem"),
+        @Query(
+                name = "findByBudgetAndStatus", language = "JDOQL",
+                value = "SELECT " +
+                        "FROM org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation " +
+                        "WHERE budget == :budget && "
+                        + "status == :status"),
         @Query(
                 name = "findByBudgetAndUnitAndInvoiceChargeAndType", language = "JDOQL",
                 value = "SELECT " +
@@ -116,7 +109,7 @@ import lombok.Setter;
         @Index(name = "BudgetCalculation_budget_unit_invoiceCharge_IDX",
                 members = { "budget", "unit", "invoiceCharge" })
 })
-@Unique(name = "BudgetCalculation_partitionItem_keyItem_calculationType_status_UNQ", members = {"partitionItem", "keyItem", "calculationType", "status"})
+@Unique(name = "BudgetCalculation_partitionItem_keyItem_calculationType_UNQ", members = {"partitionItem", "keyItem", "calculationType"})
 @DomainObject(
         auditing = Auditing.DISABLED,
         publishing = Publishing.DISABLED,
@@ -156,10 +149,6 @@ public class BudgetCalculation extends UdoDomainObject2<BudgetCalculation>
     private BudgetCalculationType calculationType;
 
     @Getter @Setter
-    @Column(allowsNull = "false")
-    private BudgetCalculationStatus status;
-
-    @Getter @Setter
     @Column(name = "budgetId", allowsNull = "false")
     private Budget budget;
 
@@ -174,6 +163,10 @@ public class BudgetCalculation extends UdoDomainObject2<BudgetCalculation>
     @Getter @Setter
     @Column(name = "incomingChargeId", allowsNull = "false")
     private Charge incomingCharge;
+
+    @Getter @Setter
+    @Column(allowsNull = "false")
+    private Status status;
 
     @Override
     @PropertyLayout(hidden = Where.EVERYWHERE)
@@ -199,8 +192,8 @@ public class BudgetCalculation extends UdoDomainObject2<BudgetCalculation>
 
     @Action(semantics = SemanticsOf.SAFE)
     @ActionLayout(contributed = Contributed.AS_ASSOCIATION, hidden = Where.ALL_TABLES)
-    // TODO: revisit when working on shortfall and audited calculations
-    public BigDecimal getValueForBudgetPeriod() {
+    // TODO: revisit when working on multiple partitions for auditing
+    public BigDecimal getValueForPartitionPeriod() {
         return getValue().multiply(BigDecimal.ONE);
     }
 

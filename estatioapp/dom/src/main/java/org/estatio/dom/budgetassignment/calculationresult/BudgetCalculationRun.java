@@ -16,8 +16,8 @@ import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.budgeting.budget.Budget;
-import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationStatus;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
+import org.estatio.dom.budgeting.budgetcalculation.Status;
 import org.estatio.dom.lease.Lease;
 
 import lombok.Getter;
@@ -58,7 +58,7 @@ public class BudgetCalculationRun extends UdoDomainObject2<BudgetCalculationRun>
 
     @Getter @Setter
     @Column(allowsNull = "false")
-    private BudgetCalculationStatus status;
+    private Status status;
 
     @Getter @Setter
     @Persistent(mappedBy = "budgetCalculationRun", dependentElement = "true")
