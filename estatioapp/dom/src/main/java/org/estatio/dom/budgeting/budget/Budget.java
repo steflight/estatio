@@ -60,8 +60,6 @@ import org.incode.module.base.dom.with.WithIntervalMutable;
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 import org.estatio.dom.asset.Property;
-import org.estatio.dom.budgetassignment.ServiceChargeItem;
-import org.estatio.dom.budgetassignment.ServiceChargeItemRepository;
 import org.estatio.dom.budgeting.api.BudgetItemCreator;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
@@ -78,7 +76,6 @@ import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
 import org.estatio.dom.budgeting.partioning.Partitioning;
 import org.estatio.dom.budgeting.partioning.PartitioningRepository;
 import org.estatio.dom.charge.Charge;
-import org.estatio.dom.lease.Occupancy;
 import org.estatio.dom.lease.OccupancyRepository;
 
 import lombok.Getter;
@@ -310,13 +307,6 @@ public class Budget extends UdoDomainObject2<Budget>
             final boolean areYouSure
     ){
 
-        /* delete calculation links and service charge items if needed */
-        for (Occupancy occupancy : occupancyRepository.occupanciesByPropertyAndInterval(getProperty(),getInterval())) {
-            for (ServiceChargeItem item : serviceChargeItemRepository.findByOccupancy(occupancy)){
-                    getContainer().remove(item);
-                    getContainer().flush();
-            }
-        }
 
         // delete calculations
         for (BudgetCalculation calculation : budgetCalculationRepository.findByBudget(this)) {
@@ -387,9 +377,6 @@ public class Budget extends UdoDomainObject2<Budget>
 
     @Inject
     private KeyTableRepository keyTableRepository;
-
-    @Inject
-    private ServiceChargeItemRepository serviceChargeItemRepository; // dependency on budgetassignment package only for (temporary) remove action
 
     @Inject
     private BudgetCalculationService budgetCalculationService;

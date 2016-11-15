@@ -17,21 +17,17 @@ import org.estatio.dom.asset.Unit;
 import org.estatio.dom.budgetassignment.viewmodels.BudgetCalculationResultViewModel;
 import org.estatio.dom.budgetassignment.viewmodels.DetailedBudgetCalculationResultViewmodel;
 import org.estatio.dom.budgeting.budget.Budget;
-import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationService;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationViewmodel;
-import org.estatio.dom.budgeting.budgetcalculation.Status;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.budgeting.partioning.PartitionItem;
-import org.estatio.dom.charge.Charge;
 import org.estatio.dom.lease.Lease;
 import org.estatio.dom.lease.LeaseRepository;
 import org.estatio.dom.lease.LeaseStatus;
 import org.estatio.dom.lease.Occupancy;
-import org.estatio.dom.lease.OccupancyRepository;
 
 @DomainService(nature = NatureOfService.DOMAIN)
 public class BudgetAssignmentService {
@@ -63,19 +59,6 @@ public class BudgetAssignmentService {
         }
 
         return results;
-    }
-
-    private BigDecimal getTotalBudgetedValue(final BudgetItem budgetItem){
-        BigDecimal returnValue = BigDecimal.ZERO;
-        List<BudgetCalculationViewmodel> resultsForItem =
-                budgetCalculationService.getAllCalculations(budgetItem.getBudget()).stream().filter(x -> x.getPartitionItem().getBudgetItem().equals(budgetItem)).collect(Collectors.toList()
-        );
-        for (BudgetCalculationViewmodel bcResult : resultsForItem){
-            if (bcResult.getValue() != null && bcResult.getCalculationType() == BudgetCalculationType.BUDGETED) {
-                returnValue = returnValue.add(bcResult.getValue());
-            }
-        }
-        return returnValue.setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
     private String getRowLabelLastPart(final BudgetItem budgetItem){
@@ -153,64 +136,6 @@ public class BudgetAssignmentService {
         return assignmentResults;
     }
 
-
-    public List<BudgetCalculationLink> assignBudgetCalculations(final Budget budget) {
-
-        removeCurrentlyAssignedCalculations(budget);
-
-        List<BudgetCalculationLink> result = new ArrayList<>();
-
-        for (Charge invoiceCharge : budget.getInvoiceCharges()) {
-
-            List<BudgetCalculation> calculationsForCharge = budgetCalculationRepository.findByBudgetAndCharge(budget, invoiceCharge);
-
-            for (Occupancy occupancy : occupancyRepository.occupanciesByPropertyAndInterval(budget.getProperty(), budget.getInterval())) {
-
-                List<BudgetCalculation> budgetCalculationsForOccupancy = calculationsForOccupancy(calculationsForCharge, occupancy);
-
-                // find or create service charge item
-                if (budgetCalculationsForOccupancy.size()>0){
-
-                    ServiceChargeItem serviceChargeItem = serviceChargeItemRepository.findOrCreateServiceChargeItem(occupancy, invoiceCharge);
-
-                }
-
-            }
-
-        }
-
-        return result;
-    }
-
-    private void removeCurrentlyAssignedCalculations(final Budget budget) {
-        for (BudgetCalculation calculation : budgetCalculationRepository.findByBudgetAndStatus(budget, Status.ASSIGNED)){
-
-            for (BudgetCalculationLink link : budgetCalculationLinkRepository.findByBudgetCalculation(calculation)){
-                link.remove();
-            }
-
-            calculation.remove();
-        }
-    }
-
-    private List<BudgetCalculation> calculationsForOccupancy(final List<BudgetCalculation> calculationList, final Occupancy occupancy){
-        List<BudgetCalculation> result = new ArrayList<>();
-
-        for (BudgetCalculation budgetCalculation : calculationList){
-
-            if (budgetCalculation.getKeyItem().getUnit().equals(occupancy.getUnit())){
-                result.add(budgetCalculation);
-            }
-        }
-
-        return result;
-    }
-
-    List<Occupancy> associatedOccupancies(final BudgetCalculation calculation){
-        return occupancyRepository.occupanciesByUnitAndInterval(calculation.getKeyItem().getUnit(), calculation.getBudget().getInterval());
-    }
-
-
     private class RowLabelHelper implements Comparable<RowLabelHelper> {
 
         RowLabelHelper(
@@ -235,15 +160,6 @@ public class BudgetAssignmentService {
 
     @Inject
     private BudgetCalculationService budgetCalculationService;
-
-    @Inject
-    private BudgetCalculationLinkRepository budgetCalculationLinkRepository;
-
-    @Inject
-    private OccupancyRepository occupancyRepository;
-
-    @Inject
-    private ServiceChargeItemRepository serviceChargeItemRepository;
 
     @Inject
     private LeaseRepository leaseRepository;

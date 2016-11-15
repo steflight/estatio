@@ -10,7 +10,6 @@ import javax.inject.Inject;
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 
-import org.estatio.dom.budgetassignment.BudgetCalculationLinkRepository;
 import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
@@ -143,9 +142,6 @@ public class BudgetCalculationService {
 
     @Inject
     private BudgetCalculationRepository budgetCalculationRepository;
-
-    @Inject
-    private BudgetCalculationLinkRepository budgetCalculationLinkRepository;
 
 
 }

@@ -1,8 +1,5 @@
 package org.estatio.dom.budgetassignment;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.jmock.auto.Mock;
 import org.junit.Before;
 import org.junit.Rule;
@@ -11,7 +8,6 @@ import org.junit.Test;
 import org.apache.isis.core.unittestsupport.jmocking.JUnitRuleMockery2;
 
 import org.estatio.dom.budgeting.budget.Budget;
-import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
 import org.estatio.dom.lease.Occupancy;
 
@@ -33,12 +29,7 @@ public class BudgetAssignmentServiceTest {
         occupancy1 = new Occupancy();
         occupancy2 = new Occupancy();
 
-        budgetAssignmentService = new BudgetAssignmentService(){
-            @Override
-            List<Occupancy> associatedOccupancies(final BudgetCalculation calculation){
-                return Arrays.asList(occupancy1, occupancy2);
-            }
-        };
+        budgetAssignmentService = new BudgetAssignmentService();
         budgetAssignmentService.budgetCalculationRepository = budgetCalculationRepository;
 
         budget = new Budget();

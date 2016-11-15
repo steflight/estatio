@@ -17,9 +17,6 @@ import org.apache.isis.applib.services.wrapper.InvalidException;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
-import org.estatio.dom.budgetassignment.BudgetCalculationLinkRepository;
-import org.estatio.dom.budgetassignment.Budget_assignCalculationsContribution;
-import org.estatio.dom.budgetassignment.ServiceChargeItemRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
@@ -59,15 +56,6 @@ public class BudgetIntegrationTest extends EstatioIntegrationTest {
 
     @Inject
     BudgetCalculationRepository budgetCalculationRepository;
-
-    @Inject
-    BudgetCalculationLinkRepository budgetCalculationLinkRepository;
-
-    @Inject
-    Budget_assignCalculationsContribution budgetAssignmentContributions;
-
-    @Inject
-    ServiceChargeItemRepository serviceChargeItemRepository;
 
     @Inject
     LeaseRepository leaseRepository;
@@ -110,7 +98,6 @@ public class BudgetIntegrationTest extends EstatioIntegrationTest {
 
             // calculate and assign budget2015
             budgetCalculationService.calculatePersistedCalculations(budget2015);
-            budgetAssignmentContributions.assignCalculations(budget2015);
 
             topmodelBudgetServiceChargeItem = leaseRepository.findLeaseByReference(LeaseForOxfTopModel001Gb.REF).findFirstItemOfType(LeaseItemType.SERVICE_CHARGE_BUDGETED);
             topmodelOccupancy = occupancyRepository.findByLease(topmodelBudgetServiceChargeItem.getLease()).get(0);
@@ -123,7 +110,6 @@ public class BudgetIntegrationTest extends EstatioIntegrationTest {
             assertThat(budgetsForOxf.size()).isEqualTo(2);
             assertThat(budgetCalculationRepository.allBudgetCalculations().size()).isEqualTo(75);
             assertThat(budget2015.getKeyTables().size()).isEqualTo(2);
-            assertThat(serviceChargeItemRepository.findByOccupancy(topmodelOccupancy).size()).isEqualTo(1);
             assertThat(keyTableRepository.allKeyTables().size()).isEqualTo(4);
 
             // when
@@ -132,10 +118,8 @@ public class BudgetIntegrationTest extends EstatioIntegrationTest {
             // then
             assertThat(budgetRepository.findByProperty(propertyOxf).size()).isEqualTo(1);
             assertThat(budgetCalculationRepository.allBudgetCalculations().size()).isEqualTo(0);
-            assertThat(budgetCalculationLinkRepository.allBudgetCalculationLinks().size()).isEqualTo(0);
             assertThat(topmodelBudgetServiceChargeItem.getTerms().size()).isEqualTo(0);
             assertThat(keyTableRepository.allKeyTables().size()).isEqualTo(2);
-            assertThat(serviceChargeItemRepository.findByOccupancy(topmodelOccupancy).size()).isEqualTo(0);
         }
 
         @Test
