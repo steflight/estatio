@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Query;
 import javax.jdo.annotations.Unique;
 import javax.jdo.annotations.VersionStrategy;
 
@@ -24,7 +25,6 @@ import org.estatio.dom.budgetassignment.override.BudgetOverrideCalculation;
 import org.estatio.dom.budgetassignment.override.BudgetOverrideRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
-import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.lease.Occupancy;
 
@@ -42,6 +42,14 @@ import lombok.Setter;
         strategy = VersionStrategy.VERSION_NUMBER,
         column = "version")
 @Unique(name = "BudgetCalculationResult_budgetCalculationRun_invoiceCharge_UNQ", members = { "budgetCalculationRun", "invoiceCharge" })
+@javax.jdo.annotations.Queries({
+        @Query(
+                name = "findUnique", language = "JDOQL",
+                value = "SELECT " +
+                        "FROM org.estatio.dom.budgetassignment.BudgetCalculationLink " +
+                        "WHERE budgetCalculationRun == :budgetCalculationRun && "
+                        + "invoiceCharge == :invoiceCharge")
+})
 
 @DomainObject(
         objectType = "org.estatio.dom.budgetassignment.calculationresult.BudgetCalculationResult"
@@ -86,9 +94,6 @@ public class BudgetCalculationResult extends UdoDomainObject2<BudgetCalculationR
 
     @Inject
     private BudgetOverrideRepository budgetOverrideRepository;
-
-    @Inject
-    private PartitionItemRepository partitionItemRepository;
 
     @Inject
     private BudgetCalculationRepository budgetCalculationRepository;
