@@ -11,6 +11,7 @@ import org.apache.isis.applib.annotation.SemanticsOf;
 import org.estatio.dom.budgetassignment.BudgetAssignmentService;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationService;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 
 @Mixin
 public class Budget_Calculate {
@@ -24,7 +25,7 @@ public class Budget_Calculate {
     @ActionLayout(contributed = Contributed.AS_ACTION)
     public void calculate() {
         budgetCalculationService.calculatePersistedCalculations(budget);
-        budgetAssignmentService.calculateOverrideValues(budget);
+        budgetAssignmentService.calculateResultsForLeases(budget, BudgetCalculationType.BUDGETED);
         budgetAssignmentService.assign(budget);
     }
 

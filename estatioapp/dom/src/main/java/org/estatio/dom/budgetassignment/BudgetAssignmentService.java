@@ -14,9 +14,13 @@ import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 
 import org.estatio.dom.asset.Unit;
+import org.estatio.dom.budgetassignment.calculationresult.BudgetCalculationResult;
+import org.estatio.dom.budgetassignment.calculationresult.BudgetCalculationResultRepository;
+import org.estatio.dom.budgetassignment.calculationresult.BudgetCalculationRun;
+import org.estatio.dom.budgetassignment.calculationresult.BudgetCalculationRunRepository;
 import org.estatio.dom.budgetassignment.override.BudgetOverride;
-import org.estatio.dom.budgetassignment.override.BudgetOverrideValue;
 import org.estatio.dom.budgetassignment.override.BudgetOverrideRepository;
+import org.estatio.dom.budgetassignment.override.BudgetOverrideValue;
 import org.estatio.dom.budgetassignment.viewmodels.BudgetCalculationResultViewModel;
 import org.estatio.dom.budgetassignment.viewmodels.DetailedBudgetCalculationResultViewmodel;
 import org.estatio.dom.budgeting.budget.Budget;
@@ -27,6 +31,8 @@ import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationViewmodel;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.budgeting.partioning.PartitionItem;
+import org.estatio.dom.budgeting.partioning.Partitioning;
+import org.estatio.dom.charge.Charge;
 import org.estatio.dom.lease.Lease;
 import org.estatio.dom.lease.LeaseRepository;
 import org.estatio.dom.lease.LeaseStatus;
@@ -35,31 +41,52 @@ import org.estatio.dom.lease.Occupancy;
 @DomainService(nature = NatureOfService.DOMAIN)
 public class BudgetAssignmentService {
 
-    public List<BudgetOverrideValue> calculateOverrideValues(final Budget budget){
+    public List<BudgetCalculationRun> calculateResultsForLeases(final Budget budget, final BudgetCalculationType type){
+        List<BudgetCalculationRun> results = new ArrayList<>();
 
-        removeNewValues(budget);
-
-        List<BudgetOverrideValue> results = new ArrayList<>();
-        for (Lease lease : leaseRepository.findByAssetAndActiveOnDate(budget.getProperty(), budget.getStartDate())){
+        for (Lease lease : leaseRepository.findByAssetAndActiveOnDate(budget.getProperty(), budget.getStartDate())) {
             // TODO: this is an extra filter because currently occupancies can outrun terminated leases
             if (lease.getStatus() != LeaseStatus.TERMINATED) {
-                for (BudgetOverride override : budgetOverrideRepository.findByLease(lease)) {
-                    results.addAll(override.calculate(budget.getStartDate()));
-                }
+
+                removeNewOverrideValues(lease);
+                calculateOverrideValues(lease, budget);
+                results.add(executeCalculationRun(lease, budget, type));
+
             }
+        }
+
+        return results;
+    }
+
+    public BudgetCalculationRun executeCalculationRun(final Lease lease, final Budget budget, final BudgetCalculationType type){
+        BudgetCalculationRun run = budgetCalculationRunRepository.findOrCreateNewBudgetCalculationRun(lease, budget, type);
+        createBudgetCalculationResults(run);
+        return run;
+    }
+
+    public void createBudgetCalculationResults(final BudgetCalculationRun run){
+
+        for (Partitioning partitioning : run.getBudget().getPartitionings()){
+            for (Charge invoiceCharge : partitioning.getDistinctInvoiceCharges()){
+                BudgetCalculationResult result = run.findOrCreateResult(invoiceCharge);
+                result.calculate();
+            }
+        }
+
+    }
+
+    public List<BudgetOverrideValue> calculateOverrideValues(final Lease lease, final Budget budget){
+        List<BudgetOverrideValue> results = new ArrayList<>();
+        for (BudgetOverride override : budgetOverrideRepository.findByLease(lease)) {
+            results.addAll(override.calculate(budget.getStartDate()));
         }
         return results;
     }
 
-    public void removeNewValues(final Budget budget){
-        for (Lease lease : leaseRepository.findByAssetAndActiveOnDate(budget.getProperty(), budget.getStartDate())){
-            // TODO: this is an extra filter because currently occupancies can outrun terminated leases
-            if (lease.getStatus() != LeaseStatus.TERMINATED) {
-                for (BudgetOverride override : budgetOverrideRepository.findByLease(lease)) {
-                    for (BudgetOverrideValue value : override.getValues()){
-                        value.remove();
-                    }
-                }
+    public void removeNewOverrideValues(final Lease lease){
+        for (BudgetOverride override : budgetOverrideRepository.findByLease(lease)) {
+            for (BudgetOverrideValue value : override.getValues()){
+                value.remove();
             }
         }
     }
@@ -202,5 +229,11 @@ public class BudgetAssignmentService {
 
     @Inject
     private BudgetOverrideRepository budgetOverrideRepository;
+
+    @Inject
+    private BudgetCalculationRunRepository budgetCalculationRunRepository;
+
+    @Inject
+    private BudgetCalculationResultRepository budgetCalculationResultRepository;
 
 }

@@ -18,6 +18,7 @@ import org.estatio.dom.budgeting.budget.BudgetRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationService;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 
 @DomainService(nature = NatureOfService.VIEW_MENU_ONLY)
 @DomainServiceLayout(menuBar = DomainServiceLayout.MenuBar.PRIMARY, named = "Budgets")
@@ -34,7 +35,7 @@ public class BudgetCalculationMenu {
         for (Budget budget : budgetRepository.allBudgets()){
             if (budget.getInterval().contains(localDate)) {
                 budgetCalculationService.calculatePersistedCalculations(budget);
-                budgetAssignmentService.calculateOverrideValues(budget);
+                budgetAssignmentService.calculateResultsForLeases(budget, BudgetCalculationType.BUDGETED);
                 budgetAssignmentService.assign(budget);
             }
         }

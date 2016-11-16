@@ -48,9 +48,12 @@ public class BudgetCalculationRunRepository extends UdoDomainRepositoryAndFactor
         return uniqueMatch("findUnique", "lease", lease, "budget", budget, "type", type);
     }
 
-
     public List<BudgetCalculationRun> allBudgetCalculationRuns(){
         return allInstances();
+    }
+
+    public List<BudgetCalculationRun> findByLease(final Lease lease) {
+        return allMatches("findByLease", "lease", lease);
     }
 }
 

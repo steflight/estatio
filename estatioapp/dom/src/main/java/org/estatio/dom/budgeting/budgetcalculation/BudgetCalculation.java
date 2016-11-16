@@ -209,7 +209,8 @@ public class BudgetCalculation extends UdoDomainObject2<BudgetCalculation>
     }
 
     @Programmatic
-    public void remove() {repositoryService.remove(this);
+    public void remove() {
+        repositoryService.remove(this);
     }
 
     @Inject
