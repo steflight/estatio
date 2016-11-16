@@ -21,6 +21,7 @@ package org.estatio.dom.budgeting.budgetcalculation;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+import javax.inject.Inject;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.DatastoreIdentity;
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -43,6 +44,7 @@ import org.apache.isis.applib.annotation.PropertyLayout;
 import org.apache.isis.applib.annotation.Publishing;
 import org.apache.isis.applib.annotation.SemanticsOf;
 import org.apache.isis.applib.annotation.Where;
+import org.apache.isis.applib.services.repository.RepositoryService;
 import org.apache.isis.applib.services.timestamp.Timestampable;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
@@ -207,8 +209,10 @@ public class BudgetCalculation extends UdoDomainObject2<BudgetCalculation>
     }
 
     @Programmatic
-    public void remove(){
-        getContainer().remove(this);
+    public void remove() {repositoryService.remove(this);
     }
+
+    @Inject
+    private RepositoryService repositoryService;
 
 }

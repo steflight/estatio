@@ -67,24 +67,106 @@ public class BudgetOverrideTest {
 
     LocalDate budgetStartDate;
     BigDecimal valueCalculatedByBudget;
-    BudgetOverrideCalculationRepository budgetOverrideCalculationRepository;
-    BudgetOverrideCalculation budgetOverrideCalculation;
+    BudgetOverrideValueRepository budgetOverrideValueRepository;
+    BudgetOverrideValue budgetOverrideValue;
 
     @Before
     public void setup() {
-        budgetOverrideCalculation = new BudgetOverrideCalculation();
-        budgetOverrideCalculationRepository = new BudgetOverrideCalculationRepository(){
+        budgetOverrideValue = new BudgetOverrideValue();
+        budgetOverrideValueRepository = new BudgetOverrideValueRepository(){
             @Override
-            public BudgetOverrideCalculation newBudgetOverrideCalculation(
+            public BudgetOverrideValue newBudgetOverrideValue(
                     final BigDecimal value,
                     final BudgetOverride budgetOverride,
                     final BudgetCalculationType type){
-                return budgetOverrideCalculation;
+                return budgetOverrideValue;
             }
         };
     }
 
-    public static class CalculateForMax extends BudgetOverrideTest {
+    // generic behaviour of BudgetOverride#calculate (independent of BudgetOverride#resultFor)
+    // BudgetOverrideForMax can be replaced by any other subclass of BudgetOverride
+    public static class CalculateTest extends BudgetOverrideTest {
+
+        BudgetOverrideForMax override;
+        BudgetOverrideValue calculation;
+
+        @Test
+        public void calculateTest() {
+            // given
+            valueCalculatedByBudget = new BigDecimal("1000.00");
+            calculation = new BudgetOverrideValue();
+            override = new BudgetOverrideForMax(){
+                @Override
+                BigDecimal getCalculatedValueByBudget(final LocalDate budgetStartDate, final BudgetCalculationType type){
+                    return valueCalculatedByBudget;
+                }
+
+                @Override BudgetOverrideValue resultFor(final LocalDate date, final BudgetCalculationType type) {
+                    return calculation;
+                }
+
+            };
+            override.budgetOverrideValueRepository = budgetOverrideValueRepository;
+            budgetStartDate = new LocalDate(2015, 01, 01);
+
+            // when no dates and no type set
+            List<BudgetOverrideValue> calculations = override.calculate(budgetStartDate);
+
+            // then
+            assertThat(calculations.size()).isEqualTo(2);
+
+            // and when startdate set on budgetStartDate
+            override.setStartDate(budgetStartDate);
+            calculations = override.calculate(budgetStartDate);
+
+            // then
+            assertThat(calculations.size()).isEqualTo(2);
+
+            // and when enddate set on budgetStartDate
+            override.setEndDate(budgetStartDate);
+            calculations = override.calculate(budgetStartDate);
+
+            // then
+            assertThat(calculations.size()).isEqualTo(2);
+
+            // and when startdate after budgetStartDate
+            override.setStartDate(budgetStartDate.plusDays(1));
+            override.setEndDate(null);
+            calculations = override.calculate(budgetStartDate);
+
+            // then
+            assertThat(calculations.size()).isEqualTo(0);
+
+            // and when enddate before budgetStartDate
+            override.setStartDate(null);
+            override.setEndDate(budgetStartDate.minusDays(1));
+            calculations = override.calculate(budgetStartDate);
+
+            // then
+            assertThat(calculations.size()).isEqualTo(0);
+
+            // and when type set
+            override.setStartDate(null);
+            override.setEndDate(null);
+            override.setType(BudgetCalculationType.BUDGETED);
+            calculations = override.calculate(budgetStartDate);
+
+            // then
+            assertThat(calculations.size()).isEqualTo(1);
+
+            // and when
+            override.setType(BudgetCalculationType.AUDITED);
+            calculations = override.calculate(budgetStartDate);
+
+            // then
+            assertThat(calculations.size()).isEqualTo(1);
+
+        }
+
+    }
+
+    public static class CalculateForMaxSpecific extends BudgetOverrideTest {
 
         BudgetOverrideForMax override;
         BigDecimal maxValue;
@@ -99,13 +181,13 @@ public class BudgetOverrideTest {
                     return valueCalculatedByBudget;
                 }
             };
-            override.budgetOverrideCalculationRepository = budgetOverrideCalculationRepository;
+            override.budgetOverrideValueRepository = budgetOverrideValueRepository;
             budgetStartDate = new LocalDate(2015, 01, 01);
 
             // when
             maxValue = new BigDecimal("1000.00");
             override.setMaxValue(maxValue);
-            List<BudgetOverrideCalculation> calculations = override.calculate(budgetStartDate);
+            List<BudgetOverrideValue> calculations = override.calculate(budgetStartDate);
 
             // then
             assertThat(calculations.size()).isEqualTo(0);
@@ -117,109 +199,6 @@ public class BudgetOverrideTest {
 
             // then
             assertThat(calculations.size()).isEqualTo(2);
-
-            // and when
-            override.setType(BudgetCalculationType.BUDGETED);
-            calculations = override.calculate(budgetStartDate);
-
-            // then
-            assertThat(calculations.size()).isEqualTo(1);
-
-            // and when
-            override.setType(BudgetCalculationType.AUDITED);
-            calculations = override.calculate(budgetStartDate);
-
-            // then
-            assertThat(calculations.size()).isEqualTo(1);
-
-        }
-
-    }
-
-    public static class CalculateForFixed extends BudgetOverrideTest {
-
-        BudgetOverrideForFixed override;
-        BigDecimal fixedValue;
-
-        @Test
-        public void calculateTest() {
-            // given
-            fixedValue = new BigDecimal("1234.45");
-            override = new BudgetOverrideForFixed(){
-                @Override
-                BigDecimal getCalculatedValueByBudget(final LocalDate budgetStartDate, final BudgetCalculationType type){
-                    return valueCalculatedByBudget;
-                }
-            };
-            override.budgetOverrideCalculationRepository = budgetOverrideCalculationRepository;
-            override.setFixedValue(fixedValue);
-            budgetStartDate = new LocalDate(2015, 01, 01);
-
-            // when
-            List<BudgetOverrideCalculation> calculations = override.calculate(budgetStartDate);
-
-            // then
-            assertThat(calculations.size()).isEqualTo(2);
-
-            // and when
-            override.setType(BudgetCalculationType.BUDGETED);
-            calculations = override.calculate(budgetStartDate);
-
-            // then
-            assertThat(calculations.size()).isEqualTo(1);
-
-            // and when
-            override.setType(BudgetCalculationType.AUDITED);
-            calculations = override.calculate(budgetStartDate);
-
-            // then
-            assertThat(calculations.size()).isEqualTo(1);
-
-        }
-
-    }
-
-    public static class CalculateForFlatRate extends BudgetOverrideTest {
-
-        BudgetOverrideForFlatRate override;
-        BigDecimal valuePerM2;
-        BigDecimal area;
-
-        @Test
-        public void calculateTest() {
-            // given
-            valuePerM2 = new BigDecimal("10.00");
-            area = new BigDecimal("2.5");
-            override = new BudgetOverrideForFlatRate(){
-                @Override
-                BigDecimal getCalculatedValueByBudget(final LocalDate budgetStartDate, final BudgetCalculationType type){
-                    return valueCalculatedByBudget;
-                }
-            };
-            override.budgetOverrideCalculationRepository = budgetOverrideCalculationRepository;
-            override.setValuePerM2(valuePerM2);
-            override.setWeightedArea(area);
-            budgetStartDate = new LocalDate(2015, 01, 01);
-
-            // when
-            List<BudgetOverrideCalculation> calculations = override.calculate(budgetStartDate);
-
-            // then
-            assertThat(calculations.size()).isEqualTo(2);
-
-            // and when
-            override.setType(BudgetCalculationType.BUDGETED);
-            calculations = override.calculate(budgetStartDate);
-
-            // then
-            assertThat(calculations.size()).isEqualTo(1);
-
-            // and when
-            override.setType(BudgetCalculationType.AUDITED);
-            calculations = override.calculate(budgetStartDate);
-
-            // then
-            assertThat(calculations.size()).isEqualTo(1);
 
         }
 

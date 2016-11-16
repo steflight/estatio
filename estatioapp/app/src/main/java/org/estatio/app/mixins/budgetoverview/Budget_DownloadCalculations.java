@@ -30,7 +30,7 @@ public class Budget_DownloadCalculations {
     @ActionLayout(cssClassFa = "fa-download")
     public Blob downloadCalculations() {
         final String fileName =  budget.title() + ".xlsx";
-        WorksheetSpec spec = new WorksheetSpec(BudgetCalculationResultViewModel.class, "calculations");
+        WorksheetSpec spec = new WorksheetSpec(BudgetCalculationResultViewModel.class, "values");
         WorksheetContent worksheetContent = new WorksheetContent(budgetAssignmentResults(), spec);
         return excelService.toExcelPivot(worksheetContent, fileName);
     }

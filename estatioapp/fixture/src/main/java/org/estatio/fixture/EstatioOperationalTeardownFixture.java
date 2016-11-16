@@ -49,7 +49,7 @@ import org.estatio.dom.bankmandate.BankMandate;
 import org.estatio.dom.budgetassignment.calculationresult.BudgetCalculationResult;
 import org.estatio.dom.budgetassignment.calculationresult.BudgetCalculationRun;
 import org.estatio.dom.budgetassignment.override.BudgetOverride;
-import org.estatio.dom.budgetassignment.override.BudgetOverrideCalculation;
+import org.estatio.dom.budgetassignment.override.BudgetOverrideValue;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
@@ -109,7 +109,7 @@ public class EstatioOperationalTeardownFixture extends FixtureScript {
 
         deleteFrom(BudgetCalculationResult.class);
         deleteFrom(BudgetCalculationRun.class);
-        deleteFrom(BudgetOverrideCalculation.class);
+        deleteFrom(BudgetOverrideValue.class);
         deleteFrom(BudgetOverride.class);
         deleteFrom(BudgetCalculation.class);
         deleteFrom(PartitionItem.class);

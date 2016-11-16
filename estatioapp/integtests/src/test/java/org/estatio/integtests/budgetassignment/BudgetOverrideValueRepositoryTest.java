@@ -9,12 +9,12 @@ import org.junit.Test;
 
 import org.apache.isis.applib.fixturescripts.FixtureScript;
 
-import org.estatio.dom.asset.PropertyRepository;
-import org.estatio.dom.budgetassignment.override.BudgetOverrideCalculation;
-import org.estatio.dom.budgetassignment.override.BudgetOverrideCalculationRepository;
 import org.estatio.dom.budgetassignment.override.BudgetOverrideForFixed;
 import org.estatio.dom.budgetassignment.override.BudgetOverrideRepository;
+import org.estatio.dom.budgetassignment.override.BudgetOverrideValue;
+import org.estatio.dom.budgetassignment.override.BudgetOverrideValueRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
+import org.estatio.dom.budgeting.budgetcalculation.Status;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.charge.ChargeRepository;
 import org.estatio.dom.lease.Lease;
@@ -26,16 +26,13 @@ import org.estatio.integtests.EstatioIntegrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class BudgetOverrideCalculationRepositoryTest extends EstatioIntegrationTest {
+public class BudgetOverrideValueRepositoryTest extends EstatioIntegrationTest {
 
     @Inject
     BudgetOverrideRepository budgetOverrideRepository;
 
     @Inject
-    PropertyRepository propertyRepository;
-
-    @Inject
-    BudgetOverrideCalculationRepository budgetOverrideCalculationRepository;
+    BudgetOverrideValueRepository budgetOverrideValueRepository;
 
     @Inject
     LeaseRepository leaseRepository;
@@ -58,7 +55,7 @@ public class BudgetOverrideCalculationRepositoryTest extends EstatioIntegrationT
     public void newBudgetOverrideCalculationWorks(){
 
         BudgetOverrideForFixed budgetOverrideForFixed;
-        BudgetOverrideCalculation budgetOverrideCalculation;
+        BudgetOverrideValue budgetOverrideValue;
         BigDecimal calculatedValue = new BigDecimal("1234.56");
 
         // given
@@ -67,17 +64,18 @@ public class BudgetOverrideCalculationRepositoryTest extends EstatioIntegrationT
         BigDecimal overrideValue = new BigDecimal("1234.56");
         String reason = "Some reason";
         budgetOverrideForFixed = wrap(budgetOverrideRepository).newBudgetOverrideForFixed(overrideValue, leaseTopModel, null, null, invoiceCharge, null, null, reason);
-        assertThat(budgetOverrideCalculationRepository.allBudgetOverrideCalculations().size()).isEqualTo(0);
+        assertThat(budgetOverrideValueRepository.allBudgetOverrideCalculations().size()).isEqualTo(0);
 
         // when
-        budgetOverrideCalculation = wrap(budgetOverrideCalculationRepository).newBudgetOverrideCalculation(calculatedValue, budgetOverrideForFixed, BudgetCalculationType.BUDGETED);
+        budgetOverrideValue = wrap(budgetOverrideValueRepository).newBudgetOverrideValue(calculatedValue, budgetOverrideForFixed, BudgetCalculationType.BUDGETED);
 
         // then
-        assertThat(budgetOverrideCalculationRepository.allBudgetOverrideCalculations().size()).isEqualTo(1);
-        assertThat(budgetOverrideCalculation.getValue()).isEqualTo(calculatedValue);
-        assertThat(budgetOverrideCalculation.getBudgetOverride()).isEqualTo(budgetOverrideForFixed);
-        assertThat(budgetOverrideCalculation.getType()).isEqualTo(BudgetCalculationType.BUDGETED);
-        assertThat(budgetOverrideCalculation.getApplicationTenancy()).isEqualTo(budgetOverrideForFixed.getApplicationTenancy());
+        assertThat(budgetOverrideValueRepository.allBudgetOverrideCalculations().size()).isEqualTo(1);
+        assertThat(budgetOverrideValue.getValue()).isEqualTo(calculatedValue);
+        assertThat(budgetOverrideValue.getBudgetOverride()).isEqualTo(budgetOverrideForFixed);
+        assertThat(budgetOverrideValue.getType()).isEqualTo(BudgetCalculationType.BUDGETED);
+        assertThat(budgetOverrideValue.getStatus()).isEqualTo(Status.NEW);
+        assertThat(budgetOverrideValue.getApplicationTenancy()).isEqualTo(budgetOverrideForFixed.getApplicationTenancy());
 
     }
 

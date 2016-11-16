@@ -21,13 +21,13 @@ import org.junit.Test;
 
 import org.incode.module.base.dom.testing.AbstractBeanPropertiesTest;
 
-public class BudgetOverrideCalculationTest {
+public class BudgetOverrideValueTest {
 
     public static class BeanProperties extends AbstractBeanPropertiesTest {
 
         @Test
         public void test() {
-            final BudgetOverrideCalculation pojo = new BudgetOverrideCalculation();
+            final BudgetOverrideValue pojo = new BudgetOverrideValue();
             newPojoTester()
                     .withFixture(pojos(BudgetOverride.class, BudgetOverrideForFixed.class))
                     .exercise(pojo);

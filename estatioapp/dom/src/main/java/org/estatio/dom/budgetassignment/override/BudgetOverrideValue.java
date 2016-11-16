@@ -3,6 +3,7 @@ package org.estatio.dom.budgetassignment.override;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+import javax.inject.Inject;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.DatastoreIdentity;
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -12,8 +13,10 @@ import javax.jdo.annotations.Version;
 import javax.jdo.annotations.VersionStrategy;
 
 import org.apache.isis.applib.annotation.DomainObject;
+import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.annotation.PropertyLayout;
 import org.apache.isis.applib.annotation.Where;
+import org.apache.isis.applib.services.repository.RepositoryService;
 import org.apache.isis.applib.services.timestamp.Timestampable;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
@@ -21,6 +24,7 @@ import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
+import org.estatio.dom.budgeting.budgetcalculation.Status;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -38,12 +42,12 @@ import lombok.Setter;
         column = "version")
 
 @DomainObject(
-        objectType = "org.estatio.dom.budgetassignment.override.BudgetOverrideCalculation"
+        objectType = "org.estatio.dom.budgetassignment.override.BudgetOverrideValue"
 )
-public class BudgetOverrideCalculation extends UdoDomainObject2<BudgetOverrideCalculation>
+public class BudgetOverrideValue extends UdoDomainObject2<BudgetOverrideValue>
         implements WithApplicationTenancyProperty, Timestampable {
 
-    public BudgetOverrideCalculation() {
+    public BudgetOverrideValue() {
         super("budgetOverride, value");
     }
 
@@ -60,6 +64,10 @@ public class BudgetOverrideCalculation extends UdoDomainObject2<BudgetOverrideCa
     private BudgetCalculationType type;
 
     @Getter @Setter
+    @Column(allowsNull = "false")
+    private Status status;
+
+    @Getter @Setter
     @Column(allowsNull = "true")
     @PropertyLayout(hidden = Where.ALL_TABLES)
     private Timestamp updatedAt;
@@ -69,8 +77,16 @@ public class BudgetOverrideCalculation extends UdoDomainObject2<BudgetOverrideCa
     @Column(allowsNull = "true")
     private String updatedBy;
 
+    @Programmatic
+    public void remove(){
+        repositoryService.remove(this);
+    }
+
     @Override
     public ApplicationTenancy getApplicationTenancy() {
         return budgetOverride.getApplicationTenancy();
     }
+
+    @Inject
+    private RepositoryService repositoryService;
 }

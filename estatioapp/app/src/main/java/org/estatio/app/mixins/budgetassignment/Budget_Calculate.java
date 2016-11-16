@@ -24,7 +24,7 @@ public class Budget_Calculate {
     @ActionLayout(contributed = Contributed.AS_ACTION)
     public void calculate() {
         budgetCalculationService.calculatePersistedCalculations(budget);
-        budgetAssignmentService.calculateOverrides(budget);
+        budgetAssignmentService.calculateOverrideValues(budget);
         budgetAssignmentService.assign(budget);
     }
 

@@ -25,8 +25,7 @@ public class BudgetOverrideForMax extends BudgetOverride {
     @Column(scale = 2)
     private BigDecimal maxValue;
 
-    @Override
-    BudgetOverrideCalculation resultFor(final LocalDate date, final BudgetCalculationType type) {
+    @Override BudgetOverrideValue resultFor(final LocalDate date, final BudgetCalculationType type) {
         if (getCalculatedValueByBudget(date, type).compareTo(maxValue) > 0) {
             return createCalculation(maxValue, type);
         }

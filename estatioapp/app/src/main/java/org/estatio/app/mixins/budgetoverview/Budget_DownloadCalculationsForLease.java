@@ -32,7 +32,7 @@ public class Budget_DownloadCalculationsForLease {
     @ActionLayout(cssClassFa = "fa-download")
     public Blob downloadCalculationsForLease(Lease lease) {
         final String fileName =  lease.getReference() + " - budget details" + ".xlsx";
-        WorksheetSpec spec = new WorksheetSpec(DetailedBudgetCalculationResultViewmodel.class, "calculations for lease");
+        WorksheetSpec spec = new WorksheetSpec(DetailedBudgetCalculationResultViewmodel.class, "values for lease");
         WorksheetContent worksheetContent = new WorksheetContent(budgetAssignmentResultsForLease(lease), spec);
         return excelService.toExcel(worksheetContent, fileName);
     }

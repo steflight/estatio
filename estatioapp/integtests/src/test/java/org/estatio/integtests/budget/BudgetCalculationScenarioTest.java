@@ -14,13 +14,23 @@ import org.apache.isis.applib.fixturescripts.FixtureScript;
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
 import org.estatio.dom.budgetassignment.BudgetAssignmentService;
+import org.estatio.dom.budgetassignment.override.BudgetOverride;
+import org.estatio.dom.budgetassignment.override.BudgetOverrideForFlatRate;
+import org.estatio.dom.budgetassignment.override.BudgetOverrideForMax;
+import org.estatio.dom.budgetassignment.override.BudgetOverrideRepository;
+import org.estatio.dom.budgetassignment.override.BudgetOverrideType;
+import org.estatio.dom.budgetassignment.override.BudgetOverrideValue;
 import org.estatio.dom.budgetassignment.viewmodels.BudgetCalculationResultViewModel;
 import org.estatio.dom.budgetassignment.viewmodels.DetailedBudgetCalculationResultViewmodel;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationService;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationViewmodel;
+import org.estatio.dom.budgeting.budgetcalculation.Status;
 import org.estatio.dom.budgeting.keytable.KeyTable;
+import org.estatio.dom.charge.Charge;
 import org.estatio.dom.charge.ChargeRepository;
 import org.estatio.dom.lease.Lease;
 import org.estatio.dom.lease.LeaseRepository;
@@ -56,6 +66,9 @@ BudgetCalculationScenarioTest extends EstatioIntegrationTest {
     @Inject
     ChargeRepository chargeRepository;
 
+    @Inject
+    BudgetOverrideRepository budgetOverrideRepository;
+
 
     @Before
     public void setupData() {
@@ -73,7 +86,10 @@ BudgetCalculationScenarioTest extends EstatioIntegrationTest {
 
         Property property;
         Budget budget;
-        List<BudgetCalculationViewmodel> calculationResults;
+        List<BudgetCalculation> calculations;
+        List<BudgetOverride> overrides;
+        List<BudgetOverrideValue> overrideValues;
+        List<BudgetCalculationViewmodel> budgetCalculationViewmodels;
         List<BudgetCalculationResultViewModel> budgetCalculationResultViewModels;
         List<DetailedBudgetCalculationResultViewmodel> detailedBudgetCalculationResultViewmodels;
 
@@ -91,7 +107,9 @@ BudgetCalculationScenarioTest extends EstatioIntegrationTest {
         public void CalculateAndAssign() throws Exception {
             calculate();
             detailedCalculation();
-//            persistCalculations();
+            persistedCalculations();
+            calculateOverrides();
+
 //            assignBudget();
 //            assignBudgetWhenUpdated();
 //            assignBudgetWhenAudited();
@@ -101,11 +119,11 @@ BudgetCalculationScenarioTest extends EstatioIntegrationTest {
         public void calculate() throws Exception {
 
             // when
-            calculationResults = budgetCalculationService.getAllCalculations(budget);
+            budgetCalculationViewmodels = budgetCalculationService.getAllCalculations(budget);
             budgetCalculationResultViewModels = budgetAssignmentService.getAssignmentResults(budget);
 
             // then
-            assertThat(calculationResults.size()).isEqualTo(33);
+            assertThat(budgetCalculationViewmodels.size()).isEqualTo(33);
             assertThat(budgetCalculationResultViewModels.size()).isEqualTo(20);
             assertThat(budgetedAmountFor(LeasesForBudNl.REF1, ChargeRefData.NL_SERVICE_CHARGE)).isEqualTo(new BigDecimal("1928.571437"));
             assertThat(budgetedAmountFor(LeasesForBudNl.REF1, ChargeRefData.NL_SERVICE_CHARGE2)).isEqualTo(new BigDecimal("964.285722"));
@@ -147,7 +165,7 @@ BudgetCalculationScenarioTest extends EstatioIntegrationTest {
             Lease leaseForDago = leaseRepository.findLeaseByReference(LeasesForBudNl.REF4);
 
             // when
-            calculationResults = budgetCalculationService.getAllCalculations(budget);
+            budgetCalculationViewmodels = budgetCalculationService.getAllCalculations(budget);
             detailedBudgetCalculationResultViewmodels = budgetAssignmentService.getDetailedBudgetAssignmentResults(budget, leaseForDago);
 
             // then
@@ -175,7 +193,57 @@ BudgetCalculationScenarioTest extends EstatioIntegrationTest {
 
         }
 
-        public void persistCalculations() throws Exception {
+        public void persistedCalculations() throws Exception {
+
+            // when
+            calculations = budgetCalculationService.calculatePersistedCalculations(budget);
+
+            // then
+            assertThat(calculations.size()).isEqualTo(33);
+
+        }
+
+        public void calculateOverrides() throws Exception {
+
+            // given
+            Lease leasePoison = leaseRepository.findLeaseByReference(LeasesForBudNl.REF1);
+            Lease leaseMiracle = leaseRepository.findLeaseByReference(LeasesForBudNl.REF2);
+            Charge invoiceCharge = chargeRepository.findByReference(ChargeRefData.NL_SERVICE_CHARGE);
+            Charge incomingCharge = chargeRepository.findByReference(ChargeRefData.NL_INCOMING_CHARGE_1);
+
+            // when
+            overrideValues = budgetAssignmentService.calculateOverrideValues(budget);
+
+            // then
+            assertThat(overrideValues.size()).isEqualTo(2);
+            assertThat(budgetOverrideRepository.findByLease(leasePoison).size()).isEqualTo(1);
+            BudgetOverrideForMax oPoison = (BudgetOverrideForMax) budgetOverrideRepository.findByLease(leasePoison).get(0);
+            assertThat(oPoison.getType()).isEqualTo(BudgetCalculationType.BUDGETED);
+            assertThat(oPoison.getInvoiceCharge()).isEqualTo(invoiceCharge);
+            assertThat(oPoison.getIncomingCharge()).isEqualTo(incomingCharge);
+            assertThat(oPoison.getStartDate()).isEqualTo(budget.getStartDate());
+            assertThat(oPoison.getEndDate()).isNull();
+            assertThat(oPoison.getReason()).isEqualTo(BudgetOverrideType.CEILING.reason);
+            assertThat(oPoison.getMaxValue()).isEqualTo(new BigDecimal("350.00"));
+            assertThat(oPoison.getValues().size()).isEqualTo(1);
+            assertThat(oPoison.getValues().first().getValue()).isEqualTo(new BigDecimal("350.00"));
+            assertThat(oPoison.getValues().first().getType()).isEqualTo(BudgetCalculationType.BUDGETED);
+            assertThat(oPoison.getValues().first().getStatus()).isEqualTo(Status.NEW);
+
+            assertThat(budgetOverrideRepository.findByLease(leaseMiracle).size()).isEqualTo(1);
+            BudgetOverrideForFlatRate oMiracle = (BudgetOverrideForFlatRate) budgetOverrideRepository.findByLease(leaseMiracle).get(0);
+            assertThat(oMiracle.getType()).isEqualTo(BudgetCalculationType.BUDGETED);
+            assertThat(oMiracle.getInvoiceCharge()).isEqualTo(invoiceCharge);
+            assertThat(oMiracle.getIncomingCharge()).isNull();
+            assertThat(oMiracle.getStartDate()).isEqualTo(budget.getStartDate());
+            assertThat(oMiracle.getEndDate()).isNull();
+            assertThat(oMiracle.getReason()).isEqualTo(BudgetOverrideType.FLATRATE.reason);
+            assertThat(oMiracle.getValuePerM2()).isEqualTo(new BigDecimal("12.50"));
+            assertThat(oMiracle.getWeightedArea()).isEqualTo(new BigDecimal("90.00"));
+            assertThat(oMiracle.getValues().size()).isEqualTo(1);
+            assertThat(oMiracle.getValues().first().getValue()).isEqualTo(new BigDecimal("1125.0000"));
+            assertThat(oMiracle.getValues().first().getType()).isEqualTo(BudgetCalculationType.BUDGETED);
+            assertThat(oMiracle.getValues().first().getStatus()).isEqualTo(Status.NEW);
 
         }
 

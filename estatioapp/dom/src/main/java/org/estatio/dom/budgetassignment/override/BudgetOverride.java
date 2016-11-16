@@ -106,10 +106,11 @@ public abstract class BudgetOverride extends UdoDomainObject2<BudgetOverride> {
 
     @Getter @Setter
     @Persistent(mappedBy = "budgetOverride", dependentElement = "true")
-    private SortedSet<BudgetOverrideCalculation> calculations = new TreeSet<>();
+    private SortedSet<BudgetOverrideValue> values = new TreeSet<>();
 
-    public List<BudgetOverrideCalculation> calculate(final LocalDate budgetStartDate){
-        List<BudgetOverrideCalculation> results = new ArrayList<>();
+    @Programmatic
+    public List<BudgetOverrideValue> calculate(final LocalDate budgetStartDate){
+        List<BudgetOverrideValue> results = new ArrayList<>();
         if (isActiveOnCalculationDate(budgetStartDate)) {
             if (getType() == null) {
                 if (resultFor(budgetStartDate, BudgetCalculationType.BUDGETED)!=null) results.add(resultFor(budgetStartDate, BudgetCalculationType.BUDGETED));
@@ -129,8 +130,10 @@ public abstract class BudgetOverride extends UdoDomainObject2<BudgetOverride> {
         return results;
     }
 
-    abstract BudgetOverrideCalculation resultFor(final LocalDate date, final BudgetCalculationType type);
+    @Programmatic
+    abstract BudgetOverrideValue resultFor(final LocalDate date, final BudgetCalculationType type);
 
+    @Programmatic
     public boolean isActiveOnCalculationDate(final LocalDate calculationDate) {
         if (getStartDate()!=null && calculationDate.isBefore(getStartDate())){
             return false;
@@ -167,8 +170,8 @@ public abstract class BudgetOverride extends UdoDomainObject2<BudgetOverride> {
     }
 
     @Programmatic
-    public BudgetOverrideCalculation createCalculation(final BigDecimal value, final BudgetCalculationType type){
-        return budgetOverrideCalculationRepository.newBudgetOverrideCalculation(value, this, type);
+    public BudgetOverrideValue createCalculation(final BigDecimal value, final BudgetCalculationType type){
+        return budgetOverrideValueRepository.newBudgetOverrideValue(value, this, type);
     }
 
     @Inject
@@ -178,6 +181,6 @@ public abstract class BudgetOverride extends UdoDomainObject2<BudgetOverride> {
     BudgetCalculationRepository budgetCalculationRepository;
 
     @Inject
-    BudgetOverrideCalculationRepository budgetOverrideCalculationRepository;
+    BudgetOverrideValueRepository budgetOverrideValueRepository;
 
 }

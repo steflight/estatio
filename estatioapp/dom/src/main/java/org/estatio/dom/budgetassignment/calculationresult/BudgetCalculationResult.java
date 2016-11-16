@@ -21,7 +21,7 @@ import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.budgetassignment.override.BudgetOverride;
-import org.estatio.dom.budgetassignment.override.BudgetOverrideCalculation;
+import org.estatio.dom.budgetassignment.override.BudgetOverrideValue;
 import org.estatio.dom.budgetassignment.override.BudgetOverrideRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
@@ -70,10 +70,10 @@ public class BudgetCalculationResult extends UdoDomainObject2<BudgetCalculationR
 
     @Action(semantics = SemanticsOf.SAFE)
     @ActionLayout(contributed = Contributed.AS_ASSOCIATION)
-    public List<BudgetOverrideCalculation> overrideCalculations(){
-        List<BudgetOverrideCalculation> results = new ArrayList<>();
+    public List<BudgetOverrideValue> overrideCalculations(){
+        List<BudgetOverrideValue> results = new ArrayList<>();
         for (BudgetOverride override : budgetOverrideRepository.findByLeaseAndInvoiceChargeAndType(getBudgetCalculationRun().getLease(), getInvoiceCharge(), getBudgetCalculationRun().getType())){
-            results.addAll(override.getCalculations());
+            results.addAll(override.getValues());
         }
         return results;
     }

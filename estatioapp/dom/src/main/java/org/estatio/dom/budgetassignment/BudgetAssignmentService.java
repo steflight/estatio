@@ -15,7 +15,7 @@ import org.apache.isis.applib.annotation.NatureOfService;
 
 import org.estatio.dom.asset.Unit;
 import org.estatio.dom.budgetassignment.override.BudgetOverride;
-import org.estatio.dom.budgetassignment.override.BudgetOverrideCalculation;
+import org.estatio.dom.budgetassignment.override.BudgetOverrideValue;
 import org.estatio.dom.budgetassignment.override.BudgetOverrideRepository;
 import org.estatio.dom.budgetassignment.viewmodels.BudgetCalculationResultViewModel;
 import org.estatio.dom.budgetassignment.viewmodels.DetailedBudgetCalculationResultViewmodel;
@@ -35,8 +35,11 @@ import org.estatio.dom.lease.Occupancy;
 @DomainService(nature = NatureOfService.DOMAIN)
 public class BudgetAssignmentService {
 
-    public List<BudgetOverrideCalculation> calculateOverrides(final Budget budget){
-        List<BudgetOverrideCalculation> results = new ArrayList<>();
+    public List<BudgetOverrideValue> calculateOverrideValues(final Budget budget){
+
+        removeNewValues(budget);
+
+        List<BudgetOverrideValue> results = new ArrayList<>();
         for (Lease lease : leaseRepository.findByAssetAndActiveOnDate(budget.getProperty(), budget.getStartDate())){
             // TODO: this is an extra filter because currently occupancies can outrun terminated leases
             if (lease.getStatus() != LeaseStatus.TERMINATED) {
@@ -46,6 +49,19 @@ public class BudgetAssignmentService {
             }
         }
         return results;
+    }
+
+    public void removeNewValues(final Budget budget){
+        for (Lease lease : leaseRepository.findByAssetAndActiveOnDate(budget.getProperty(), budget.getStartDate())){
+            // TODO: this is an extra filter because currently occupancies can outrun terminated leases
+            if (lease.getStatus() != LeaseStatus.TERMINATED) {
+                for (BudgetOverride override : budgetOverrideRepository.findByLease(lease)) {
+                    for (BudgetOverrideValue value : override.getValues()){
+                        value.remove();
+                    }
+                }
+            }
+        }
     }
 
     public void assign(final Budget budget){
