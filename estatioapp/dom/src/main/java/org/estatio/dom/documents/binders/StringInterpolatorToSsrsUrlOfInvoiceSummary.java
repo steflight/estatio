@@ -21,10 +21,10 @@ package org.estatio.dom.documents.binders;
 
 import org.estatio.dom.invoice.viewmodel.InvoiceSummaryForPropertyDueDateStatus;
 
-public class RendererModelFactoryForInvoiceSummaryRenderUsingStringInterpolatorToSsrsUrl
-        extends RendererModelFactoryRenderUsingStringInterpolatorToSsrsUrlAbstract<InvoiceSummaryForPropertyDueDateStatus> {
+public class StringInterpolatorToSsrsUrlOfInvoiceSummary
+        extends StringInterpolatorToSsrsUrlAbstract<InvoiceSummaryForPropertyDueDateStatus> {
 
-    public RendererModelFactoryForInvoiceSummaryRenderUsingStringInterpolatorToSsrsUrl() {
+    public StringInterpolatorToSsrsUrlOfInvoiceSummary() {
         super(InvoiceSummaryForPropertyDueDateStatus.class);
     }
 

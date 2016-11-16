@@ -37,6 +37,7 @@ import org.incode.module.document.dom.impl.applicability.Applicability;
 import org.incode.module.document.dom.impl.docs.Document;
 import org.incode.module.document.dom.impl.docs.DocumentAbstract;
 import org.incode.module.document.dom.impl.docs.DocumentTemplate;
+import org.incode.module.document.dom.impl.docs.paperclips.PaperclipForDocument;
 import org.incode.module.document.dom.impl.paperclips.Paperclip;
 import org.incode.module.document.dom.impl.rendering.RenderingStrategy;
 import org.incode.module.document.dom.impl.types.DocumentType;
@@ -186,6 +187,7 @@ public class EstatioOperationalTeardownFixture extends FixtureScript {
         deleteFrom(Person.class);
         deleteFrom(Party.class);
 
+        deleteFrom(PaperclipForDocument.class);
         deleteFrom(Paperclip.class);
         deleteFrom(Applicability.class);
         deleteFrom(Document.class);

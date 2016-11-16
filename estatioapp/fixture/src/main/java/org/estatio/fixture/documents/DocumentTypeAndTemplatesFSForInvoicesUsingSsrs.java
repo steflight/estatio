@@ -40,13 +40,13 @@ import org.incode.module.document.dom.impl.rendering.RenderingStrategyRepository
 import org.incode.module.document.dom.impl.types.DocumentType;
 import org.incode.module.document.fixture.DocumentTemplateFSAbstract;
 
-import org.estatio.dom.documents.binders.AttachmentAdvisorAttachToNone;
-import org.estatio.dom.documents.binders.AttachmentAdvisorOfEmailCoverForPrelimLetterOrInvoiceNoteAttachToSame;
-import org.estatio.dom.documents.binders.AttachmentAdvisorOfInvoiceNoteForInvoiceAttachToInvoiceAndAnyReceipts;
-import org.estatio.dom.documents.binders.AttachmentAdvisorOfPrelimLetterForInvoiceAttachToSame;
-import org.estatio.dom.documents.binders.RendererModelFactoryForInvoiceSummaryRenderUsingStringInterpolatorToSsrsUrl;
-import org.estatio.dom.documents.binders.RendererModelFactoryOfEmailCoverRenderForPrelimLetterOrInvoiceNoteUsingFreemarker;
-import org.estatio.dom.documents.binders.RendererModelFactoryOfPrelimLetterOrInvoiceNoteForInvoiceRenderUsingStringInterpolatorToSsrsUrl;
+import org.estatio.dom.documents.binders.AttachToNone;
+import org.estatio.dom.documents.binders.ForEmailCoverOfPrelimLetterOrInvoiceNoteAttachToSame;
+import org.estatio.dom.documents.binders.ForInvoiceNoteOfInvoiceAttachToInvoiceAndAnyReceipts;
+import org.estatio.dom.documents.binders.ForPrelimLetterOfInvoiceAttachToSame;
+import org.estatio.dom.documents.binders.StringInterpolatorToSsrsUrlOfInvoiceSummary;
+import org.estatio.dom.documents.binders.FreemarkerModelOfPrelimLetterOrInvoiceNoteForEmailCover;
+import org.estatio.dom.documents.binders.StringInterpolatorToSsrsUrlOfInvoice;
 import org.estatio.dom.invoice.Constants;
 import org.estatio.dom.invoice.Invoice;
 import org.estatio.dom.invoice.viewmodel.InvoiceSummaryForPropertyDueDateStatus;
@@ -116,8 +116,8 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 contentText, fmkRenderingStrategy,
                 NAME_TEXT_PRELIM_LETTER_GLOBAL, fmkRenderingStrategy,
                 Document.class,
-                RendererModelFactoryOfEmailCoverRenderForPrelimLetterOrInvoiceNoteUsingFreemarker.class,
-                AttachmentAdvisorOfEmailCoverForPrelimLetterOrInvoiceNoteAttachToSame.class,
+                FreemarkerModelOfPrelimLetterOrInvoiceNoteForEmailCover.class,
+                ForEmailCoverOfPrelimLetterOrInvoiceNoteAttachToSame.class,
                 executionContext);
 
         contentText = loadResource("PrelimLetterEmailCoverNote-ITA.html");
@@ -127,8 +127,8 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 contentText, fmkRenderingStrategy,
                 NAME_TEXT_PRELIM_LETTER_ITA, fmkRenderingStrategy,
                 Document.class,
-                RendererModelFactoryOfEmailCoverRenderForPrelimLetterOrInvoiceNoteUsingFreemarker.class,
-                AttachmentAdvisorOfEmailCoverForPrelimLetterOrInvoiceNoteAttachToSame.class,
+                FreemarkerModelOfPrelimLetterOrInvoiceNoteForEmailCover.class,
+                ForEmailCoverOfPrelimLetterOrInvoiceNoteAttachToSame.class,
                 executionContext);
 
 
@@ -147,8 +147,8 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 "Preliminary letter for Invoice ${this.number}",
                 siRenderingStrategy,
                 Invoice.class,
-                RendererModelFactoryOfPrelimLetterOrInvoiceNoteForInvoiceRenderUsingStringInterpolatorToSsrsUrl.class,
-                AttachmentAdvisorOfPrelimLetterForInvoiceAttachToSame.class,
+                StringInterpolatorToSsrsUrlOfInvoice.class,
+                ForPrelimLetterOfInvoiceAttachToSame.class,
                 executionContext
         );
 
@@ -165,8 +165,8 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 "Preliminary letter for Invoice ${this.number} (Italy)",
                 siRenderingStrategy,
                 Invoice.class,
-                RendererModelFactoryOfPrelimLetterOrInvoiceNoteForInvoiceRenderUsingStringInterpolatorToSsrsUrl.class,
-                AttachmentAdvisorOfPrelimLetterForInvoiceAttachToSame.class,
+                StringInterpolatorToSsrsUrlOfInvoice.class,
+                ForPrelimLetterOfInvoiceAttachToSame.class,
                 executionContext
         );
 
@@ -186,8 +186,8 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 contentText, fmkRenderingStrategy,
                 NAME_TEXT_INVOICE_GLOBAL, fmkRenderingStrategy,
                 Document.class,
-                RendererModelFactoryOfEmailCoverRenderForPrelimLetterOrInvoiceNoteUsingFreemarker.class,
-                AttachmentAdvisorOfEmailCoverForPrelimLetterOrInvoiceNoteAttachToSame.class,
+                FreemarkerModelOfPrelimLetterOrInvoiceNoteForEmailCover.class,
+                ForEmailCoverOfPrelimLetterOrInvoiceNoteAttachToSame.class,
                 executionContext);
 
         contentText = loadResource("InvoiceEmailCoverNote-ITA.html");
@@ -197,8 +197,8 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 contentText, fmkRenderingStrategy,
                 NAME_TEXT_INVOICE_ITA, fmkRenderingStrategy,
                 Document.class,
-                RendererModelFactoryOfEmailCoverRenderForPrelimLetterOrInvoiceNoteUsingFreemarker.class,
-                AttachmentAdvisorOfEmailCoverForPrelimLetterOrInvoiceNoteAttachToSame.class,
+                FreemarkerModelOfPrelimLetterOrInvoiceNoteForEmailCover.class,
+                ForEmailCoverOfPrelimLetterOrInvoiceNoteAttachToSame.class,
 				executionContext
         );
 
@@ -217,8 +217,8 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 sipcRenderingStrategy,
                 "Invoice for ${this.number}", siRenderingStrategy,
                 Invoice.class,
-                RendererModelFactoryOfPrelimLetterOrInvoiceNoteForInvoiceRenderUsingStringInterpolatorToSsrsUrl.class,
-                AttachmentAdvisorOfInvoiceNoteForInvoiceAttachToInvoiceAndAnyReceipts.class,
+                StringInterpolatorToSsrsUrlOfInvoice.class,
+                ForInvoiceNoteOfInvoiceAttachToInvoiceAndAnyReceipts.class,
                 executionContext
         );
 
@@ -234,8 +234,8 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 sipcRenderingStrategy,
                 "Invoice for ${this.number}", siRenderingStrategy,
                 Invoice.class,
-                RendererModelFactoryOfPrelimLetterOrInvoiceNoteForInvoiceRenderUsingStringInterpolatorToSsrsUrl.class,
-                AttachmentAdvisorOfInvoiceNoteForInvoiceAttachToInvoiceAndAnyReceipts.class,
+                StringInterpolatorToSsrsUrlOfInvoice.class,
+                ForInvoiceNoteOfInvoiceAttachToInvoiceAndAnyReceipts.class,
                 executionContext
         );
 
@@ -267,8 +267,8 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 "Invoices overview",
                 siRenderingStrategy,
                 InvoiceSummaryForPropertyDueDateStatus.class,
-                RendererModelFactoryForInvoiceSummaryRenderUsingStringInterpolatorToSsrsUrl.class,
-                AttachmentAdvisorAttachToNone.class,  // since preview only
+                StringInterpolatorToSsrsUrlOfInvoiceSummary.class,
+                AttachToNone.class,  // since preview only
                 executionContext
         );
 
@@ -284,8 +284,8 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 "Preliminary letter for Invoices",
                 siRenderingStrategy,
                 InvoiceSummaryForPropertyDueDateStatus.class,
-                RendererModelFactoryForInvoiceSummaryRenderUsingStringInterpolatorToSsrsUrl.class,
-                AttachmentAdvisorAttachToNone.class,  // since preview only
+                StringInterpolatorToSsrsUrlOfInvoiceSummary.class,
+                AttachToNone.class,  // since preview only
                 executionContext
         );
 
@@ -301,8 +301,8 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 "Preliminary Invoice for Seller",
                 siRenderingStrategy,
                 InvoiceSummaryForPropertyDueDateStatus.class,
-                RendererModelFactoryForInvoiceSummaryRenderUsingStringInterpolatorToSsrsUrl.class,
-                AttachmentAdvisorAttachToNone.class,  // since preview only
+                StringInterpolatorToSsrsUrlOfInvoiceSummary.class,
+                AttachToNone.class,  // since preview only
                 executionContext
         );
     }
@@ -324,7 +324,9 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
 				        contentText, contentRenderingStrategy, 
 						nameText, nameRenderingStrategy, 
 						executionContext);
-        template.applicable(applicableToClass, rendererModelFactoryClass, attachmentAdvisorClass);
+
+        mixin(DocumentTemplate._applicable.class, template)
+                .applicable(applicableToClass, rendererModelFactoryClass, attachmentAdvisorClass);
 
         return template;
     }
@@ -375,7 +377,7 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrs extends DocumentTemp
                 nameText, nameRenderingStrategy,
                 executionContext);
 
-        documentTemplate.applicable(domainClass, rendererModelFactoryClass, attachmentAdvisorClass);
+        mixin(DocumentTemplate._applicable.class, documentTemplate).applicable(domainClass, rendererModelFactoryClass, attachmentAdvisorClass);
 
         executionContext.addResult(this, documentTemplate);
     }

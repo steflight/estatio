@@ -118,7 +118,8 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
                 DocumentTemplate prelimLetterTemplate = findDocumentTemplateFor(Constants.DOC_TYPE_REF_PRELIM, invoice);
 
                 // when
-                final Document document = (Document)wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+                wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+                Document document = prelimLetterOf(invoice);
 
                 // then
                 assertThat(document).isNotNull();
@@ -140,7 +141,8 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
                 approveAndInvoice(invoice);
 
                 // when
-                final Document document = (Document)wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(invoiceNoteTemplate);
+                wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(invoiceNoteTemplate);
+                Document document = invoiceNoteOf(invoice);
 
                 // then
                 assertThat(document).isNotNull();
@@ -264,7 +266,8 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
 
             // when
             DocumentTemplate prelimLetterTemplate = findDocumentTemplateFor(Constants.DOC_TYPE_REF_PRELIM, invoice);
-            final Document document = (Document)wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+            wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+            Document document = prelimLetterOf(invoice);
 
             // (clearing queryResultsCache)
             invoice = findInvoice(InvoiceStatus.NEW);
@@ -352,7 +355,8 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
 
             // when
             DocumentTemplate prelimLetterTemplate = findDocumentTemplateFor(Constants.DOC_TYPE_REF_INVOICE, invoice);
-            final Document document = (Document)wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+            wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+            Document document = invoiceNoteOf(invoice);
 
             invoice = findInvoice(InvoiceStatus.INVOICED);
             invoiceNoteViewModel = invoiceNoteViewModelOf(invoice);
@@ -364,12 +368,12 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
 
             assertThat(mixin(DocAndCommForInvoiceNote_communication.class, invoiceNoteViewModel).$$()).isNull();
 
-            // is attached to only invoice
+            // is attached to invoice and also the receipt
             paperclips = paperclipRepository.findByDocument(invoiceNoteDoc);
-            assertThat(paperclips).hasSize(1);
-            assertThat(paperclips).extracting(x -> x.getAttachedTo()).contains(invoice);
+            assertThat(paperclips).hasSize(2);
+            assertThat(paperclips).extracting(x -> x.getAttachedTo()).contains(invoice, attachedReceipt);
 
-            // while the invoice itself now has two attachments (the original receipt and the newly created doc)
+            // while the invoice itself also has two attachments (the original receipt and the newly created doc)
             paperclips = paperclipRepository.findByAttachedTo(invoice);
             assertThat(paperclips).hasSize(2);
             assertThat(paperclips).extracting(x -> x.getDocument()).contains(attachedReceipt, invoiceNoteDoc);
@@ -394,10 +398,10 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
 
             assertThat(communication.getState()).isEqualTo(CommunicationState.PENDING);
 
-            // and InvNote doc now also attached to comm, invoice.buyer and invoice.seller (as well as invoice)
+            // and InvNote doc now also attached to comm, invoice.buyer and invoice.seller (as well as invoice and receipt)
             paperclips = paperclipRepository.findByDocument(invoiceNoteDoc);
-            assertThat(paperclips).hasSize(4);
-            assertThat(paperclips).extracting(x -> x.getAttachedTo()).contains(invoice, invoice.getBuyer(), invoice.getSeller(), invoiceNoteComm);
+            assertThat(paperclips).hasSize(5);
+            assertThat(paperclips).extracting(x -> x.getAttachedTo()).contains(invoice, invoice.getBuyer(), invoice.getSeller(), invoiceNoteComm, attachedReceipt);
 
             // and comm attached to PL, also to a new covernote, AND ALSO to the original attached receipt
             paperclips = paperclipRepository.findByAttachedTo(invoiceNoteComm);
@@ -420,7 +424,8 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
 
             // and given have a PL doc
             DocumentTemplate prelimLetterTemplate = findDocumentTemplateFor(Constants.DOC_TYPE_REF_PRELIM, invoice);
-            final Document document = (Document)wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+            wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+            Document document = prelimLetterOf(invoice);
             assertThat(document).isNotNull();
 
             // and given is attached to only invoice
@@ -457,7 +462,8 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
 
             // and given have a PL doc
             DocumentTemplate prelimLetterTemplate = findDocumentTemplateFor(Constants.DOC_TYPE_REF_PRELIM, invoice);
-            final Document document = (Document)wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+            wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+            Document document = prelimLetterOf(invoice);
             assertThat(document).isNotNull();
 
             // and given document sent
@@ -523,7 +529,9 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
 
             // and given have a PL doc
             DocumentTemplate prelimLetterTemplate = findDocumentTemplateFor(Constants.DOC_TYPE_REF_PRELIM, invoice);
-            final Document document = (Document)wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+            wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+            Document document = prelimLetterOf(invoice);
+
             assertThat(document).isNotNull();
 
             assertThat(paperclipRepository.findByAttachedTo(invoice)).hasSize(1);
@@ -553,7 +561,8 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
 
             // and given have a PL doc
             DocumentTemplate prelimLetterTemplate = findDocumentTemplateFor(Constants.DOC_TYPE_REF_PRELIM, invoice);
-            final Document document = (Document)wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+            wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+            Document document = prelimLetterOf(invoice);
 
             // and given document sent
             final CommunicationChannel sendTo = invoice.getSendTo();
@@ -582,7 +591,8 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
             DocumentTemplate prelimLetterTemplate = findDocumentTemplateFor(Constants.DOC_TYPE_REF_PRELIM, invoice);
 
             // and given
-            final Document document = (Document)wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+            wrap(mixin(Invoice_createAndAttachDocument.class, invoice)).$$(prelimLetterTemplate);
+            Document document = prelimLetterOf(invoice);
             assertThat(document).isNotNull();
 
             // and given
@@ -660,6 +670,24 @@ public class Invoice_DocumentManagement_IntegTest extends EstatioIntegrationTest
     void approveAndInvoice(final Invoice invoice) {
         wrap(mixin(Invoice._approve.class, invoice)).$$();
         wrap(mixin(Invoice._invoice.class, invoice)).$$(invoice.getDueDate().minusDays(1));
+    }
+
+    Document prelimLetterOf(final Invoice invoice) {
+        final List<DocAndCommForPrelimLetter> viewModels = mixin(Invoice_preliminaryLetters.class, invoice).$$();
+        assertThat(viewModels).hasSize(1);
+        final DocAndCommForPrelimLetter viewModel = viewModels.get(0);
+        final Document document = mixin(DocAndCommForPrelimLetter_document.class, viewModel).$$();
+        assertThat(document).isNotNull();
+        return document;
+    }
+
+    Document invoiceNoteOf(final Invoice invoice) {
+        final List<DocAndCommForInvoiceNote> viewModels = mixin(Invoice_invoiceNotes.class, invoice).$$();
+        assertThat(viewModels).hasSize(1);
+        final DocAndCommForInvoiceNote viewModel = viewModels.get(0);
+        final Document document = mixin(DocAndCommForInvoiceNote_document.class, viewModel).$$();
+        assertThat(document).isNotNull();
+        return document;
     }
 
 

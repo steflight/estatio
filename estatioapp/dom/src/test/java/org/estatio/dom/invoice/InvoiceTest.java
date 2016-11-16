@@ -435,6 +435,8 @@ public class InvoiceTest {
             applicationTenancy.setPath("/");
 
             invoice_invoice = new Invoice._invoice(this.invoice);
+            invoice_invoice.numeratorRepository = mockNumeratorRepository;
+            invoice_invoice.invoiceRepository = mockInvoiceRepository;
         }
 
         @Test

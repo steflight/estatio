@@ -30,10 +30,10 @@ import org.estatio.dom.appsettings.EstatioSettingsService;
  * Creates a dataModel to be used with {@link StringInterpolatorService} for both content and subject;
  * requires domain object to implement {@link WithApplicationTenancy}.
  */
-public abstract class RendererModelFactoryRenderUsingStringInterpolatorToSsrsUrlAbstract<T> extends
+public abstract class StringInterpolatorToSsrsUrlAbstract<T> extends
         RendererModelFactoryAbstract<T> {
 
-    public RendererModelFactoryRenderUsingStringInterpolatorToSsrsUrlAbstract(Class<T> expectedInputType) {
+    public StringInterpolatorToSsrsUrlAbstract(Class<T> expectedInputType) {
         super(expectedInputType);
     }
 

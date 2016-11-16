@@ -1,3 +1,4 @@
+
 /*
  *
  *  Copyright 2012-2014 Eurocommercial Properties NV
@@ -18,14 +19,26 @@
  */
 package org.estatio.dom.documents.binders;
 
-import org.estatio.dom.invoice.Invoice;
+import java.util.Collections;
+import java.util.List;
 
-public class RendererModelFactoryOfPrelimLetterOrInvoiceNoteForInvoiceRenderUsingStringInterpolatorToSsrsUrl extends
-        RendererModelFactoryRenderUsingStringInterpolatorToSsrsUrlAbstract<Invoice> {
+import org.incode.module.document.dom.impl.applicability.AttachmentAdvisor;
+import org.incode.module.document.dom.impl.applicability.AttachmentAdvisorAbstract;
+import org.incode.module.document.dom.impl.docs.DocumentTemplate;
 
-    public RendererModelFactoryOfPrelimLetterOrInvoiceNoteForInvoiceRenderUsingStringInterpolatorToSsrsUrl() {
-        super(Invoice.class);
+public class AttachToNone
+        extends AttachmentAdvisorAbstract<Object> {
+
+    public AttachToNone() {
+        super(Object.class);
     }
 
+    @Override
+    protected List<AttachmentAdvisor.PaperclipSpec> doAdvise(
+            final DocumentTemplate documentTemplate,
+            final Object domainObject) {
+
+        return Collections.emptyList();
+    }
 
 }

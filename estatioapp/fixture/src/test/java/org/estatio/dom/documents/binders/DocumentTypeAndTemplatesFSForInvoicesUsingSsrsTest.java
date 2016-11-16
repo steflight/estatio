@@ -24,6 +24,7 @@ import org.incode.module.document.dom.impl.types.DocumentType;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.Unit;
+import org.estatio.dom.invoice.Constants;
 import org.estatio.dom.invoice.Invoice;
 import org.estatio.dom.lease.Lease;
 import org.estatio.dom.lease.Occupancy;
@@ -43,6 +44,9 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrsTest {
     DocumentTemplate mockDocumentTemplate;
 
     @Mock
+    DocumentType mockDocumentType;
+
+    @Mock
     Document mockDocument;
 
     @Mock
@@ -58,11 +62,11 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrsTest {
     @Mock
     PaperclipRepository mockPaperclipRepository;
 
-    RendererModelFactoryOfEmailCoverRenderForPrelimLetterOrInvoiceNoteUsingFreemarker rendererModelFactory;
+    FreemarkerModelOfPrelimLetterOrInvoiceNoteForEmailCover rendererModelFactory;
 
     @Before
     public void setUp() throws Exception {
-        stubDocumentType = new DocumentType("DT", "Some document type");
+        stubDocumentType = new DocumentType(Constants.DOC_TYPE_REF_PRELIM, "Prelim letter");
 
         stubInvoice = new Invoice();
         stubInvoice.setDueDate(new LocalDate(2016,11,1));
@@ -91,6 +95,9 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrsTest {
 
             allowing(mockLease).getReference();
             will(returnValue("XXX-ABC-789"));
+
+            allowing(mockDocument).getType();
+            will(returnValue(stubDocumentType));
         }});
 
         // expecting
@@ -99,7 +106,7 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrsTest {
             will(returnValue("prototyping"));
         }});
 
-        rendererModelFactory = new RendererModelFactoryOfEmailCoverRenderForPrelimLetterOrInvoiceNoteUsingFreemarker();
+        rendererModelFactory = new FreemarkerModelOfPrelimLetterOrInvoiceNoteForEmailCover();
         rendererModelFactory.paperclipRepository = mockPaperclipRepository;
     }
 

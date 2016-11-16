@@ -34,10 +34,10 @@ import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
 import org.estatio.dom.invoice.Invoice;
 import org.estatio.dom.invoice.dnc.Invoice_attachReceipt;
 
-public class AttachmentAdvisorOfInvoiceNoteForInvoiceAttachToInvoiceAndAnyReceipts extends
+public class ForInvoiceNoteOfInvoiceAttachToInvoiceAndAnyReceipts extends
         AttachmentAdvisorAbstract<Invoice> {
 
-    public AttachmentAdvisorOfInvoiceNoteForInvoiceAttachToInvoiceAndAnyReceipts() {
+    public ForInvoiceNoteOfInvoiceAttachToInvoiceAndAnyReceipts() {
         super(Invoice.class);
     }
 

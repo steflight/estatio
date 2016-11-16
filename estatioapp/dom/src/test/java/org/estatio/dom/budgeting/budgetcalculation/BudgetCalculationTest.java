@@ -19,10 +19,10 @@ package org.estatio.dom.budgeting.budgetcalculation;
 
 import org.junit.Test;
 
-import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.incode.module.unittestsupport.dom.bean.AbstractBeanPropertiesTest;
 
 import org.estatio.dom.budgeting.keyitem.KeyItem;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
 
 public class BudgetCalculationTest {
 
