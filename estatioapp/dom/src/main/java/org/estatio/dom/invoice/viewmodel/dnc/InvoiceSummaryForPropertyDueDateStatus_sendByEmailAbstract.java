@@ -52,31 +52,30 @@ public abstract class InvoiceSummaryForPropertyDueDateStatus_sendByEmailAbstract
     @ActionLayout(contributed = Contributed.AS_ACTION)
     public InvoiceSummaryForPropertyDueDateStatus $$() throws IOException {
 
-        final List<Tuple> tuples = tuplesToSend();
-        for (Tuple tuple : tuples) {
-            final Invoice invoice = tuple.getInvoice();
-            final Document document = tuple.getDocument();
+        final List<InvoiceAndDocument> invoiceAndDocuments = invoiceAndDocumentsToSend();
+        for (InvoiceAndDocument invoiceAndDocument : invoiceAndDocuments) {
+            final Invoice invoice = invoiceAndDocument.getInvoice();
+            final Document document = invoiceAndDocument.getDocument();
 
             final Invoice_email invoice_email = invoice_email(invoice);
 
             final EmailAddress emailAddress = invoice_email.default1$$(document);
             final String cc = invoice_email.default2$$(document);
             final String bcc = invoice_email.default3$$(document);
-            final String message = invoice_email.default4$$();
 
-            invoice_email.$$(document, emailAddress, cc, bcc, message);
+            invoice_email.$$(document, emailAddress, cc, bcc);
         }
         return this.invoiceSummary;
     }
 
     public String disable$$() {
-        return tuplesToSend().isEmpty()? "No documents available to be send by email": null;
+        return invoiceAndDocumentsToSend().isEmpty()? "No documents available to be send by email": null;
     }
 
     @Override
-    Predicate<Tuple> filter() {
+    Predicate<InvoiceAndDocument> filter() {
         return Predicates.and(
-                        tuple -> !exclude(tuple),
+                        invoiceAndDocument -> !exclude(invoiceAndDocument),
                         canBeSentByEmail()
                 );
     }
@@ -84,14 +83,14 @@ public abstract class InvoiceSummaryForPropertyDueDateStatus_sendByEmailAbstract
     /**
      * Optional hook to allow subclasses to further restrict the documents that can be sent.
      */
-    protected boolean exclude(final Tuple tuple) {
+    protected boolean exclude(final InvoiceAndDocument invoiceAndDocument) {
         return false;
     }
 
-    private Predicate<Tuple> canBeSentByEmail() {
-        return tuple -> {
-            final Invoice_email emailMixin = invoice_email(tuple.getInvoice());
-            final EmailAddress emailAddress = emailMixin.default1$$(tuple.getDocument());
+    private Predicate<InvoiceAndDocument> canBeSentByEmail() {
+        return invoiceAndDocument -> {
+            final Invoice_email emailMixin = invoice_email(invoiceAndDocument.getInvoice());
+            final EmailAddress emailAddress = emailMixin.default1$$(invoiceAndDocument.getDocument());
             return emailAddress != null;
         };
     }

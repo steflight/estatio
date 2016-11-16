@@ -17,7 +17,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.estatio.dom.invoice;
+package org.estatio.dom.invoice.dnc;
 
 import java.io.IOException;
 import java.util.List;
@@ -29,9 +29,11 @@ import com.google.common.collect.Lists;
 
 import org.apache.isis.applib.annotation.Mixin;
 
-import org.incode.module.document.dom.impl.docs.Document;
 import org.incode.module.document.dom.impl.docs.DocumentTemplate;
 import org.incode.module.document.dom.mixins.T_createAndAttachDocumentAndRender;
+
+import org.estatio.dom.invoice.Constants;
+import org.estatio.dom.invoice.Invoice;
 
 @Mixin
 public class Invoice_createAndAttachDocument extends T_createAndAttachDocumentAndRender<Invoice> {
@@ -40,8 +42,9 @@ public class Invoice_createAndAttachDocument extends T_createAndAttachDocumentAn
         super(domainObject);
     }
 
-    public Document $$(DocumentTemplate template) throws IOException {
-        return super.$$(template);
+    public Object $$(DocumentTemplate template) throws IOException {
+        super.$$(template);
+        return domainObject;
     }
 
     @Override

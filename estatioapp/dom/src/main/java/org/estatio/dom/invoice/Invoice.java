@@ -604,12 +604,36 @@ public class Invoice
             return null;
         }
 
-        public String validate$$(final LocalDate invoiceDate) {
-            return invoice.validInvoiceDate(invoiceDate);
+        public String validate0$$(final LocalDate invoiceDate) {
+            return validInvoiceDate(invoiceDate);
+        }
+
+        String validInvoiceDate(LocalDate invoiceDate) {
+            if (invoice.getDueDate() != null && invoice.getDueDate().compareTo(invoiceDate) < 0) {
+                return String.format("Invoice date must be on or before the due date (%s)", invoice.getDueDate().toString());
+            }
+            final ApplicationTenancy applicationTenancy = invoice.getApplicationTenancy();
+            final Numerator numerator = numeratorRepository.findInvoiceNumberNumerator(invoice.getFixedAsset(), applicationTenancy);
+            if (numerator != null) {
+                final String invoiceNumber = numerator.lastIncrementStr();
+                if (invoiceNumber != null) {
+                    List<Invoice> result = invoiceRepository.findByInvoiceNumber(invoiceNumber);
+                    if (result.size() > 0) {
+                        final Invoice invoice = result.get(0);
+                        if (invoice.getInvoiceDate().isAfter(invoiceDate)){
+                            return String.format("Invoice number %s has an invoice date %s which is after %s", invoice.getInvoiceNumber(), invoice.getInvoiceDate().toString(), invoiceDate.toString());
+                        }
+                    }
+                }
+            }
+            return null;
         }
 
         @javax.inject.Inject
         NumeratorForCollectionRepository numeratorRepository;
+
+        @javax.inject.Inject
+        InvoiceRepository invoiceRepository;
 
         @javax.inject.Inject
         MessageService messageService;
@@ -620,29 +644,6 @@ public class Invoice
 
 
 
-    // //////////////////////////////////////
-
-    @Programmatic
-    String validInvoiceDate(LocalDate invoiceDate) {
-        if (getDueDate() != null && getDueDate().compareTo(invoiceDate) < 0) {
-            return "Due date cannot be before invoice date";
-        }
-        final ApplicationTenancy applicationTenancy = getApplicationTenancy();
-        final Numerator numerator = numeratorRepository.findInvoiceNumberNumerator(getFixedAsset(), applicationTenancy);
-        if (numerator != null) {
-            final String invoiceNumber = numerator.lastIncrementStr();
-            if (invoiceNumber != null) {
-                List<Invoice> result = invoiceRepository.findByInvoiceNumber(invoiceNumber);
-                if (result.size() > 0) {
-                    final Invoice invoice = result.get(0);
-                    if (invoice.getInvoiceDate().isAfter(invoiceDate)){
-                        return String.format("Invoice number %s has an invoice date %s which is after %s", invoice.getInvoiceNumber(), invoice.getInvoiceDate().toString(), invoiceDate.toString());
-                    }
-                }
-            }
-        }
-        return null;
-    }
 
     // //////////////////////////////////////
 

@@ -111,9 +111,7 @@ public class InvoiceSummaryforPropertyDueDateStatus_invoiceNotes_IntegTest exten
 
 
             // given invoiced
-            invoice.setStatus(InvoiceStatus.INVOICED);
-            invoice.setInvoiceNumber("12345");
-            invoice.setInvoiceDate(clockService.now());
+            approveAndInvoice(invoice);
 
             summary = findSummary(InvoiceStatus.INVOICED);
             invoiceNoteViewModel = invoiceNoteViewModelOf(summary);
@@ -217,6 +215,7 @@ public class InvoiceSummaryforPropertyDueDateStatus_invoiceNotes_IntegTest exten
 
     }
 
+    //region > helpers
 
     InvoiceSummaryForPropertyDueDateStatus findSummary() {
         return findSummary(InvoiceStatus.NEW);
@@ -240,6 +239,13 @@ public class InvoiceSummaryforPropertyDueDateStatus_invoiceNotes_IntegTest exten
 
         return viewModels.get(0);
     }
+
+    void approveAndInvoice(final Invoice invoice) {
+        wrap(mixin(Invoice._approve.class, invoice)).$$();
+        wrap(mixin(Invoice._invoice.class, invoice)).$$(invoice.getDueDate().minusDays(1));
+    }
+    //endregion
+
 
     @Inject
     ClockService clockService;

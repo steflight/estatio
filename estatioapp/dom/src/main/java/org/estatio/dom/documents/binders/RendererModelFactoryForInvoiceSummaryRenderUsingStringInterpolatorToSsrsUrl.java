@@ -19,20 +19,13 @@
  */
 package org.estatio.dom.documents.binders;
 
-import java.util.Collections;
-import java.util.List;
+import org.estatio.dom.invoice.viewmodel.InvoiceSummaryForPropertyDueDateStatus;
 
-public class BinderForReportServerAttachNone extends BinderForReportServerAbstract<Object> {
+public class RendererModelFactoryForInvoiceSummaryRenderUsingStringInterpolatorToSsrsUrl
+        extends RendererModelFactoryRenderUsingStringInterpolatorToSsrsUrlAbstract<InvoiceSummaryForPropertyDueDateStatus> {
 
-    public BinderForReportServerAttachNone() {
-        super(Object.class);
+    public RendererModelFactoryForInvoiceSummaryRenderUsingStringInterpolatorToSsrsUrl() {
+        super(InvoiceSummaryForPropertyDueDateStatus.class);
     }
 
-    /**
-     * Never bound to the input object at all.
-     */
-    @Override
-    protected List<Object> determineAttachTo(final Object domainObject) {
-        return Collections.emptyList();
-    }
 }

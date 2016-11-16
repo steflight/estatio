@@ -19,18 +19,18 @@
 
 package org.estatio.dom.documents.binders;
 
-import java.util.Collections;
 import java.util.Optional;
 
 import javax.inject.Inject;
 
-import org.incode.module.document.dom.impl.applicability.BinderAbstract;
+import org.incode.module.document.dom.impl.applicability.RendererModelFactoryAbstract;
 import org.incode.module.document.dom.impl.docs.Document;
 import org.incode.module.document.dom.impl.docs.DocumentTemplate;
 import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.Unit;
+import org.estatio.dom.invoice.Constants;
 import org.estatio.dom.invoice.Invoice;
 import org.estatio.dom.lease.Occupancy;
 import org.estatio.dom.lease.tags.Brand;
@@ -38,22 +38,25 @@ import org.estatio.dom.party.Party;
 
 import lombok.Data;
 
-/**
- * For use with email covering notes for invoices.
- */
-public class BinderForDocumentAttachedToPrelimLetterOrInvoice extends BinderAbstract<Document> {
+public class RendererModelFactoryOfEmailCoverRenderForPrelimLetterOrInvoiceNoteUsingFreemarker
+        extends RendererModelFactoryAbstract<Document> {
 
-    public BinderForDocumentAttachedToPrelimLetterOrInvoice() {
+    public RendererModelFactoryOfEmailCoverRenderForPrelimLetterOrInvoiceNoteUsingFreemarker() {
         super(Document.class);
     }
 
     @Override
-    public Binding doNewBinding(
+    protected Object doNewRendererModel(
             final DocumentTemplate documentTemplate,
-            final Document document,
-            final String additionalTextIfAny) {
+            final Document prelimLetterOrInvoiceNoteDoc) {
 
-        final Invoice invoice = paperclipRepository.paperclipAttaches(document, Invoice.class);
+        final String docTypeRef = prelimLetterOrInvoiceNoteDoc.getType().getReference();
+        if (!Constants.DOC_TYPE_REF_PRELIM.equals(docTypeRef) && !Constants.DOC_TYPE_REF_INVOICE.equals(docTypeRef)) {
+            throw new IllegalArgumentException(
+                    String.format("Document must be a prelim letter or invoice note (provided document' type is '%s')", docTypeRef));
+        }
+
+        final Invoice invoice = paperclipRepository.paperclipAttaches(prelimLetterOrInvoiceNoteDoc, Invoice.class);
 
         final DataModel dataModel = new DataModel();
         dataModel.setInvoice(invoice);
@@ -67,10 +70,9 @@ public class BinderForDocumentAttachedToPrelimLetterOrInvoice extends BinderAbst
             dataModel.setBrand(occupancy.getBrand());
         }
 
-        dataModel.setDocument(document);
-        dataModel.setAdditionalText(additionalTextIfAny);
+        dataModel.setDocument(prelimLetterOrInvoiceNoteDoc);
 
-        return new Binding(dataModel, Collections.singletonList(document));
+        return dataModel;
     }
 
     @Data
@@ -81,7 +83,6 @@ public class BinderForDocumentAttachedToPrelimLetterOrInvoice extends BinderAbst
         Unit unit;
         Brand brand;
         Document document;
-        String additionalText;
     }
 
     @Inject

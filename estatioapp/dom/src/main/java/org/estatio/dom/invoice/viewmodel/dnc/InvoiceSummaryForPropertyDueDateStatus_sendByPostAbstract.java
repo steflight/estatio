@@ -39,6 +39,7 @@ import org.isisaddons.module.pdfbox.dom.service.PdfBoxService;
 import org.incode.module.communications.dom.impl.commchannel.CommunicationChannelType;
 import org.incode.module.communications.dom.impl.commchannel.PostalAddress;
 import org.incode.module.communications.dom.impl.comms.Communication;
+import org.incode.module.communications.dom.mixins.DocumentConstants;
 import org.incode.module.document.dom.impl.docs.Document;
 import org.incode.module.document.dom.impl.docs.DocumentSort;
 
@@ -48,7 +49,6 @@ import org.estatio.dom.invoice.viewmodel.InvoiceSummaryForPropertyDueDateStatus;
 
 public abstract class InvoiceSummaryForPropertyDueDateStatus_sendByPostAbstract extends InvoiceSummaryForPropertyDueDateStatus_sendAbstract {
 
-    static final String MIME_TYPE_APPLICATION_PDF = "application/pdf";
     private final String defaultFileName;
 
     public InvoiceSummaryForPropertyDueDateStatus_sendByPostAbstract(
@@ -65,29 +65,27 @@ public abstract class InvoiceSummaryForPropertyDueDateStatus_sendByPostAbstract 
 
         final List<byte[]> pdfBytes = Lists.newArrayList();
 
-        for (Tuple tuple : tuplesToSend()) {
-            final Invoice invoice = tuple.getInvoice();
-            final Document document = tuple.getDocument();
+        for (final InvoiceAndDocument invoiceAndDocument : invoiceAndDocumentsToSend()) {
+            final Invoice invoice = invoiceAndDocument.getInvoice();
+            final Document prelimLetterOrInvoiceNote = invoiceAndDocument.getDocument();
 
             final Invoice_print invoice_print = invoice_print(invoice);
-            final PostalAddress postalAddress = invoice_print.default1$$(document);
+            final PostalAddress postalAddress = invoice_print.default1$$(prelimLetterOrInvoiceNote);
 
-            final DocumentSort documentSort = document.getSort();
-            final byte[] bytes = documentSort.asBytes(document);
-            pdfBytes.add(bytes);
+            invoice_print.appendPdfBytes(prelimLetterOrInvoiceNote, pdfBytes);
 
-            final Communication communication = invoice_print.$$(document, postalAddress);
+            final Communication communication = invoice_print.createCommunication(prelimLetterOrInvoiceNote, postalAddress);
             communication.sent();
         }
 
         final byte[] mergedBytes = pdfBoxService.merge(pdfBytes.toArray(new byte[][] {}));
 
-        return new Blob(fileName, MIME_TYPE_APPLICATION_PDF, mergedBytes);
+        return new Blob(fileName, DocumentConstants.MIME_TYPE_APPLICATION_PDF, mergedBytes);
     }
 
 
     public String disable$$() {
-        return tuplesToSend().isEmpty()? "No documents available to be send by post": null;
+        return invoiceAndDocumentsToSend().isEmpty()? "No documents available to be send by post": null;
     }
 
     public String default0$$() {
@@ -96,20 +94,20 @@ public abstract class InvoiceSummaryForPropertyDueDateStatus_sendByPostAbstract 
 
 
     @Override
-    Predicate<Tuple> filter() {
+    Predicate<InvoiceAndDocument> filter() {
         return Predicates.and(isDocPdfAndBlob(), withPostalAddress());
     }
 
-    private Predicate<Tuple> withPostalAddress() {
-        return tuple -> {
-            final Invoice_print invoice_print = invoice_print(tuple.getInvoice());
-            final PostalAddress postalAddress = invoice_print.default1$$(tuple.getDocument());
+    private Predicate<InvoiceAndDocument> withPostalAddress() {
+        return invoiceAndDocument -> {
+            final Invoice_print invoice_print = invoice_print(invoiceAndDocument.getInvoice());
+            final PostalAddress postalAddress = invoice_print.default1$$(invoiceAndDocument.getDocument());
             return postalAddress != null;
         };
     }
 
-    static Predicate<Tuple> isDocPdfAndBlob() {
-        return tuple -> isPdfAndBlob().apply(tuple.getDocument());
+    static Predicate<InvoiceAndDocument> isDocPdfAndBlob() {
+        return invoiceAndDocument -> isPdfAndBlob().apply(invoiceAndDocument.getDocument());
     }
 
     static Predicate<Document> isPdfAndBlob() {
@@ -117,7 +115,7 @@ public abstract class InvoiceSummaryForPropertyDueDateStatus_sendByPostAbstract 
     }
 
     static Predicate<Document> isPdf() {
-        return document -> MIME_TYPE_APPLICATION_PDF.equals(document.getMimeType());
+        return document -> DocumentConstants.MIME_TYPE_APPLICATION_PDF.equals(document.getMimeType());
     }
 
     static Predicate<Document> isBlobSort() {

@@ -23,23 +23,21 @@ import java.util.List;
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 
-import org.incode.module.document.dom.impl.applicability.Binder;
+import org.incode.module.document.dom.impl.applicability.RendererModelFactory;
 import org.incode.module.document.dom.services.ClassNameServiceAbstract;
 import org.incode.module.document.dom.services.ClassNameViewModel;
-import org.incode.module.document.dom.spi.BinderClassNameService;
+import org.incode.module.document.dom.spi.RendererModelFactoryClassNameService;
 
 @DomainService(nature = NatureOfService.DOMAIN)
-public class BinderClassNameServiceForEstatio extends ClassNameServiceAbstract<Binder> implements
-        BinderClassNameService {
+public class RendererModelFactoryClassNameServiceForEstatio extends ClassNameServiceAbstract<RendererModelFactory> implements
+        RendererModelFactoryClassNameService {
 
-    private static final String PACKAGE_PREFIX = "org.estatio";
-
-    public BinderClassNameServiceForEstatio() {
-        super(Binder.class, PACKAGE_PREFIX);
+    public RendererModelFactoryClassNameServiceForEstatio() {
+        super(RendererModelFactory.class, "org.estatio");
     }
 
     @Override
-    public List<ClassNameViewModel> binderClassNames() {
+    public List<ClassNameViewModel> rendererModelFactoryClassNames() {
         return this.classNames();
     }
 }

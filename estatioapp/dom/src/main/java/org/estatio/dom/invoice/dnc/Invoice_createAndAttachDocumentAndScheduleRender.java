@@ -17,7 +17,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.estatio.dom.invoice;
+package org.estatio.dom.invoice.dnc;
 
 import java.io.IOException;
 
@@ -25,9 +25,10 @@ import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.Mixin;
 import org.apache.isis.applib.annotation.Where;
 
-import org.incode.module.document.dom.impl.docs.Document;
 import org.incode.module.document.dom.impl.docs.DocumentTemplate;
 import org.incode.module.document.dom.mixins.T_createAndAttachDocumentAndScheduleRender;
+
+import org.estatio.dom.invoice.Invoice;
 
 @Mixin
 public class Invoice_createAndAttachDocumentAndScheduleRender
@@ -42,8 +43,9 @@ public class Invoice_createAndAttachDocumentAndScheduleRender
      */
     @Action(hidden = Where.EVERYWHERE)
     @Override
-    public Document $$(
+    public Object $$(
             final DocumentTemplate template) throws IOException {
-        return super.$$(template);
+        super.$$(template);
+        return domainObject;
     }
 }

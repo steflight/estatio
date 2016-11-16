@@ -1,3 +1,4 @@
+
 /*
  *
  *  Copyright 2012-2014 Eurocommercial Properties NV
@@ -21,22 +22,23 @@ package org.estatio.dom.documents.binders;
 import java.util.Collections;
 import java.util.List;
 
-import org.isisaddons.module.security.dom.tenancy.WithApplicationTenancy;
-import org.isisaddons.module.stringinterpolator.dom.StringInterpolatorService;
+import org.incode.module.document.dom.impl.applicability.AttachmentAdvisor;
+import org.incode.module.document.dom.impl.applicability.AttachmentAdvisorAbstract;
+import org.incode.module.document.dom.impl.docs.DocumentTemplate;
 
-/**
- * Creates a dataModel to be used with {@link StringInterpolatorService} for both content and subject;
- * requires domain object to implement {@link WithApplicationTenancy}.
- *
- * The input object is used for 'attachTo'.
- */
-public class BinderForReportServerAttachToInput extends BinderForReportServerAbstract<Object> {
+public class AttachmentAdvisorAttachToNone
+        extends AttachmentAdvisorAbstract<Object> {
 
-    public BinderForReportServerAttachToInput() {
+    public AttachmentAdvisorAttachToNone() {
         super(Object.class);
     }
 
-    protected List<Object> determineAttachTo(final Object domainObject) {
-        return Collections.singletonList(domainObject);
+    @Override
+    protected List<AttachmentAdvisor.PaperclipSpec> doAdvise(
+            final DocumentTemplate documentTemplate,
+            final Object domainObject) {
+
+        return Collections.emptyList();
     }
+
 }

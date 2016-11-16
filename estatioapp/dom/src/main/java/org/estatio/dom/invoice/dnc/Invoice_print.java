@@ -29,24 +29,29 @@ import com.google.common.collect.Lists;
 
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.ActionLayout;
+import org.apache.isis.applib.annotation.MemberOrder;
 import org.apache.isis.applib.annotation.Mixin;
 import org.apache.isis.applib.annotation.ParameterLayout;
+import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.annotation.SemanticsOf;
 import org.apache.isis.applib.services.factory.FactoryService;
-import org.apache.isis.applib.services.queryresultscache.QueryResultsCache;
-import org.apache.isis.applib.services.xactn.TransactionService;
+import org.apache.isis.applib.value.Blob;
+
+import org.isisaddons.module.pdfbox.dom.service.PdfBoxService;
 
 import org.incode.module.communications.dom.impl.commchannel.PostalAddress;
 import org.incode.module.communications.dom.impl.comms.Communication;
-import org.incode.module.communications.dom.impl.comms.CommunicationRepository;
+import org.incode.module.communications.dom.mixins.DocumentConstants;
 import org.incode.module.communications.dom.mixins.Document_print;
 import org.incode.module.document.dom.DocumentModule;
 import org.incode.module.document.dom.impl.docs.Document;
 import org.incode.module.document.dom.impl.docs.DocumentAbstract;
+import org.incode.module.document.dom.impl.docs.DocumentSort;
 import org.incode.module.document.dom.impl.docs.DocumentState;
 import org.incode.module.document.dom.impl.paperclips.Paperclip;
 import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
 
+import org.estatio.dom.invoice.Constants;
 import org.estatio.dom.invoice.Invoice;
 
 /**
@@ -68,11 +73,44 @@ public class Invoice_print {
             domainEvent = ActionDomainEvent.class
     )
     @ActionLayout(cssClassFa = "print")
-    public Communication $$(
+    @MemberOrder(name = "documents", sequence = "4.2")
+    public Blob $$(
             final Document document,
             @ParameterLayout(named = "to:")
             final PostalAddress toChannel) throws IOException {
 
+        createCommunication(document, toChannel);
+
+        final List<byte[]> pdfBytes = Lists.newArrayList();
+        appendPdfBytes(document, pdfBytes);
+
+        final String fileName = document.getName();
+        final byte[] mergedBytes = pdfBoxService.merge(pdfBytes.toArray(new byte[][] {}));
+
+        return new Blob(fileName, DocumentConstants.MIME_TYPE_APPLICATION_PDF, mergedBytes);
+    }
+
+    @Programmatic
+    public void appendPdfBytes(final Document prelimLetterOrInvoiceNote, final List<byte[]> pdfBytes) {
+
+        // this one should be a PDF
+        appendBytesIfPdf(prelimLetterOrInvoiceNote, pdfBytes);
+
+        // and any attachments that are PDFs are also merged in
+        final List<Paperclip> paperclips = paperclipRepository.findByDocument(prelimLetterOrInvoiceNote);
+        for (Paperclip paperclip : paperclips) {
+            final Object objAttachedToDocument = paperclip.getAttachedTo();
+            if(objAttachedToDocument instanceof Document) {
+                final Document docAttachedToDocument = (Document) objAttachedToDocument;
+                Invoice_print.appendBytesIfPdf(docAttachedToDocument, pdfBytes);
+            }
+        }
+    }
+
+    @Programmatic
+    public Communication createCommunication(
+            final Document document,
+            final @ParameterLayout(named = "to:") PostalAddress toChannel) throws IOException {
         // just delegate to Document_email to do the work.
         final Communication communication = document_print(document).$$(toChannel);
 
@@ -80,12 +118,7 @@ public class Invoice_print {
         // that way, if the (temporary) invoice is subsequently deleted
         paperclipRepository.attach(document, "buyer", invoice.getBuyer());
         paperclipRepository.attach(document, "seller", invoice.getSeller());
-
         return communication;
-    }
-
-    private Document_print document_print(final Document document) {
-        return factoryService.mixin(Document_print.class, document);
     }
 
     public String disable$$() {
@@ -112,23 +145,12 @@ public class Invoice_print {
             if (document.getState() != DocumentState.RENDERED) {
                 continue;
             }
+            final String reference = document.getType().getReference();
+            if (!Constants.DOC_TYPE_REF_PRELIM.equals(reference) && !Constants.DOC_TYPE_REF_INVOICE.equals(reference)) {
+                continue;
+            }
             final Document_print document_print = document_print(document);
             if(document_print.disable$$() != null) {
-
-                // equivalent of all this stuff...
-
-//                final CommHeaderForPrint printHeader = determinePrintHeader(document);
-//                final Set<PostalAddress> toChoices = printHeader.getToChoices();
-//                if (toChoices.isEmpty()) {
-//                    // ... and there are choices to send to
-//                    continue;
-//                }
-//                final String disabledReason = printHeader.getDisabledReason();
-//                if (disabledReason != null) {
-//                    // ... and not otherwise disabled
-//                    continue;
-//                }
-
                 continue;
             }
             documents.add(document);
@@ -145,34 +167,36 @@ public class Invoice_print {
         return document == null ? null : document_print(document).default0$$();
     }
 
-//    private CommHeaderForPrint determinePrintHeader(final Document document) {
-//        return queryResultsCache.execute(() -> {
-//            final CommHeaderForPrint commHeaderForPrint = new CommHeaderForPrint();
-//            invoiceDocumentCommunicationSupport.inferPrintHeaderFor(invoice, document, commHeaderForPrint);;
-//            return commHeaderForPrint;
-//        }, Invoice_print.class, "determinePrintHeader", document);
-//    }
+    //region > helpers
+
+    private Document_print document_print(final Document document) {
+        return factoryService.mixin(Document_print.class, document);
+    }
+
+    private static void appendBytesIfPdf(final Document docAttachedToDocument, final List<byte[]> pdfBytes) {
+        final DocumentSort attachedDocSort = docAttachedToDocument.getSort();
+        if (!attachedDocSort.isBytes()) {
+            return;
+        }
+        final String mimeType = docAttachedToDocument.getMimeType();
+        if (!DocumentConstants.MIME_TYPE_APPLICATION_PDF.equals(mimeType)) {
+            return;
+        }
+        final byte[] attachedDocBytes = attachedDocSort.asBytes(docAttachedToDocument);
+        pdfBytes.add(attachedDocBytes);
+    }
+
+    //endregion
 
 
     @Inject
     FactoryService factoryService;
 
     @Inject
-    QueryResultsCache queryResultsCache;
-
-//    @Inject
-//    UNUSED_InvoiceDocumentCommunicationSupport invoiceDocumentCommunicationSupport;
-
-    @Inject
-    TransactionService transactionService;
-
-    @Inject
     PaperclipRepository paperclipRepository;
 
     @Inject
-    CommunicationRepository communicationRepository;
+    PdfBoxService pdfBoxService;
 
-//    @Inject
-//    BackgroundService2 backgroundService;
 
 }

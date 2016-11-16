@@ -40,7 +40,7 @@ import lombok.Data;
 public abstract class InvoiceSummaryForPropertyDueDateStatus_sendAbstract extends InvoiceSummaryForPropertyDueDateStatus_actionAbstract {
 
     @Data
-    public static class Tuple {
+    public static class InvoiceAndDocument {
         final Invoice invoice;
         final Document document;
     }
@@ -55,24 +55,25 @@ public abstract class InvoiceSummaryForPropertyDueDateStatus_sendAbstract extend
         this.communicationChannelType = communicationChannelType;
     }
 
-    abstract Predicate<Tuple> filter();
+    abstract Predicate<InvoiceAndDocument> filter();
 
-    List<Tuple> tuplesToSend() {
-        return tuplesToSend(filter());
+    List<InvoiceAndDocument> invoiceAndDocumentsToSend() {
+        return invoiceAndDocumentsToSend(filter());
     }
 
-    private List<Tuple> tuplesToSend(Predicate<Tuple> filter) {
-        final List<Tuple> tuples = Lists.newArrayList();
+    private List<InvoiceAndDocument> invoiceAndDocumentsToSend(Predicate<InvoiceAndDocument> filter) {
+        final List<InvoiceAndDocument> invoiceAndDocuments = Lists.newArrayList();
         final List<Invoice> invoices = invoiceSummary.getInvoices();
         for (Invoice invoice : invoices) {
-            appendTuplesToSend(invoice, filter, tuples);
+            appendTuplesToSend(invoice, filter, invoiceAndDocuments);
         }
-        return tuples;
+        return invoiceAndDocuments;
     }
 
     private void appendTuplesToSend(
             final Invoice invoice,
-            final Predicate<Tuple> filter, final List<Tuple> tuples) {
+            final Predicate<InvoiceAndDocument> filter,
+            final List<InvoiceAndDocument> invoiceAndDocuments) {
         final CommunicationChannel sendTo = invoice.getSendTo();
         if (sendTo == null) {
             return;
@@ -91,11 +92,11 @@ public abstract class InvoiceSummaryForPropertyDueDateStatus_sendAbstract extend
             return;
         }
 
-        final Tuple tuple = new Tuple(invoice, document);
-        if(!filter.apply(tuple)) {
+        final InvoiceAndDocument invoiceAndDocument = new InvoiceAndDocument(invoice, document);
+        if(!filter.apply(invoiceAndDocument)) {
             return;
         }
-        tuples.add(tuple);
+        invoiceAndDocuments.add(invoiceAndDocument);
     }
 
     @Inject

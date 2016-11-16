@@ -29,6 +29,7 @@ import com.google.common.collect.Lists;
 
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.ActionLayout;
+import org.apache.isis.applib.annotation.MemberOrder;
 import org.apache.isis.applib.annotation.Mixin;
 import org.apache.isis.applib.annotation.Optionality;
 import org.apache.isis.applib.annotation.Parameter;
@@ -49,6 +50,7 @@ import org.incode.module.document.dom.impl.paperclips.Paperclip;
 import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
 
 import org.estatio.dom.EstatioDomainModule;
+import org.estatio.dom.invoice.Constants;
 import org.estatio.dom.invoice.Invoice;
 
 /**
@@ -72,6 +74,7 @@ public class Invoice_email {
             domainEvent = ActionDomainEvent.class
     )
     @ActionLayout(cssClassFa = "at")
+    @MemberOrder(name = "documents", sequence = "4.1")
     public Communication $$(
             final Document document,
             @ParameterLayout(named = "to:")
@@ -89,13 +92,10 @@ public class Invoice_email {
                     regexPattern = CommunicationChannel.EmailType.REGEX,
                     regexPatternReplacement = CommunicationChannel.EmailType.REGEX_DESC)
             @ParameterLayout(named = "bcc:")
-            final String bcc,
-            @Parameter(optionality = Optionality.OPTIONAL)
-            @ParameterLayout(named = "Covering note message", multiLine = EMAIL_COVERING_NOTE_MULTILINE)
-            final String message) throws IOException {
+            final String bcc) throws IOException {
 
         // just delegate to Document_email to do the work.
-        final Communication communication = document_email(document).$$(toChannel, cc, bcc, message);
+        final Communication communication = document_email(document).$$(toChannel, cc, bcc);
 
         // now that a comm has been sent, also attach this document to the buyer and seller
         // that way, if the (temporary) invoice is subsequently deleted
@@ -136,35 +136,18 @@ public class Invoice_email {
             if (document.getState() != DocumentState.RENDERED) {
                 continue;
             }
-            final Document_email document_email = document_email(document);
-            if(document_email.disable$$() != null) {
-
-                // equivalent of all this stuff...
-
-//            if (determineEmailCoverNoteTemplate(document) == null) {
-//                // can only send documents for which an email cover note exists...
-//                continue;
-//            }
-//            final CommHeaderForEmail emailHeader = determineEmailHeader(document);
-//            final Set<EmailAddress> toChoices = emailHeader.getToChoices();
-//            if (toChoices.isEmpty()) {
-//                // ... and there are choices to send to
-//                continue;
-//            }
-//            final String disabledReason = emailHeader.getDisabledReason();
-//            if (disabledReason != null) {
-//                // ... and not otherwise disabled
-//                continue;
-//            }
-
+            final String reference = document.getType().getReference();
+            if (!Constants.DOC_TYPE_REF_PRELIM.equals(reference) && !Constants.DOC_TYPE_REF_INVOICE.equals(reference)) {
                 continue;
             }
-
+            final Document_email document_email = document_email(document);
+            if(document_email.disable$$() != null) {
+                continue;
+            }
             documents.add(document);
         }
         return documents;
     }
-
 
     public Set<EmailAddress> choices1$$(final Document document) {
         return document == null ? Collections.emptySet() : document_email(document).choices0$$();
@@ -188,28 +171,9 @@ public class Invoice_email {
         return document == null ? null :document_email(document).default2$$();
     }
 
-    public String default4$$() {
-        return "";
-    }
-
 
     @Inject
     FactoryService factoryService;
-
-//    @Inject
-//    QueryResultsCache queryResultsCache;
-//
-//    @Inject
-//    TransactionService transactionService;
-//
-//    @Inject
-//    UNUSED_InvoiceDocumentCommunicationSupport invoiceDocumentCommunicationSupport;
-
-//    @Inject
-//    DocumentTemplateRepository documentTemplateRepository;
-//
-//    @Inject
-//    CommunicationRepository communicationRepository;
 
     @Inject
     PaperclipRepository paperclipRepository;

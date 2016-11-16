@@ -18,29 +18,26 @@
  */
 package org.estatio.dom.documents.binders;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.isisaddons.module.security.dom.tenancy.WithApplicationTenancy;
-import org.isisaddons.module.stringinterpolator.dom.StringInterpolatorService;
+import org.incode.module.document.dom.impl.applicability.AttachmentAdvisorAbstract;
+import org.incode.module.document.dom.impl.docs.DocumentTemplate;
 
 import org.estatio.dom.invoice.Invoice;
-import org.estatio.dom.party.Party;
 
-/**
- * Creates a dataModel to be used with {@link StringInterpolatorService} for both content and subject;
- * requires domain object to implement {@link WithApplicationTenancy}.
- *
- * The input object is used for 'attachTo'.
- */
-public class BinderForReportServerForInvoiceAttachToInvoiceOnly extends BinderForReportServerAbstract<Invoice> {
+public class AttachmentAdvisorOfPrelimLetterForInvoiceAttachToSame extends AttachmentAdvisorAbstract<Invoice> {
 
-    public BinderForReportServerForInvoiceAttachToInvoiceOnly() {
+    public AttachmentAdvisorOfPrelimLetterForInvoiceAttachToSame() {
         super(Invoice.class);
     }
 
-    protected List<Object> determineAttachTo(final Invoice invoice) {
-        return Collections.singletonList(invoice);
+    @Override
+    protected List<PaperclipSpec> doAdvise(
+            final DocumentTemplate documentTemplate,
+            final Invoice invoice) {
+
+        return Collections.singletonList(new PaperclipSpec(null, invoice));
     }
+
 }

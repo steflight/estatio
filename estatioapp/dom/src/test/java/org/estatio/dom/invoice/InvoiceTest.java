@@ -412,6 +412,8 @@ public class InvoiceTest {
 
     public static class ValidInvoiceDate extends InvoiceTest {
 
+        Invoice._invoice invoice_invoice;
+
         @Before
         public void setUp() throws Exception {
             invoice = new Invoice() {
@@ -431,11 +433,13 @@ public class InvoiceTest {
             numerator.setFormat("XXX-%05d");
             applicationTenancy = new ApplicationTenancy();
             applicationTenancy.setPath("/");
+
+            invoice_invoice = new Invoice._invoice(this.invoice);
         }
 
         @Test
         public void invoiceDateIsAfterDueDate() {
-            assertThat(invoice.validInvoiceDate(new LocalDate(2012, 2, 3))).isNotNull();
+            assertThat(invoice_invoice.validInvoiceDate(new LocalDate(2012, 2, 3))).isNotNull();
         }
 
         @Test
@@ -446,7 +450,7 @@ public class InvoiceTest {
             assertThat(invoice.getApplicationTenancy()).isNotNull();
 
             // when,then
-            assertThat(invoice.validInvoiceDate(new LocalDate(2012, 2, 1))).isNull();
+            assertThat(invoice_invoice.validInvoiceDate(new LocalDate(2012, 2, 1))).isNull();
         }
 
         @Test
@@ -457,7 +461,7 @@ public class InvoiceTest {
             assertThat(invoice.getApplicationTenancy()).isNotNull();
 
             // when,then
-            assertThat(invoice.validInvoiceDate(new LocalDate(2012, 1, 1))).isEqualTo("Invoice number XXX-0010 has an invoice date 2012-01-02 which is after 2012-01-01");
+            assertThat(invoice_invoice.validInvoiceDate(new LocalDate(2012, 1, 1))).isEqualTo("Invoice number XXX-0010 has an invoice date 2012-01-02 which is after 2012-01-01");
         }
     }
 

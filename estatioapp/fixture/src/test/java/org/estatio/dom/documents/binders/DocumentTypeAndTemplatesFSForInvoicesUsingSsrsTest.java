@@ -17,7 +17,6 @@ import org.apache.isis.core.unittestsupport.jmocking.JUnitRuleMockery2;
 import org.isisaddons.module.freemarker.dom.service.FreeMarkerService;
 
 import org.incode.module.docrendering.freemarker.dom.impl.RendererForFreemarker;
-import org.incode.module.document.dom.impl.applicability.Binder;
 import org.incode.module.document.dom.impl.docs.Document;
 import org.incode.module.document.dom.impl.docs.DocumentTemplate;
 import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
@@ -59,7 +58,7 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrsTest {
     @Mock
     PaperclipRepository mockPaperclipRepository;
 
-    BinderForDocumentAttachedToPrelimLetterOrInvoice binder;
+    RendererModelFactoryOfEmailCoverRenderForPrelimLetterOrInvoiceNoteUsingFreemarker rendererModelFactory;
 
     @Before
     public void setUp() throws Exception {
@@ -100,8 +99,8 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrsTest {
             will(returnValue("prototyping"));
         }});
 
-        binder = new BinderForDocumentAttachedToPrelimLetterOrInvoice();
-        binder.paperclipRepository = mockPaperclipRepository;
+        rendererModelFactory = new RendererModelFactoryOfEmailCoverRenderForPrelimLetterOrInvoiceNoteUsingFreemarker();
+        rendererModelFactory.paperclipRepository = mockPaperclipRepository;
     }
 
     @Test
@@ -119,17 +118,14 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrsTest {
         }});
 
         // when
-        final Binder.Binding binding = binder.newBinding(mockDocumentTemplate, mockDocument, "some additional text");
-
-        // then
-        final Object dataModel = binding.getDataModel();
+        final Object rendererModel = rendererModelFactory.newRendererModel(mockDocumentTemplate, mockDocument);
 
         // given
         final RendererForFreemarker renderer = rendererForFreemarker();
 
         // when
         final String nameText = DocumentTypeAndTemplatesFSForInvoicesUsingSsrs.NAME_TEXT_INVOICE_GLOBAL;
-        final String rendered = renderer.renderCharsToChars(stubDocumentType, "", "/", 0L, nameText, dataModel);
+        final String rendered = renderer.renderCharsToChars(stubDocumentType, "", "/", 0L, nameText, rendererModel);
 
         // then
         Assertions.assertThat(rendered).isEqualTo("XXX Buyer-1 XXX-123 Brandino Invoice 2016-11-01");
@@ -146,17 +142,14 @@ public class DocumentTypeAndTemplatesFSForInvoicesUsingSsrsTest {
         }});
 
         // when
-        final Binder.Binding binding = binder.newBinding(mockDocumentTemplate, mockDocument, "some additional text");
-
-        // then
-        final Object dataModel = binding.getDataModel();
+        final Object rendererModel = rendererModelFactory.newRendererModel(mockDocumentTemplate, mockDocument);
 
         // given
         final RendererForFreemarker renderer = rendererForFreemarker();
 
         // when
         final String nameText = DocumentTypeAndTemplatesFSForInvoicesUsingSsrs.NAME_TEXT_INVOICE_GLOBAL;
-        final String rendered = renderer.renderCharsToChars(stubDocumentType, "", "/", 0L, nameText, dataModel);
+        final String rendered = renderer.renderCharsToChars(stubDocumentType, "", "/", 0L, nameText, rendererModel);
 
         // then
         Assertions.assertThat(rendered).isEqualTo("XXX Buyer-1   Invoice 2016-11-01");

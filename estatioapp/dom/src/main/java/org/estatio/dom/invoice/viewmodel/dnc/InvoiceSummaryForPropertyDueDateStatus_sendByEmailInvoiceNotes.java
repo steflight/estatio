@@ -35,8 +35,8 @@ public class InvoiceSummaryForPropertyDueDateStatus_sendByEmailInvoiceNotes exte
     }
 
     @Override
-    protected boolean exclude(final Tuple tuple) {
-        return invoiceEmailPolicyService.disableSendInvoiceNote(tuple.getInvoice(), tuple.getDocument()) != null;
+    protected boolean exclude(final InvoiceAndDocument invoiceAndDocument) {
+        return invoiceEmailPolicyService.disableSendInvoiceNote(invoiceAndDocument.getInvoice(), invoiceAndDocument.getDocument()) != null;
     }
 
     @Inject

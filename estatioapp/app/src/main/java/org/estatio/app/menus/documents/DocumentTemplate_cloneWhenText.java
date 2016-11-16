@@ -88,7 +88,7 @@ public class DocumentTemplate_cloneWhenText {
                 type, date, applicationTenancy.getPath(), fileSuffix, previewOnly, name, mimeType, templateText, contentRenderingStrategy,
                 nameText, nameRenderingStrategy);
         for (Applicability applicability : documentTemplate.getAppliesTo()) {
-            template.applicable(applicability.getDomainClassName(), applicability.getBinderClassName());
+            template.applicable(applicability.getDomainClassName(), applicability.getRendererModelFactoryClassName(), applicability.getAttachmentAdvisorClassName());
         }
         return template;
     }

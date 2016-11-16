@@ -18,12 +18,10 @@
  */
 package org.estatio.dom.documents.binders;
 
-import java.util.List;
-
 import org.isisaddons.module.security.dom.tenancy.WithApplicationTenancy;
 import org.isisaddons.module.stringinterpolator.dom.StringInterpolatorService;
 
-import org.incode.module.document.dom.impl.applicability.BinderAbstract;
+import org.incode.module.document.dom.impl.applicability.RendererModelFactoryAbstract;
 import org.incode.module.document.dom.impl.docs.DocumentTemplate;
 
 import org.estatio.dom.appsettings.EstatioSettingsService;
@@ -32,32 +30,22 @@ import org.estatio.dom.appsettings.EstatioSettingsService;
  * Creates a dataModel to be used with {@link StringInterpolatorService} for both content and subject;
  * requires domain object to implement {@link WithApplicationTenancy}.
  */
-public abstract class BinderForReportServerAbstract<T> extends BinderAbstract<T> {
+public abstract class RendererModelFactoryRenderUsingStringInterpolatorToSsrsUrlAbstract<T> extends
+        RendererModelFactoryAbstract<T> {
 
-    public BinderForReportServerAbstract(Class<T> expectedInputType) {
+    public RendererModelFactoryRenderUsingStringInterpolatorToSsrsUrlAbstract(Class<T> expectedInputType) {
         super(expectedInputType);
     }
 
-    public Binding doNewBinding(
+    @Override
+    protected Object doNewRendererModel(
             final DocumentTemplate documentTemplate,
-            final T domainObject,
-            final String additionalTextIfAny) {
+            final T domainObject) {
 
         final String baseUrl = estatioSettingsService.fetchReportServerBaseUrl();
 
-        // dataModel
-        final DataModel dataModel = new DataModel(domainObject, baseUrl);
-
-        // binding
-        return new Binding(dataModel, determineAttachTo((T)domainObject));
+        return new DataModel(domainObject, baseUrl);
     }
-
-    /**
-     * Mandatory hook.
-     * @param domainObject
-     * @return
-     */
-    protected abstract List<Object> determineAttachTo(final T domainObject);
 
     @javax.inject.Inject
     EstatioSettingsService estatioSettingsService;

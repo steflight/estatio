@@ -108,6 +108,7 @@
                     <row>
                         <col span="12">
                             <ns2:collection id="documents">
+                                <ns2:action id="attachReceipt"/>
                                 <ns2:action id="preview"/>
                                 <ns2:action id="createAndAttachDocument">
                                     <ns2:named>Prepare</ns2:named>

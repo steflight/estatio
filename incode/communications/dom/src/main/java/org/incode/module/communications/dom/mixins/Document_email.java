@@ -32,6 +32,7 @@ import org.apache.isis.applib.annotation.ParameterLayout;
 import org.apache.isis.applib.annotation.SemanticsOf;
 import org.apache.isis.applib.services.background.BackgroundService2;
 import org.apache.isis.applib.services.email.EmailService;
+import org.apache.isis.applib.services.factory.FactoryService;
 import org.apache.isis.applib.services.queryresultscache.QueryResultsCache;
 import org.apache.isis.applib.services.xactn.TransactionService;
 
@@ -46,8 +47,10 @@ import org.incode.module.document.dom.impl.docs.Document;
 import org.incode.module.document.dom.impl.docs.DocumentState;
 import org.incode.module.document.dom.impl.docs.DocumentTemplate;
 import org.incode.module.document.dom.impl.docs.DocumentTemplateRepository;
+import org.incode.module.document.dom.impl.paperclips.Paperclip;
 import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
 import org.incode.module.document.dom.impl.types.DocumentType;
+import org.incode.module.document.dom.services.DocumentCreatorService;
 
 /**
  * Provides the ability to send an email.
@@ -85,10 +88,7 @@ public class Document_email  {
                     regexPattern = CommunicationChannel.EmailType.REGEX,
                     regexPatternReplacement = CommunicationChannel.EmailType.REGEX_DESC)
             @ParameterLayout(named = "bcc:")
-            final String bcc,
-            @Parameter(optionality = Optionality.OPTIONAL)
-            @ParameterLayout(named = "Covering note message", multiLine = EMAIL_COVERING_NOTE_MULTILINE)
-            final String message) throws IOException {
+            final String bcc) throws IOException {
 
         if(this.document.getState() == DocumentState.NOT_RENDERED) {
             // this shouldn't happen, but want to fail-fast in case a future programmer calls this directly
@@ -96,10 +96,13 @@ public class Document_email  {
         }
 
         // create and attach cover note
+        // nb: this functionality is basically the same as T_createAndAttachDocumentAbstract#$$
         final DocumentTemplate coverNoteTemplate = determineEmailCoverNoteTemplate();
-        final Document coverNoteDoc = coverNoteTemplate.createDocumentUsingBinding(this.document, message);
 
-        coverNoteDoc.render(coverNoteTemplate, this.document, message);
+        final Document coverNoteDoc =
+                documentCreatorService.createDocumentAndAttachPaperclips(this.document, coverNoteTemplate);
+
+        coverNoteDoc.render(coverNoteTemplate, this.document);
 
         // create comm and correspondents
         final String atPath = document.getAtPath();
@@ -108,15 +111,31 @@ public class Document_email  {
 
         transactionService.flushTransaction();
 
-        // attach the doc and the cover note to communication
-        paperclipRepository.attach(document, DocumentConstants.PAPERCLIP_ROLE_ATTACHMENT, communication);
+        // attach the cover note to the communication
         paperclipRepository.attach(coverNoteDoc, DocumentConstants.PAPERCLIP_ROLE_COVER, communication);
+        paperclipRepository.attach(document, DocumentConstants.PAPERCLIP_ROLE_ATTACHMENT, communication);
+
+        // also copy over as attachments to the comm anything else also attached to original document
+        final List<Paperclip> documentPaperclips = paperclipRepository.findByDocument(this.document);
+        for (Paperclip documentPaperclip : documentPaperclips) {
+            final Object objAttachedToDocument = documentPaperclip.getAttachedTo();
+            if (!(objAttachedToDocument instanceof Document)) {
+                continue;
+            }
+            final Document docAttachedToDocument = (Document) objAttachedToDocument;
+            if (docAttachedToDocument == document || docAttachedToDocument == coverNoteDoc) {
+                continue;
+            }
+            paperclipRepository.attach(docAttachedToDocument, DocumentConstants.PAPERCLIP_ROLE_ATTACHMENT, communication);
+        }
+        transactionService.flushTransaction();
 
         // finally, schedule the email to be sent
         communication.scheduleSend();
 
         return communication;
     }
+
 
     public String disable$$() {
         if (emailService == null || !emailService.isConfigured()) {
@@ -125,8 +144,6 @@ public class Document_email  {
         if (document.getState() != DocumentState.RENDERED) {
             return "Document not yet rendered";
         }
-
-
         if(determineEmailCoverNoteTemplate() == null) {
             return "Email cover note type/template not provided";
         }
@@ -140,7 +157,12 @@ public class Document_email  {
     }
 
     public EmailAddress default0$$() {
-        return determineEmailHeader().getToDefault();
+        final EmailAddress toDefault = determineEmailHeader().getToDefault();
+        if (toDefault != null) {
+            return toDefault;
+        }
+        final Set<EmailAddress> choices = choices0$$();
+        return choices.isEmpty() ? null : choices.iterator().next();
     }
 
     public Set<EmailAddress> choices0$$() {
@@ -155,9 +177,6 @@ public class Document_email  {
         return determineEmailHeader().getBcc();
     }
 
-    public String default3$$() {
-        return "";
-    }
 
     private DocumentTemplate determineEmailCoverNoteTemplate() {
         final DocumentType blankDocType = determineEmailCoverNoteDocumentType();
@@ -217,5 +236,12 @@ public class Document_email  {
 
     @Inject
     BackgroundService2 backgroundService;
+
+    @Inject
+    DocumentCreatorService documentCreatorService;
+
+    @Inject
+    FactoryService factoryService;
+
 
 }

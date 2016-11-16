@@ -40,6 +40,7 @@ import org.incode.module.communications.dom.spi.DocumentCommunicationSupport;
 import org.incode.module.document.dom.DocumentModule;
 import org.incode.module.document.dom.impl.docs.Document;
 import org.incode.module.document.dom.impl.docs.DocumentState;
+import org.incode.module.document.dom.impl.paperclips.Paperclip;
 import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
 
 /**
@@ -78,6 +79,21 @@ public class Document_print {
 
         // attach this doc to communication
         paperclipRepository.attach(document, DocumentConstants.PAPERCLIP_ROLE_ENCLOSED, communication);
+
+        // also copy over as attachments to the comm anything else also attached to original document
+        final List<Paperclip> documentPaperclips = paperclipRepository.findByDocument(this.document);
+        for (Paperclip documentPaperclip : documentPaperclips) {
+            final Object objAttachedToDocument = documentPaperclip.getAttachedTo();
+            if (!(objAttachedToDocument instanceof Document)) {
+                continue;
+            }
+            final Document docAttachedToDocument = (Document) objAttachedToDocument;
+            if (docAttachedToDocument == document) {
+                continue;
+            }
+            paperclipRepository.attach(docAttachedToDocument, DocumentConstants.PAPERCLIP_ROLE_ENCLOSED, communication);
+        }
+        transactionService.flushTransaction();
 
         return communication;
     }
