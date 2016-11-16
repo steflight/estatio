@@ -21,12 +21,12 @@ public class Budget_Calculate {
         this.budget = budget;
     }
 
-    @Action(semantics = SemanticsOf.SAFE)
+    @Action(semantics = SemanticsOf.NON_IDEMPOTENT_ARE_YOU_SURE)
     @ActionLayout(contributed = Contributed.AS_ACTION)
-    public void calculate() {
+    public Budget calculate() {
         budgetCalculationService.calculatePersistedCalculations(budget);
         budgetAssignmentService.calculateResultsForLeases(budget, BudgetCalculationType.BUDGETED);
-        budgetAssignmentService.assign(budget);
+        return budget;
     }
 
     @Inject

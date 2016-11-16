@@ -91,6 +91,11 @@ public class BudgetCalculationRun extends UdoDomainObject2<BudgetCalculationRun>
         return budgetCalculationResultRepository.findOrCreateBudgetCalculationResult(this, invoiceCharge);
     }
 
+    @Programmatic
+    public void remove() {
+        remove(this);
+    }
+
     @Inject
     private BudgetCalculationResultRepository budgetCalculationResultRepository;
 }

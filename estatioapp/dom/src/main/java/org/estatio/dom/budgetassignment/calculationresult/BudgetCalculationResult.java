@@ -151,6 +151,11 @@ public class BudgetCalculationResult extends UdoDomainObject2<BudgetCalculationR
         }
     }
 
+    @Programmatic
+    public void remove() {
+        remove(this);
+    }
+
     @Override
     public ApplicationTenancy getApplicationTenancy() {
         return getBudgetCalculationRun().getApplicationTenancy();

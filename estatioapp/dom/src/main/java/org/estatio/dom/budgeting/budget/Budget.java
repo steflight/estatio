@@ -44,7 +44,6 @@ import org.apache.isis.applib.annotation.DomainObjectLayout;
 import org.apache.isis.applib.annotation.MemberOrder;
 import org.apache.isis.applib.annotation.Optionality;
 import org.apache.isis.applib.annotation.Parameter;
-import org.apache.isis.applib.annotation.ParameterLayout;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.annotation.PropertyLayout;
 import org.apache.isis.applib.annotation.RestrictTo;
@@ -61,7 +60,6 @@ import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgeting.api.BudgetItemCreator;
-import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationService;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
@@ -298,33 +296,9 @@ public class Budget extends UdoDomainObject2<Budget>
         return partitioningRepository.findUnique(this, BudgetCalculationType.BUDGETED, getStartDate());
     }
 
-    /*
-    * TODO: revisit after refactoring
-    * */
-    @Action(restrictTo = RestrictTo.PROTOTYPING ,semantics = SemanticsOf.NON_IDEMPOTENT_ARE_YOU_SURE)
-    public void removeBudget(
-            @ParameterLayout(named = "This will delete the budget and all associated data including keytables, calculations and generated service charge terms. (You may consider downloading the budget and the keytables beforehand.) Are you sure?")
-            final boolean areYouSure
-    ){
-
-
-        // delete calculations
-        for (BudgetCalculation calculation : budgetCalculationRepository.findByBudget(this)) {
-            calculation.remove();
-        }
-
-        // delete partition items
-        for (BudgetItem budgetItem : getItems()) {
-            for (PartitionItem item : partitionItemRepository.findByBudgetItem(budgetItem)) {
-                item.remove();
-            }
-        }
-
+    @Programmatic
+    public void remove(){
         remove(this);
-    }
-
-    public String validateRemoveBudget(final boolean areYouSure){
-        return areYouSure ? null : "Please confirm";
     }
 
     @Action(restrictTo = RestrictTo.PROTOTYPING, semantics = SemanticsOf.NON_IDEMPOTENT_ARE_YOU_SURE)
