@@ -128,10 +128,12 @@ public class Budget extends UdoDomainObject2<Budget>
 
     @Column(allowsNull = "true") // done because of inherited implementation WithStartDate
     @Getter @Setter
+    @PropertyLayout(hidden = Where.EVERYWHERE)
     private LocalDate startDate;
 
     @Column(allowsNull = "true")
     @Getter @Setter
+    @PropertyLayout(hidden = Where.EVERYWHERE)
     private LocalDate endDate;
 
     @Persistent(mappedBy = "budget", dependentElement = "true")

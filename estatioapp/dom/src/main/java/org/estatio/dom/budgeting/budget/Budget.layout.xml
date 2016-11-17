@@ -3,15 +3,14 @@
     <row>
         <col span="12" unreferencedActions="true">
             <ns2:domainObject/>
-            <ns2:action id="removeBudget" />
+            <ns2:action id="Calculate"/>
+            <ns2:action id="AssignToLeases"/>
+            <ns2:action id="Reconciliate"/>
             <ns2:action id="createNextBudget" />
-            <ns2:action id="calculate"/>
-            <ns2:action id="assignCalculations"/>
             <ns2:action id="DownloadCalculations"/>
             <ns2:action id="DownloadCalculationsForLease"/>
             <ns2:action id="importExportBudget" />
-            <ns2:action id="recentChanges"/>
-            <ns2:action id="links"/>
+            <ns2:action id="Remove" />
         </col>
     </row>
     <row>
