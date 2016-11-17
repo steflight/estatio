@@ -6,6 +6,7 @@ import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.ActionLayout;
 import org.apache.isis.applib.annotation.Contributed;
 import org.apache.isis.applib.annotation.Mixin;
+import org.apache.isis.applib.annotation.ParameterLayout;
 import org.apache.isis.applib.annotation.SemanticsOf;
 
 import org.estatio.dom.budgetassignment.BudgetAssignmentService;
@@ -23,9 +24,15 @@ public class Budget_Calculate {
 
     @Action(semantics = SemanticsOf.NON_IDEMPOTENT_ARE_YOU_SURE)
     @ActionLayout(contributed = Contributed.AS_ACTION)
-    public Budget calculate() {
+    public Budget calculate(
+            @ParameterLayout(describedAs = "Final calculation will make the calculations permanent and impact the leases")
+            final boolean finalCalculation
+    ) {
         budgetCalculationService.calculatePersistedCalculations(budget);
         budgetAssignmentService.calculateResultsForLeases(budget, BudgetCalculationType.BUDGETED);
+        if (finalCalculation){
+            budgetAssignmentService.assign(budget);
+        }
         return budget;
     }
 
