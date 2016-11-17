@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 import org.junit.Test;
 
 import org.estatio.dom.asset.Unit;
-import org.estatio.dom.budgeting.UnitForTesting;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.budgeting.keytable.KeyTableForTesting;
 
@@ -40,7 +39,7 @@ public class KeyItemRepositoryTest {
 
         //given
         KeyTable keyTable = new KeyTableForTesting();
-        Unit unit = new UnitForTesting();
+        Unit unit = new Unit();
         BigDecimal sourcevalue = BigDecimal.ZERO;
         BigDecimal keyValue = new BigDecimal(10);
 
@@ -60,7 +59,7 @@ public class KeyItemRepositoryTest {
 
         //given
         KeyTable keyTable = new KeyTableForTesting();
-        Unit unit = new UnitForTesting();
+        Unit unit = new Unit();
         BigDecimal sourcevalue = BigDecimal.valueOf(-0.001);
         BigDecimal keyValue = new BigDecimal(10);
 
@@ -80,7 +79,7 @@ public class KeyItemRepositoryTest {
 
         //given
         KeyTable keyTable = new KeyTableForTesting();
-        Unit unit = new UnitForTesting();
+        Unit unit = new Unit();
         BigDecimal sourcevalue = new BigDecimal(1);
         BigDecimal keyValue = BigDecimal.valueOf(-0.001);
 

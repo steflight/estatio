@@ -22,8 +22,8 @@ import java.math.BigDecimal;
 import org.junit.Test;
 
 import org.incode.module.base.dom.testing.AbstractBeanPropertiesTest;
+
 import org.estatio.dom.asset.Unit;
-import org.estatio.dom.budgeting.UnitForTesting;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.budgeting.keytable.KeyTableForTesting;
 
@@ -39,7 +39,7 @@ public class KeyItemTest {
             final KeyItem pojo = new KeyItem();
             newPojoTester()
                     .withFixture(pojos(KeyTable.class, KeyTableForTesting.class))
-                    .withFixture(pojos(Unit.class, UnitForTesting.class))
+                    .withFixture(pojos(Unit.class, Unit.class))
                     .exercise(pojo);
         }
 
