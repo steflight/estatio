@@ -152,7 +152,7 @@ public class Budget extends UdoDomainObject2<Budget>
     public BudgetItem newBudgetItem(
             final BigDecimal budgetedValue,
             final Charge charge) {
-        return budgetItemRepository.newBudgetItem(this, charge);
+        return budgetItemRepository.newBudgetItem(this, budgetedValue, charge);
     }
 
     public String validateNewBudgetItem(

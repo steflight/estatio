@@ -202,13 +202,8 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
 
     @Programmatic
     public void createCopyOn(final Budget budget) {
+        // only copies of budgeted values are made
         BudgetItem itemCopy = budget.newBudgetItem(getBudgetedValue(), getCharge());
-        for (BudgetItemValue value : getValues()){
-            // only copies of budgeted values are made
-            if (value.getType() == BudgetCalculationType.BUDGETED) {
-                itemCopy.newValue(value.getValue(), budget.getStartDate(), value.getType());
-            }
-        }
         for (PartitionItem partitionItem : partitionItemRepository.findByBudgetItem(this)){
             // only copies of budgeted items are made
             if (partitionItem.getPartitioning().getType()==BudgetCalculationType.BUDGETED) {

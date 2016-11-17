@@ -154,7 +154,7 @@ public class BudgetItemRepositoryTest {
         }
 
         @Test
-        public void findOrCreateXxxCreatingNewItem() throws Exception {
+        public void findOrCreateNewItem() throws Exception {
 
             final Budget budget = new Budget();
             final Charge charge = new Charge();
