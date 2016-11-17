@@ -50,10 +50,10 @@
                 <ns2:action id="newBudgetItem"/>
                 <ns2:action id="removeAllBudgetItems"/>
             </ns2:collection>
-            <ns2:collection id="partitionings" defaultView="table"/>
             <ns2:collection id="keyTables" defaultView="table">
                 <ns2:action id="createKeyTable"/>
             </ns2:collection>
+            <ns2:collection id="partitionings" defaultView="table"/>
         </col>
     </row>
 </grid>
