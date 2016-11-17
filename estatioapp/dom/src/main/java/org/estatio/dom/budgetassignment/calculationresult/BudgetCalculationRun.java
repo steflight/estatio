@@ -17,6 +17,8 @@ import org.apache.isis.applib.annotation.Programmatic;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.dom.utils.TitleBuilder;
+
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
@@ -60,6 +62,17 @@ public class BudgetCalculationRun extends UdoDomainObject2<BudgetCalculationRun>
 
     public BudgetCalculationRun() {
         super("lease, budget, type");
+    }
+
+    public String title(){
+        return TitleBuilder
+                .start()
+                .withName(getLease())
+                .withName(" - ")
+                .withName(getBudget())
+                .withName(" - ")
+                .withName(getType())
+                .toString();
     }
 
     @Getter @Setter

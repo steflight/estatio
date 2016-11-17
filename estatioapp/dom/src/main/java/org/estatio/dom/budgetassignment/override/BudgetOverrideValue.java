@@ -21,6 +21,8 @@ import org.apache.isis.applib.services.timestamp.Timestampable;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.dom.utils.TitleBuilder;
+
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
@@ -49,6 +51,14 @@ public class BudgetOverrideValue extends UdoDomainObject2<BudgetOverrideValue>
 
     public BudgetOverrideValue() {
         super("budgetOverride, value");
+    }
+
+    public String title(){
+        return TitleBuilder.start()
+                .withParent(getBudgetOverride())
+                .withName(" ")
+                .withName(getValue())
+                .toString();
     }
 
     @Getter @Setter

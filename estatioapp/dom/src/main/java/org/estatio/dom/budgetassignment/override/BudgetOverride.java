@@ -23,6 +23,8 @@ import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.annotation.PropertyLayout;
 import org.apache.isis.applib.annotation.Where;
 
+import org.incode.module.base.dom.utils.TitleBuilder;
+
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.asset.Unit;
 import org.estatio.dom.budgeting.budget.Budget;
@@ -73,6 +75,14 @@ public abstract class BudgetOverride extends UdoDomainObject2<BudgetOverride> {
 
     public BudgetOverride() {
         super("lease, invoiceCharge, type, incomingCharge, startDate, endDate, reason");
+    }
+
+    public String title(){
+        return TitleBuilder.start()
+                .withName(getLease())
+                .withName(" - ")
+                .withName(getReason())
+                .toString();
     }
 
     @Getter @Setter

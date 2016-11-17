@@ -18,9 +18,13 @@ import org.apache.isis.applib.annotation.ActionLayout;
 import org.apache.isis.applib.annotation.Contributed;
 import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.Programmatic;
+import org.apache.isis.applib.annotation.PropertyLayout;
 import org.apache.isis.applib.annotation.SemanticsOf;
+import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
+
+import org.incode.module.base.dom.utils.TitleBuilder;
 
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.budgetassignment.override.BudgetOverride;
@@ -63,8 +67,17 @@ public class BudgetCalculationResult extends UdoDomainObject2<BudgetCalculationR
         super("budgetCalculationRun, invoiceCharge");
     }
 
+    public String title(){
+        return TitleBuilder.start()
+                .withParent(getBudgetCalculationRun())
+                .withName(" ")
+                .withName(getInvoiceCharge())
+                .toString();
+    }
+
     @Getter @Setter
     @Column(name = "budgetCalculationRunId", allowsNull = "false")
+    @PropertyLayout(hidden = Where.REFERENCES_PARENT)
     private BudgetCalculationRun budgetCalculationRun;
 
     @Getter @Setter
