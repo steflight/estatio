@@ -148,8 +148,8 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
 
     @Programmatic
     public BigDecimal getAuditedValue(){
-        if (budgetItemValueRepository.findByBudgetItemAndType(this, BudgetCalculationType.AUDITED).size() > 0) {
-            return budgetItemValueRepository.findByBudgetItemAndType(this, BudgetCalculationType.AUDITED).get(0).getValue();
+        if (budgetItemValueRepository.findByBudgetItemAndType(this, BudgetCalculationType.ACTUAL).size() > 0) {
+            return budgetItemValueRepository.findByBudgetItemAndType(this, BudgetCalculationType.ACTUAL).get(0).getValue();
         } else {
             return null;
         }
@@ -197,7 +197,7 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
     }
 
     public List<Partitioning> choices0CreatePartitionItemForAudit(final Partitioning partitioning, final Charge charge, final KeyTable keyTable, final BigDecimal percentage) {
-        return partitioningRepository.findByBudgetAndType(getBudget(), BudgetCalculationType.AUDITED);
+        return partitioningRepository.findByBudgetAndType(getBudget(), BudgetCalculationType.ACTUAL);
     }
 
     @Programmatic

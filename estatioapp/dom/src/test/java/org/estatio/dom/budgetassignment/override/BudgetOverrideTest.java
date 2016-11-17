@@ -156,7 +156,7 @@ public class BudgetOverrideTest {
             assertThat(calculations.size()).isEqualTo(1);
 
             // and when
-            override.setType(BudgetCalculationType.AUDITED);
+            override.setType(BudgetCalculationType.ACTUAL);
             calculations = override.calculate(budgetStartDate);
 
             // then

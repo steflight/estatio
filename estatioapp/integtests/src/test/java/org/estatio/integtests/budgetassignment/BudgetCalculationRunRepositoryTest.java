@@ -88,11 +88,11 @@ public class BudgetCalculationRunRepositoryTest extends EstatioIntegrationTest {
             assertThat(budgetCalculationRunRepository.allBudgetCalculationRuns().size()).isEqualTo(1);
 
             // and when again
-            run = wrap(budgetCalculationRunRepository).findOrCreateNewBudgetCalculationRun(leaseTopModel, budget2015, BudgetCalculationType.AUDITED);
+            run = wrap(budgetCalculationRunRepository).findOrCreateNewBudgetCalculationRun(leaseTopModel, budget2015, BudgetCalculationType.ACTUAL);
 
             // then
             assertThat(budgetCalculationRunRepository.allBudgetCalculationRuns().size()).isEqualTo(2);
-            assertThat(run.getType()).isEqualTo(BudgetCalculationType.AUDITED);
+            assertThat(run.getType()).isEqualTo(BudgetCalculationType.ACTUAL);
 
         }
     }

@@ -89,7 +89,7 @@ public class BudgetCalculationRepository extends UdoDomainRepositoryAndFactory<B
         List<BudgetCalculation> result = new ArrayList<>();
         for (BudgetItem item : budget.getItems()){
 
-            result.addAll(findByBudgetItemAndCalculationType(item, BudgetCalculationType.AUDITED));
+            result.addAll(findByBudgetItemAndCalculationType(item, BudgetCalculationType.ACTUAL));
             result.addAll(findByBudgetItemAndCalculationType(item, BudgetCalculationType.BUDGETED));
 
         }

@@ -114,15 +114,15 @@ public abstract class BudgetOverride extends UdoDomainObject2<BudgetOverride> {
         if (isActiveOnCalculationDate(budgetStartDate)) {
             if (getType() == null) {
                 if (resultFor(budgetStartDate, BudgetCalculationType.BUDGETED)!=null) results.add(resultFor(budgetStartDate, BudgetCalculationType.BUDGETED));
-                if (resultFor(budgetStartDate, BudgetCalculationType.AUDITED)!=null) results.add(resultFor(budgetStartDate, BudgetCalculationType.AUDITED));
+                if (resultFor(budgetStartDate, BudgetCalculationType.ACTUAL)!=null) results.add(resultFor(budgetStartDate, BudgetCalculationType.ACTUAL));
             } else {
                 switch (getType()) {
                 case BUDGETED:
                     if (resultFor(budgetStartDate, BudgetCalculationType.BUDGETED)!=null) results.add(resultFor(budgetStartDate, BudgetCalculationType.BUDGETED));
                     break;
 
-                case AUDITED:
-                    if (resultFor(budgetStartDate, BudgetCalculationType.AUDITED)!=null) results.add(resultFor(budgetStartDate, BudgetCalculationType.AUDITED));
+                case ACTUAL:
+                    if (resultFor(budgetStartDate, BudgetCalculationType.ACTUAL)!=null) results.add(resultFor(budgetStartDate, BudgetCalculationType.ACTUAL));
                     break;
                 }
             }
