@@ -12,9 +12,11 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Version;
 import javax.jdo.annotations.VersionStrategy;
 
+import org.apache.isis.applib.annotation.Auditing;
 import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.annotation.PropertyLayout;
+import org.apache.isis.applib.annotation.Publishing;
 import org.apache.isis.applib.annotation.Where;
 import org.apache.isis.applib.services.repository.RepositoryService;
 import org.apache.isis.applib.services.timestamp.Timestampable;
@@ -44,7 +46,9 @@ import lombok.Setter;
         column = "version")
 
 @DomainObject(
-        objectType = "org.estatio.dom.budgetassignment.override.BudgetOverrideValue"
+        objectType = "org.estatio.dom.budgetassignment.override.BudgetOverrideValue",
+        auditing = Auditing.DISABLED,
+        publishing = Publishing.DISABLED
 )
 public class BudgetOverrideValue extends UdoDomainObject2<BudgetOverrideValue>
         implements WithApplicationTenancyProperty, Timestampable {

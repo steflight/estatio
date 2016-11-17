@@ -15,10 +15,12 @@ import javax.jdo.annotations.VersionStrategy;
 
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.ActionLayout;
+import org.apache.isis.applib.annotation.Auditing;
 import org.apache.isis.applib.annotation.Contributed;
 import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.annotation.PropertyLayout;
+import org.apache.isis.applib.annotation.Publishing;
 import org.apache.isis.applib.annotation.SemanticsOf;
 import org.apache.isis.applib.annotation.Where;
 
@@ -59,7 +61,9 @@ import lombok.Setter;
 })
 
 @DomainObject(
-        objectType = "org.estatio.dom.budgetassignment.calculationresult.BudgetCalculationResult"
+        objectType = "org.estatio.dom.budgetassignment.calculationresult.BudgetCalculationResult",
+        auditing = Auditing.DISABLED,
+        publishing = Publishing.DISABLED
 )
 public class BudgetCalculationResult extends UdoDomainObject2<BudgetCalculationResult> {
 
