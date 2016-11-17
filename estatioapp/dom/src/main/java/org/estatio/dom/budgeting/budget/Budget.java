@@ -166,13 +166,17 @@ public class Budget extends UdoDomainObject2<Budget>
     @Action(semantics = SemanticsOf.NON_IDEMPOTENT)
     @ActionLayout(contributed = Contributed.AS_ACTION)
     @MemberOrder(name = "partitionings", sequence = "1")
-    public Budget newPartitioning(final BudgetCalculationType type){
-        partitioningRepository.newPartitioning(this, getStartDate(), getEndDate(), type);
+    public Budget newPartitioning(){
+        partitioningRepository.newPartitioning(this, getStartDate(), getEndDate(), BudgetCalculationType.ACTUAL);
         return this;
     }
 
-    public String validateNewPartitioning(final BudgetCalculationType type){
-        return partitioningRepository.validateNewPartitioning(this, getStartDate(), getEndDate(), type);
+    public String validateNewPartitioning(){
+        return partitioningRepository.validateNewPartitioning(this, getStartDate(), getEndDate(), BudgetCalculationType.ACTUAL);
+    }
+
+    public String disableNewPartitioning(){
+        return partitioningRepository.findByBudgetAndType(this, BudgetCalculationType.ACTUAL).size()>0 ? "Partitioning for reconciliation already exists" : null;
     }
 
     @Action(semantics = SemanticsOf.NON_IDEMPOTENT)
@@ -194,7 +198,7 @@ public class Budget extends UdoDomainObject2<Budget>
         LocalDate start = new LocalDate(getBudgetYear()+1, 01, 01);
         LocalDate end = new LocalDate(getBudgetYear()+1, 12, 31);
         Budget newBudget = budgetRepository.newBudget(getProperty(),start, end);
-        newBudget.newPartitioning(BudgetCalculationType.BUDGETED);
+        newBudget.findOrCreatePartitioningForBudgeting();
         return copyCurrentTo(newBudget);
     }
 
@@ -321,7 +325,7 @@ public class Budget extends UdoDomainObject2<Budget>
     public Budget findOrCreatePartitioningForBudgeting(){
         Partitioning partitioningForBudgeting = getPartitioningForBudgeting();
         if (partitioningForBudgeting==null){
-            newPartitioning(BudgetCalculationType.BUDGETED);
+            partitioningRepository.newPartitioning(this, getStartDate(), getEndDate(), BudgetCalculationType.BUDGETED);
         }
         return this;
     }
