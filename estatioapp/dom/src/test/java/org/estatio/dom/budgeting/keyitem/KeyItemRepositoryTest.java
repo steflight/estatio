@@ -23,13 +23,9 @@ import org.junit.Test;
 
 import org.estatio.dom.asset.Unit;
 import org.estatio.dom.budgeting.keytable.KeyTable;
-import org.estatio.dom.budgeting.keytable.KeyTableForTesting;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Created by jodo on 22/04/15.
- */
 public class KeyItemRepositoryTest {
 
     KeyItemRepository keyItemRepository = new KeyItemRepository();
@@ -38,7 +34,7 @@ public class KeyItemRepositoryTest {
     public void zeroSourceValue() {
 
         //given
-        KeyTable keyTable = new KeyTableForTesting();
+        KeyTable keyTable = new KeyTable();
         Unit unit = new Unit();
         BigDecimal sourcevalue = BigDecimal.ZERO;
         BigDecimal keyValue = new BigDecimal(10);
@@ -58,7 +54,7 @@ public class KeyItemRepositoryTest {
     public void negativeSourceValue() {
 
         //given
-        KeyTable keyTable = new KeyTableForTesting();
+        KeyTable keyTable = new KeyTable();
         Unit unit = new Unit();
         BigDecimal sourcevalue = BigDecimal.valueOf(-0.001);
         BigDecimal keyValue = new BigDecimal(10);
@@ -78,7 +74,7 @@ public class KeyItemRepositoryTest {
     public void negativeKeyValue() {
 
         //given
-        KeyTable keyTable = new KeyTableForTesting();
+        KeyTable keyTable = new KeyTable();
         Unit unit = new Unit();
         BigDecimal sourcevalue = new BigDecimal(1);
         BigDecimal keyValue = BigDecimal.valueOf(-0.001);

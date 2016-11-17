@@ -25,7 +25,6 @@ import org.incode.module.base.dom.testing.AbstractBeanPropertiesTest;
 
 import org.estatio.dom.asset.Unit;
 import org.estatio.dom.budgeting.keytable.KeyTable;
-import org.estatio.dom.budgeting.keytable.KeyTableForTesting;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -38,7 +37,7 @@ public class KeyItemTest {
         public void test() {
             final KeyItem pojo = new KeyItem();
             newPojoTester()
-                    .withFixture(pojos(KeyTable.class, KeyTableForTesting.class))
+                    .withFixture(pojos(KeyTable.class, KeyTable.class))
                     .withFixture(pojos(Unit.class, Unit.class))
                     .exercise(pojo);
         }

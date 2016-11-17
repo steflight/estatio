@@ -36,7 +36,6 @@ import org.estatio.dom.asset.Unit;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keyitem.KeyItem;
-import org.estatio.dom.budgeting.keyitem.KeyItemForTesting;
 import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.charge.Charge;
 
@@ -84,7 +83,7 @@ public class BudgetCalculationRepositoryTest {
         public void happyCase() {
 
             PartitionItem partitionItem = new PartitionItem();
-            KeyItem keyItem = new KeyItemForTesting();
+            KeyItem keyItem = new KeyItem();
             BudgetCalculationType calculationType = BudgetCalculationType.BUDGETED;
             budgetCalculationRepository.findUnique(partitionItem, keyItem, calculationType);
 
@@ -143,7 +142,7 @@ public class BudgetCalculationRepositoryTest {
         public void happyCase() {
 
             PartitionItem partitionItem = new PartitionItem();
-            KeyItem keyItem = new KeyItemForTesting();
+            KeyItem keyItem = new KeyItem();
             budgetCalculationRepository.findByPartitionItem(partitionItem);
 
             assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.ALL_MATCHES);
